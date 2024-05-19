@@ -2,11 +2,11 @@
   <div>
     <el-menu style="background-color: #F390C7; color: #fff;" class="el-menu-demo d-flex justify-content-around align-items-center" mode="horizontal" @select="handleSelect">
         <div class="d-flex">
-          <el-menu-item index="4" style="color: #fff;">Reservation</el-menu-item>
+          <el-menu-item index="4" style="color: #fff;">ORDER NOW</el-menu-item>
         </div>
         <div class="d-flex">
-          <el-menu-item index="1" style="color: #fff;">Home</el-menu-item>
-          <el-menu-item index="1" style="color: #fff;">News</el-menu-item>
+          <el-menu-item index="1" style="color: #fff;"><a href="./" style="text-decoration: none; color: #fff;">Home</a></el-menu-item>
+          <el-menu-item index="1" style="color: #fff;" @click="$router.push('/')">News</el-menu-item>
           <el-menu-item index="1" style="color: #fff;">Menu</el-menu-item>
           <el-menu-item index="3" style="color: #fff;">Order</el-menu-item>
           <el-menu-item index="4" style="color: #fff;">Reservation</el-menu-item>
@@ -17,6 +17,7 @@
               <i style="color: #fff;" class="el-icon-user-solid"></i>
             </template>
             <el-menu-item index="2-1" @click="$router.push('edit-profile')">Edit Profile</el-menu-item>
+            <el-menu-item index="2-1">Cart</el-menu-item>
             <el-menu-item index="2-1" @click="logout()">Logout</el-menu-item>
           </el-submenu>
         </div>
@@ -139,15 +140,15 @@
         <div>
         <div class="text-center mb-4 fw-bold">Operation Hour</div>
         <div class="d-flex">
-          <div style="width: 100px; text-align: right; margin-right: 20px;">Sat - Wed:</div> 
+          <div style="width: 100px; text-align: right; margin-right: 20px;">Sat - Wed:</div>
           09:00am - 10:00PM
         </div>
         <div class="d-flex">
-          <div style="width: 100px; text-align: right; margin-right: 20px;">Thursday:</div> 
+          <div style="width: 100px; text-align: right; margin-right: 20px;">Thursday:</div>
           09:00am - 11:00PM
         </div>
         <div class="d-flex">
-          <div style="width: 100px; text-align: right; margin-right: 20px;">Friday:</div> 
+          <div style="width: 100px; text-align: right; margin-right: 20px;">Friday:</div>
           09:00am - 8:00PM
         </div>
       </div>

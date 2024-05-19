@@ -2,10 +2,10 @@
   <div>
     <el-menu style="background-color: #F390C7; color: #fff;" class="el-menu-demo d-flex justify-content-around align-items-center" mode="horizontal">
         <div class="d-flex">
-          <el-menu-item index="4" style="color: #fff;">Reservation</el-menu-item>
+          <el-menu-item index="4" style="color: #fff;">ORDER NOW</el-menu-item>
         </div>
         <div class="d-flex">
-          <el-menu-item index="1" style="color: #fff;">Home</el-menu-item>
+          <el-menu-item index="1" style="color: #fff;"><a href="./" style="text-decoration: none; color: #fff;">Home</a></el-menu-item>
           <el-menu-item index="1" style="color: #fff;">News</el-menu-item>
           <el-menu-item index="1" style="color: #fff;">Menu</el-menu-item>
           <el-menu-item index="3" style="color: #fff;">Order</el-menu-item>
@@ -21,12 +21,11 @@
           </el-submenu>
         </div>
     </el-menu>
-
     <div class="m-4 p-4">
         <h3>Edit Profile</h3>
         <el-form style="width:50%">
             <div class="d-flex" style="width:70%;">
-              <el-image :src="image" style="width: auto; height: 150px; object-fit: cover; margin-right: 20px;" ></el-image>
+              <el-image v-if="image" :src="image" style="width: auto; height: 150px; object-fit: cover; margin-right: 20px;" ></el-image>
               <el-upload
                 class="mb-4"
                 action="your_upload_endpoint_here"
@@ -54,7 +53,7 @@
               <el-input v-model="form.confirm_password" type="password" placeholder="Confirm Password" show-password></el-input>
             </el-form-item>
             <div class="d-flex">
-              <el-button style="background-color: #fff; color:#000; width:50%" @click="">Cancel</el-button>
+              <el-button style="background-color: #fff; color:#000; width:50%" @click="$router.push('/')">Cancel</el-button>
               <el-button type="primary" style="background-color: #FE689D; border:none; width:50%" @click="saveProfile()">Save</el-button>
             </div>
           </el-form>
@@ -66,15 +65,15 @@
         <div>
         <div class="text-center mb-4 fw-bold">Operation Hour</div>
         <div class="d-flex">
-          <div style="width: 100px; text-align: right; margin-right: 20px;">Sat - Wed:</div> 
+          <div style="width: 100px; text-align: right; margin-right: 20px;">Sat - Wed:</div>
           09:00am - 10:00PM
         </div>
         <div class="d-flex">
-          <div style="width: 100px; text-align: right; margin-right: 20px;">Thursday:</div> 
+          <div style="width: 100px; text-align: right; margin-right: 20px;">Thursday:</div>
           09:00am - 11:00PM
         </div>
         <div class="d-flex">
-          <div style="width: 100px; text-align: right; margin-right: 20px;">Friday:</div> 
+          <div style="width: 100px; text-align: right; margin-right: 20px;">Friday:</div>
           09:00am - 8:00PM
         </div>
       </div>
@@ -110,7 +109,7 @@ export default {
       form: {
         name: '',
         email: '',
-        contact_number: '123456890',
+        contact_number: '',
         image: '',
       },
     }
@@ -130,7 +129,7 @@ export default {
           }
         })
         this.form = response.data
-        this.image = response.data.image_url
+        if(response.data.image_url.split("http://localhost:8000/")[1] !== '') this.image = response.data.image_url
       }catch(err){
 
       }
@@ -144,7 +143,6 @@ export default {
     },
     saveProfile() {
       // Perform validation before saving
-      this.form.contact_number = "1234567890"
       if (!this.form.name || !this.form.email || !this.form.contact_number) {
         this.$message.error('Please fill in all fields.');
         return;
@@ -158,7 +156,7 @@ export default {
       formData.append('contact_number', this.form.contact_number);
       if(this.form.password) formData.append('password', this.form.password);
       if(this.form.password) formData.append('confirm_password', this.form.confirm_password);
-      
+
       // Get uploaded image file
       const imageFile = this.$refs.upload.uploadFiles[0];
       if (imageFile) {
