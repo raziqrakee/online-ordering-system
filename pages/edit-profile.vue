@@ -2,7 +2,7 @@
   <div>
     <el-menu style="background-color: #F390C7; color: #fff;" class="el-menu-demo d-flex justify-content-around align-items-center" mode="horizontal">
         <div class="d-flex">
-          <el-menu-item index="4" style="color: #fff;">ORDER NOW</el-menu-item>
+          <el-menu-item index="4" style="color: #fff;">ORDER NOW</el-menu-item> 
         </div>
         <div class="d-flex">
           <el-menu-item index="1" style="color: #fff;"><a href="./" style="text-decoration: none; color: #fff;">Home</a></el-menu-item>
