@@ -2,7 +2,7 @@
   <div>
     <el-menu style="background-color: #F390C7; color: #fff;" class="el-menu-demo d-flex justify-content-around align-items-center" mode="horizontal">
         <div class="d-flex">
-          <el-menu-item index="4" style="color: #fff;">ORDER NOW</el-menu-item>
+          <el-menu-item index="4" style="color: #fff;">ORDER NOW</el-menu-item> 
         </div>
         <div class="d-flex">
           <el-menu-item index="1" style="color: #fff;"><a href="./" style="text-decoration: none; color: #fff;">Home</a></el-menu-item>
@@ -17,6 +17,7 @@
               <i style="color: #fff;" class="el-icon-user-solid"></i>
             </template>
             <el-menu-item index="2-1">Edit Profile</el-menu-item>
+            <el-menu-item index="2-1">Cart</el-menu-item>
             <el-menu-item index="2-1" @click="logout()">Logout</el-menu-item>
           </el-submenu>
         </div>
@@ -37,6 +38,7 @@
                 <i class="el-icon-plus"></i>
               </el-upload>
             </div>
+            <div class="mb-4 text-primary" style="text-decoration: underline; cursor: pointer; font-size: 12px;" @click="removeImage()">Remove profile picture</div>
             <el-form-item style="width: 50%;">
               <el-input v-model="form.name" placeholder="Full Name"></el-input>
             </el-form-item>
@@ -185,6 +187,16 @@ export default {
         this.$cookies.remove("token")
         // this.$router.push("/login")
         window.location.href = "login"
+    },
+    async removeImage(){
+      try{
+        const userId = this.$cookies.get("id")
+        const token = this.$cookies.get("token")
+        const response = await this.$axios.delete(`http://localhost:8000/api/user/${userId}/remove-image`)
+        window.location.reload()
+      }catch(err){
+        this.$message.error(err);
+      }
     }
 
   },

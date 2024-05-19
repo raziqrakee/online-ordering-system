@@ -2,10 +2,10 @@
   <div>
     <el-menu style="background-color: #F390C7; color: #fff;" class="el-menu-demo d-flex justify-content-around align-items-center" mode="horizontal" @select="handleSelect">
         <div class="d-flex">
-          <el-menu-item index="4" style="color: #fff;">ORDER NOW</el-menu-item>
+          <el-menu-item index="4" style="color: #fff;">ORDER NOW</el-menu-item> 
         </div>
         <div class="d-flex">
-          <el-menu-item index="1" style="color: #fff;"><a href="./" style="text-decoration: none; color: #fff;">Home</a></el-menu-item>
+          <el-menu-item index="all" style="color: #fff;"><a href="./" style="text-decoration: none; color: #fff;">Home</a></el-menu-item>
           <el-menu-item index="1" style="color: #fff;" @click="$router.push('/')">News</el-menu-item>
           <el-menu-item index="1" style="color: #fff;">Menu</el-menu-item>
           <el-menu-item index="3" style="color: #fff;">Order</el-menu-item>
@@ -195,64 +195,64 @@ export default {
         { value: 'glutenFree', label: 'Gluten-Free' },
       ],
       items: [
-  {
-    id: 1,
-    name: 'Chocolate',
-    price: 5.0,
-    imageUrl: 'ice-cream.jpeg',
-    category: 'dessert',
-    filters: ['vegetarian']
-  },
-  {
-    id: 2,
-    name: 'Ice Americano',
-    price: 8.0,
-    imageUrl: 'americano.jpeg',
-    category: 'beverages',
-    filters: ['vegan', 'glutenFree']
-  },
-  {
-    id: 3,
-    name: 'Strawberry',
-    price: 8.0,
-    imageUrl: 'ice-cream2.jpeg',
-    category: 'dessert',
-    filters: ['vegetarian', 'glutenFree']
-  },
-  {
-    id: 4,
-    name: 'Milo Ais',
-    price: 4.0,
-    imageUrl: 'milo.jpeg',
-    category: 'beverages',
-    filters: ['vegetarian', 'glutenFree']
-  },
-  {
-    id: 5,
-    name: 'French Fries',
-    price: 7.0,
-    imageUrl: 'fries.jpeg',
-    category: 'snacks',
-    filters: ['vegetarian']
-  },
-  {
-    id: 6,
-    name: 'Kacang Ais ABC',
-    price: 5.0,
-    imageUrl: 'ice-kacang.png',
-    category: 'dessert',
-    filters: ['vegan', 'glutenFree']
-  },
-  {
-    id: 7,
-    name: 'Samyang Ramen',
-    price: 7.0,
-    imageUrl: 'noodles.png',
-    category: 'korean',
-    filters: ['vegetarian']
-  },
-  // Add more items as needed
-],
+        {
+          id: 1,
+          name: 'Chocolate',
+          price: 5.0,
+          imageUrl: 'ice-cream.jpeg',
+          category: 'dessert',
+          filters: ['vegetarian']
+        },
+        {
+          id: 2,
+          name: 'Ice Americano',
+          price: 8.0,
+          imageUrl: 'americano.jpeg',
+          category: 'beverages',
+          filters: ['vegan', 'glutenFree']
+        },
+        {
+          id: 3,
+          name: 'Strawberry',
+          price: 8.0,
+          imageUrl: 'ice-cream2.jpeg',
+          category: 'dessert',
+          filters: ['vegetarian', 'glutenFree']
+        },
+        {
+          id: 4,
+          name: 'Milo Ais',
+          price: 4.0,
+          imageUrl: 'milo.jpeg',
+          category: 'beverages',
+          filters: ['vegetarian', 'glutenFree']
+        },
+        {
+          id: 5,
+          name: 'French Fries',
+          price: 7.0,
+          imageUrl: 'fries.jpeg',
+          category: 'snacks',
+          filters: ['vegetarian']
+        },
+        {
+          id: 6,
+          name: 'Kacang Ais ABC',
+          price: 5.0,
+          imageUrl: 'ice-kacang.png',
+          category: 'dessert',
+          filters: ['vegan', 'glutenFree']
+        },
+        {
+          id: 7,
+          name: 'Samyang Ramen',
+          price: 7.0,
+          imageUrl: 'noodles.png',
+          category: 'korean',
+          filters: ['vegetarian']
+        },
+        // Add more items as needed
+      ],
       itemsPerPage: 9,
       currentPage: 1,
     }
