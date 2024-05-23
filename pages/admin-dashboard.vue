@@ -44,7 +44,6 @@
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>Profile</el-dropdown-item>
                 <el-dropdown-item>Settings</el-dropdown-item>
-                <el-dropdown-item @click="logout()">Logout</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
@@ -112,7 +111,7 @@
       </div>
     </div>
   </template>
-  
+
   <script>
   export default {
     data() {
@@ -129,27 +128,27 @@
     }
   }
   </script>
-  
+
   <style>
-  
+
   /* Add custom styles for the admin dashboard */
   .admin-dashboard {
     display: flex;
     height: 100vh;
   }
-  
+
   .sidebar {
     background-color: #FFE9F5;
     color: #fff;
     padding: 20px;
     width: 200px;
   }
-  
+
   .logo {
     text-align: center;
     margin-bottom: 20px;
   }
-  
+
   .sidebar-menu {
     border-right: none;
   }
@@ -157,58 +156,58 @@
   .custom-sidebar-item{
     background-color: #FFE9F5;
   }
-  
+
   .logout {
     position: absolute;
     bottom: 20px;
     left: 40px;
     right: 20px;
   }
-  
+
   .content {
     flex: 1;
     padding: 20px;
   }
-  
+
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
   }
-  
+
   .search {
     width: 300px;
   }
-  
+
   .user {
     cursor: pointer;
   }
-  
+
   .stats {
     margin-top: 20px;
   }
-  
+
   .stat-card {
     display: flex;
     align-items: center;
   }
-  
+
   .stat-icon {
     font-size: 36px;
     margin-right: 10px;
   }
-  
+
   .stat-info {
     display: flex;
     flex-direction: column;
   }
-  
+
   .stat-value {
     font-size: 24px;
     font-weight: bold;
   }
-  
+
   .stat-label {
     font-size: 14px;
     color: #888;

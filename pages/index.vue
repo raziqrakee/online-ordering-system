@@ -2,14 +2,14 @@
   <div>
     <el-menu style="background-color: #F390C7; color: #fff;" class="el-menu-demo d-flex justify-content-around align-items-center" mode="horizontal" @select="handleSelect">
         <div class="d-flex">
-          <el-menu-item index="4" style="color: #fff;">ORDER NOW</el-menu-item> 
+          <el-menu-item index="4" style="color: #fff;">ORDER NOW</el-menu-item>
         </div>
         <div class="d-flex">
           <el-menu-item index="all" style="color: #fff;"><a href="./" style="text-decoration: none; color: #fff;">Home</a></el-menu-item>
-          <el-menu-item index="1" style="color: #fff;" @click="$router.push('/')">News</el-menu-item>
-          <el-menu-item index="1" style="color: #fff;">Menu</el-menu-item>
-          <el-menu-item index="3" style="color: #fff;">Order</el-menu-item>
-          <el-menu-item index="4" style="color: #fff;">Reservation</el-menu-item>
+          <el-menu-item style="color: #fff;" @click="navigateTo('news')">News</el-menu-item>
+          <el-menu-item index="menu" style="color: #fff;">Menu</el-menu-item>
+          <el-menu-item index="order" style="color: #fff;">Order</el-menu-item>
+          <el-menu-item index="reservation" style="color: #fff;">Reservation</el-menu-item>
         </div>
         <div class="d-flex">
           <el-submenu index="2">
@@ -23,7 +23,7 @@
         </div>
     </el-menu>
     <!-- HEADER -->
-    <div style="min-height: 60vh; background-color: #D1E6FB;">
+    <div id="home-section" style="min-height: 60vh; background-color: #D1E6FB;">
       <div class="row align-items-center">
         <div class="col-6 p-4">
           <div class="ps-4" style="font-size: 34px; color: #fff; margin: 0px; padding-bottom: 0px;">Danish Ice</div>
@@ -36,7 +36,7 @@
       </div>
     </div>
     <!-- PRODUCT -->
-    <div style="padding: 50px;">
+    <div id="menu-section" style="padding: 50px;">
       <div class="mb-3">
       <el-menu
         :default-active="activeIndex"
@@ -87,7 +87,7 @@
       </div>
     </div>
     <!-- NEWS -->
-    <div class="p-4" style="min-height: 60vh; background-color: #D1E6FB;">
+    <div id="news-section" ref="newsSection" class="p-4" style="min-height: 60vh; background-color: #D1E6FB;">
       <h3>News</h3>
       <div class="d-flex align-items-center justify-content-center">
         <div class="me-4">
@@ -106,7 +106,7 @@
       </div>
     </div>
     <!-- CONTACT FORM -->
-    <div>
+    <div id="contact-section">
       <div class="row justify-content-center p-4" style="background-color: #F7F8FA">
         <div class="col-md-8">
           <div class="card" style="border:none;background-color: #F7F8FA">
@@ -155,12 +155,12 @@
       </div>
       <div class="col-md-4 d-flex justify-content-center" style="color: #fff;">
         <div>
-          <div class=" mb-4 fw-bold p-0 ms-0">User Link</div>
-          <div>Home</div>
-          <div>About</div>
-          <div>Menu</div>
+          <div class="mb-4 fw-bold p-0 ms-0">User Link</div>
+          <div @click="navigateTo('home')">Home</div>
+          <div @click="navigateTo('news')">News</div>
+          <div @click="navigateTo('menu')">Menu</div>
           <div>Reservation</div>
-          <div>Contact</div>
+          <div @click="navigateTo('contact')">Contact</div>
         </div>
       </div>
       <div class="col-md-4 d-flex justify-content-center" style="color: #fff;">
@@ -257,6 +257,15 @@ export default {
       currentPage: 1,
     }
   },
+  mounted() {
+    // If there's a hash in the URL, scroll to the element with that ID
+    if (this.$route.hash) {
+      const element = document.querySelector(this.$route.hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  },
   computed: {
     filteredItems() {
       let filtered = this.items
@@ -275,8 +284,8 @@ export default {
   },
   methods: {
     handleSelect(index) {
-      this.activeIndex = index
-    },
+    this.activeIndex = index;
+  },
     addToCart(item) {
       // Add your cart logic here
       console.log('Added to cart:', item)
@@ -301,8 +310,22 @@ export default {
         this.$cookies.remove("token")
         // this.$router.push("/login")
         window.location.href = "login"
+    },
+    navigateTo(section) {
+      const sectionMap = {
+        home: '#home-section',
+        news: '#news-section',
+        menu: '#menu-section',
+        contact: '#contact-section'
+      }
+      const targetSection = sectionMap[section]
+      if (targetSection) {
+        const element = document.querySelector(targetSection)
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' })
+        }
+      }
     }
-
   },
 }
 </script>
