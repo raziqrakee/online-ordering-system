@@ -42,11 +42,11 @@ export default {
   data() {
     return {
       form: {
-        name: 'user+005',
-        email: 'user+005@gmail.com',
-        password: 'admin123',
-        contact_number : '0123456789',
-        confirm_password : 'admin123',
+        name: '',
+        email: '',
+        password: '',
+        contact_number : '',
+        confirm_password : '',
         rememberMe: false,
         role: 'user',
       }
@@ -70,7 +70,7 @@ export default {
       }catch(err){
         this.$notify({
           title: 'Error',
-          message: err,
+          message: err.response.data.message || 'An error occurred',
           type: 'error'
         });
       }
