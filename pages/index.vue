@@ -23,95 +23,109 @@
         </div>
     </el-menu>
     <!-- HEADER -->
-    <div id="home-section" style="min-height: 60vh; background-color: #D1E6FB;">
-      <div class="row align-items-center">
+    <div id="home-section" class="d-flex align-items-center" style="min-height: 70vh; background-color: #D1E6FB;">
+      <div class="row mx-5 w-100 d-flex justify-content-between align-items-center">
         <div class="col-6 p-4">
-          <div class="ps-4" style="font-size: 34px; color: #fff; margin: 0px; padding-bottom: 0px;">Danish Ice</div>
-          <div class="ps-4" style="font-size: 34px; color: #fff; margin: 0px; padding-bottom: 0px;">Cream Cafe</div>
-          <div class="ps-4" style="color:#fff">Embrace the Flavours of the Future with Danish Ice Cream Cafe, We Serve Gen Z's Palate with Modern Taste Sensations!</div>
+          <h1 class="mx-5 text-white fw-bold fs-1 main-header">Danish Ice</br>Cream Cafe</h1>
+          <h5 class="mx-5 text-white">
+            Embrace the Flavours of the Future with Danish Ice Cream Cafe, We Serve Gen Z's Palate with Modern Taste Sensations!
+          </h5>
+          <div class="d-flex align-items-center pt-3 mx-5">
+            <input type="text" placeholder="Search food..." class="form-control">
+            <button class="btn btn-primary-search">Search</button>
+          </div>        
         </div>
-        <div class="col-6 text-center mt-4">
-          <img src="~/static/logo.png" style="width: 300px;" />
+        <div class="col-6 text-center">
+          <img src="~/static/logo.png"/>
         </div>
       </div>
     </div>
     <!-- PRODUCT -->
-    <div id="menu-section" style="padding: 50px;">
-      <div class="mb-3">
-      <el-menu
-        :default-active="activeIndex"
-        mode="horizontal"
-        @select="handleSelect"
-        class="menu"
-      >
-        <el-menu-item index="all">All</el-menu-item>
-        <el-menu-item index="dessert">Dessert</el-menu-item>
-        <el-menu-item index="korean">Korean</el-menu-item>
-        <el-menu-item index="snacks">Snacks</el-menu-item>
-        <el-menu-item index="beverages">Beverages</el-menu-item>
-      </el-menu>
-      </div>
+    <div id="menu-section" class="m-5">
+      <div class="mx-5">
+        <h1 class="text-2xl fw-bold mb-4 text-center">Menu</h1>
+        <div class=" mb-3">
+          <el-menu
+            :default-active="activeIndex"
+            mode="horizontal"
+            @select="handleSelect"
+            class="menu"
+          >
+            <el-menu-item index="all">All</el-menu-item>
+            <el-menu-item index="dessert">Dessert</el-menu-item>
+            <el-menu-item index="korean">Korean</el-menu-item>
+            <el-menu-item index="snacks">Snacks</el-menu-item>
+            <el-menu-item index="beverages">Beverages</el-menu-item>
+          </el-menu>
+        </div>
 
-      <div class="filters mb-3">
-        <el-select v-model="selectedFilter" placeholder="Filters">
-          <el-option
-            v-for="filter in filters"
-            :key="filter.value"
-            :label="filter.label"
-            :value="filter.value"
-          ></el-option>
-        </el-select>
-      </div>
+        <div class="filters mb-3">
+          <el-select v-model="selectedFilter" placeholder="Filters">
+            <el-option
+              v-for="filter in filters"
+              :key="filter.value"
+              :label="filter.label"
+              :value="filter.value"
+            ></el-option>
+          </el-select>
+        </div>
 
-      <div class="row">
-        <div
-          v-for="item in filteredItems"
-          :key="item.id"
-          class="col-md-3 mb-4"
-        >
-          <div class="card">
-            <img style="max-height: 300px; min-height: 300px; object-fit: cover;" :src="item.imageUrl" class="card-img-top" :alt="item.name" />
-            <div class="card-body">
-              <h5 class="card-title">{{ item.name }}</h5>
-              <p class="card-text">RM{{ item.price.toFixed(2) }}</p>
-              <el-button type="primary" @click="addToCart(item)">
-                Add to Cart
-              </el-button>
+        <div class="row">
+          <div
+            v-for="item in filteredItems"
+            :key="item.id"
+            class="col-md-3 mb-4"
+          >
+            <div class="card">
+              <img style="max-height: 300px; min-height: 300px; object-fit: cover;" :src="item.imageUrl" class="card-img-top" :alt="item.name" />
+              <div class="card-body">
+                <div class="d-flex row">
+                  <h5 class="card-title">{{ item.name }}</h5>
+                  <p class="card-text">RM{{ item.price.toFixed(2) }}</p>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                  <button class="btn btn-primary" @click="addToCart(item)">
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="text-center mt-4">
-        <el-button type="primary" @click="loadMore">Load more...</el-button>
-      </div>
+        <div class="text-center mt-4">
+          <button class="btn btn-secondary" @click="loadMore">Load more...</button>
+        </div>
+      </div>  
     </div>
     <!-- NEWS -->
-    <div id="news-section" ref="newsSection" class="p-4" style="min-height: 60vh; background-color: #D1E6FB;">
-      <h3>News</h3>
-      <div class="d-flex align-items-center justify-content-center">
-        <div class="me-4">
-          <div class="fw-bold">Danish Ice Cream | Promosi Aidiladha</div>
-          <div style="width:500px">Quis hendrerit nibh mauris sed faucibus. Quis hendrerit nibh mauris sed faucibus is sed faucibus.</div>
-          <img src="~/static/news1.jpeg" width="500" />
-        </div>
-        <div class="ms-4">
-          <div class="mb-4">
-            <img src="~/static/news2.jpeg" width="246" />
+    <div id="news-section" ref="newsSection" class="py-3" style="min-height: 60vh; background-color: #D1E6FB;">
+      <div class="m-5">
+        <h1 class="text-2xl fw-bold mb-5 text-center">News</h1>
+        <div class="d-flex row align-items-start justify-content-center mx-5">
+          <div class="col-md-8 col-sm-6">
+            <h4 class="fw-bold">Danish Ice Cream | Promosi Aidiladha</h4>
+            <h6>Quis hendrerit nibh mauris sed faucibus. Quis hendrerit nibh mauris sed faucibus is sed faucibus.</h6>
+            <img class="w-100" src="~/static/news1.jpeg"/>
           </div>
-          <div>
-            <img src="~/static/news3.jpeg" width="246" />
+          <div class="col-md-4 col-sm-6">
+            <div class="mb-4">
+              <img class="w-100" src="~/static/news2.jpeg"/>
+            </div>
+            <div>
+              <img class="w-100" src="~/static/news3.jpeg"/>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <!-- CONTACT FORM -->
-    <div id="contact-section">
-      <div class="row justify-content-center p-4" style="background-color: #F7F8FA">
-        <div class="col-md-8">
-          <div class="card" style="border:none;background-color: #F7F8FA">
+    <div id="contact-section" style="background-color: #F7F8FA">
+      <div class="row justify-content-center">
+        <div class="col-md-8 mx-5 my-3">
+          <div class="card m-5" style="border:none;background-color: #F7F8FA">
             <div class="card-body">
-              <h5 class="card-title">Are you interested in catering services?</h5>
+              <h3 class="text-2xl fw-bold">Are you interested in catering services?</h3>
               <p class="card-text mb-4">Fill this form and we will contact you next 48 hours.</p>
               <el-form ref="form" :model="form" label-position="top">
                 <div class="d-flex">
@@ -126,7 +140,7 @@
                   <el-input v-model="form.message" type="textarea" rows="4"></el-input>
                 </el-form-item>
                 <div class="text-center">
-                  <el-button type="primary" @click="submitForm('form')">Send</el-button>
+                  <button class="btn btn-primary" type="primary" @click="submitForm('form')">Send</button>
                 </div>
               </el-form>
             </div>
@@ -135,45 +149,57 @@
       </div>
     </div>
     <!-- FOOTER -->
-    <div class="row p-4 align-items-center"style="background-color: #F390C7; height: 50vh;">
-      <div class="col-md-4 d-flex justify-content-center" style="color: #fff;">
-        <div>
-        <div class="text-center mb-4 fw-bold">Operation Hour</div>
-        <div class="d-flex">
-          <div style="width: 100px; text-align: right; margin-right: 20px;">Sat - Wed:</div>
-          09:00am - 10:00PM
-        </div>
-        <div class="d-flex">
-          <div style="width: 100px; text-align: right; margin-right: 20px;">Thursday:</div>
-          09:00am - 11:00PM
-        </div>
-        <div class="d-flex">
-          <div style="width: 100px; text-align: right; margin-right: 20px;">Friday:</div>
-          09:00am - 8:00PM
-        </div>
-      </div>
-      </div>
-      <div class="col-md-4 d-flex justify-content-center" style="color: #fff;">
-        <div>
-          <div class="mb-4 fw-bold p-0 ms-0">User Link</div>
-          <div @click="navigateTo('home')">Home</div>
-          <div @click="navigateTo('news')">News</div>
-          <div @click="navigateTo('menu')">Menu</div>
-          <div>Reservation</div>
-          <div @click="navigateTo('contact')">Contact</div>
-        </div>
-      </div>
-      <div class="col-md-4 d-flex justify-content-center" style="color: #fff;">
-        <div class="text-center">
-          <div class=" mb-4 fw-bold p-0 ms-0">
-            <img src="~/static/logo.png" width="128"></img>
+    <div class="row pt-5 px-5 py-4"style="background-color: #F390C7;">
+        <div class="col-md-3 col-sm-6 d-flex justify-content-center text-white">
+          <div>
+            <h3 class="fw-bold mb-4">Operation Hour</h3>
+            <p class="mb-2">Sat-Wed: 09:00am-10:00PM</p>
+            <p class="mb-2">Thursday: 09:00am-11:00PM</p>
+            <p class="mb-2">Friday: 09:00am-8:00PM</p>
           </div>
-          <div>Danish Ice Cream Cafe</div>
-          <div class="mb-4">danishicecreamkeningau@gmail.com</div>
-          <div>Lot 2, Future city complex, Jalan Masjid, 89008 Keningau, Sabah, Malaysia</div>
+        </div>
+        <div class="col-md-3 col-sm-6 d-flex justify-content-center text-white">
+          <div>
+            <h3 class="fw-bold mb-4">User Link</h3>
+            <div class="mb-2" @click="navigateTo('home')">Home</div>
+            <div class="mb-2" @click="navigateTo('news')">News</div>
+            <div class="mb-2" @click="navigateTo('menu')">Menu</div>
+            <div class="mb-2"> Reservation</div>
+            <div @click="navigateTo('contact')">Contact</div>
+          </div>
+        </div>
+        <div class="col-md-5 col-sm-6 d-flex justify-content-center mb-5 text-white">
+          <div class="text-center">
+            <div class="fw-bold mb-4">
+              <img src="~/static/logo.png" width="128"></img>
+            </div>
+            <div>Danish Ice Cream Cafe</div>
+            <div class="mb-2">danishicecreamkeningau@gmail.com</div>
+            <div>Lot 2, Future city complex, Jalan Masjid, 89008 Keningau, Sabah, Malaysia</div>
+          </div>
+        </div>
+        <div class="col-md-1 col-sm-6 d-flex mb-5 text-white">
+          <!-- <h3 class="fw-bold mb-4">Follow Us</h3> -->
+          <div class="d-flex row flex-wrap justify-content-center">
+            <div class="d-flex justify-content-center">
+              <img href="" src="~/static/icon/fb.png" alt="Facebook" class="social-list-img">
+            </div>
+            <div class="d-flex justify-content-center">
+              <img href="" src="~/static/icon/ig.png" alt="Instagram" class="social-list-img">
+            </div>
+              <div class="d-flex justify-content-center">
+              <img href="" src="~/static/icon/tiktok.png" alt="Tiktok" class="social-list-img">
+            </div>
+              <div class="d-flex justify-content-center">
+              <img href="" src="~/static/icon/whatsapp.png" alt="Whatsapp" class="social-list-img">
+            </div>
+          </div>
+        </div>
+        <hr>
+        <div class="col-md-12 col-sm-6 text-center mt-2">
+          <p class="text-white fw-light m-0">Copyright @2023 Danish Ice Cream Cafe</p>
         </div>
       </div>
-    </div>
   </div>
 </template>
 
@@ -336,5 +362,61 @@ export default {
 }
 .el-submenu__icon-arrow {
     display: none !important;
+}
+.main-header{
+  font-size: 4rem !important;
+}
+#home-section .form-control,
+#home-section .btn-primary-search{
+  min-height: 45px;
+}
+#home-section .form-control{
+  border-radius: 10px 0 0 10px;
+  max-width: 300px;
+  border-color: #6c757d20;
+}
+#home-section .btn-primary-search{
+  border-radius: 0 10px 10px 0;
+  min-width: 80px;
+}
+.btn-primary-search{
+  background-color: #F390C7;
+  border-color: #F390C7;
+  color: #FFFFFF;
+}
+.btn-primary-search:hover{
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: #000000;
+}
+.btn-primary{
+  background-color: #000000;
+  border-color: #00000000;
+  border-radius: 50px;
+  min-width: 120px;
+}
+.btn-primary:hover{
+  background-color: #FFE9F5;
+  border-color: #F390C7;
+  color: #000000;
+  border-radius: 50px;
+  min-width: 120px;
+}
+.btn-secondary{
+  background-color: #00000000;
+  border-color: #6c757d;
+  color: #6c757d;
+  border-radius: 50px;
+}
+.btn-secondary:hover{
+  background-color: #FFE9F5;
+  border-color: #F390C700;
+  color: #000000;
+  border-radius: 50px;
+}
+.social-list-img{
+  width: 30px;
+  height: 30px;
+  
 }
 </style>
