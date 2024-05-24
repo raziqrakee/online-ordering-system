@@ -1,42 +1,32 @@
-<!-- AdminDashboard.vue -->
+<!-- AdminProduct.vue -->
 <template>
-  <div class="admin-dashboard">
+  <div class="admin-product">
     <div class="sidebar" style="padding-left: 0px; padding-right: 0px;">
       <div class="logo">
         <img src="~/static/logo.png" alt="Logo" class="img-fluid" width="98px">
       </div>
-      <el-menu :default-active="activeLink" class="sidebar-menu">
-        <el-menu-item index="dashboard" class="custom-sidebar-item">
-          <i class="el-icon-menu"></i>
-          <nuxt-link to="/admin-dashboard">
+      <el-menu :default-active="activeLink" class="sidebar-menu" @select="handleSelect">
+          <el-menu-item index="dashboard" class="custom-sidebar-item">
+            <i class="el-icon-menu"></i>
             <span>Dashboard</span>
-          </nuxt-link>
-        </el-menu-item>
-        <el-menu-item index="product" class="custom-sidebar-item">
-          <i class="el-icon-goods"></i>
-          <nuxt-link to="/admin-product">
+          </el-menu-item>
+          <el-menu-item index="product" class="custom-sidebar-item" >
+            <i class="el-icon-goods"></i>
             <span>Product</span>
-          </nuxt-link>
-        </el-menu-item>
-        <el-menu-item index="order" class="custom-sidebar-item">
-          <i class="el-icon-shopping-cart-2"></i>
-          <nuxt-link to="/admin-order">
+          </el-menu-item>
+          <el-menu-item index="order" class="custom-sidebar-item">
+            <i class="el-icon-shopping-cart-2"></i>
             <span>Order</span>
-          </nuxt-link>
-        </el-menu-item>
-        <el-menu-item index="reservation" class="custom-sidebar-item">
-          <i class="el-icon-date"></i>
-          <nuxt-link to="/admin-reservation">
+          </el-menu-item>
+          <el-menu-item index="reservation" class="custom-sidebar-item">
+            <i class="el-icon-date"></i>
             <span>Reservation</span>
-          </nuxt-link>
-        </el-menu-item>
-        <el-menu-item index="report" class="custom-sidebar-item">
-          <i class="el-icon-document"></i>
-          <nuxt-link to="/sales-report">
+          </el-menu-item>
+          <el-menu-item index="report" class="custom-sidebar-item">
+            <i class="el-icon-document"></i>
             <span>Sale Report</span>
-          </nuxt-link>
-        </el-menu-item>
-      </el-menu>
+          </el-menu-item>
+        </el-menu>
       <div class="logout">
         <el-button type="danger" icon="el-icon-switch-button" round @click="logout()">Logout</el-button>
       </div>
@@ -87,7 +77,7 @@
                         </button>
                     </div>
                 </div>
-    
+
                 <div class="row bg-white p-4 gap-4 mt-4 rounded-xl">
                     <table class="table">
                         <thead class="bg-gray-100 text-center rounded-xl">
@@ -132,7 +122,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900 text-start">
-                                      Premium Rich and creamy chocolate ice cream, crafted from the finest 
+                                      Premium Rich and creamy chocolate ice cream, crafted from the finest
                                       cocoa beans and fresh dairy.
                                     </div>
                                 </td>
@@ -158,7 +148,7 @@
             </div>
         </div>
     </div>
-    
+
     </div>
   </div>
 </template>
@@ -167,10 +157,14 @@
 export default {
   data() {
     return {
-      activeLink: 'dashboard',
+      activeLink: 'product',
     }
   },
   methods:{
+    handleSelect(index) {
+      this.activeLink = index;
+      this.$router.push(`/admin-${index}`);
+    },
       logout(){
           this.$cookies.remove("token")
           // this.$router.push("/login")
@@ -182,8 +176,8 @@ export default {
 
 <style>
 
-/* Add custom styles for the admin dashboard */
-.admin-dashboard {
+/* Add custom styles for the admin product */
+.admin-product {
   display: flex;
   height: 100vh;
 }

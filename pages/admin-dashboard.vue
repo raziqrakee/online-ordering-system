@@ -5,12 +5,12 @@
         <div class="logo">
           <img src="~/static/logo.png" alt="Logo" class="img-fluid" width="98px">
         </div>
-        <el-menu :default-active="activeLink" class="sidebar-menu">
+        <el-menu :default-active="activeLink" class="sidebar-menu" @select="handleSelect">
           <el-menu-item index="dashboard" class="custom-sidebar-item">
             <i class="el-icon-menu"></i>
             <span>Dashboard</span>
           </el-menu-item>
-          <el-menu-item index="product" class="custom-sidebar-item">
+          <el-menu-item index="product" class="custom-sidebar-item" >
             <i class="el-icon-goods"></i>
             <span>Product</span>
           </el-menu-item>
@@ -119,8 +119,12 @@
         activeLink: 'dashboard',
       }
     },
-    methods:{
-        logout(){
+    methods: {
+    handleSelect(index) {
+      this.activeLink = index;
+      this.$router.push(`/admin-${index}`);
+    },
+    logout(){
             this.$cookies.remove("token")
             // this.$router.push("/login")
             window.location.href = "login"
