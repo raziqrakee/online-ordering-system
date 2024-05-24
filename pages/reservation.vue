@@ -25,51 +25,43 @@
     <!-- MAIN -->
     <div id="home-section" style="min-height: 60vh;">
       <div class="bg-white text-dark px-4 py-5 mx-5">
-        <div class="row">
-            <div class="col-md-8 col-sm-6 p-4">
-              <h3 class="text-2xl fw-bold mb-2">My Cart</h3>
-              <hr>
-              <div class="d-flex justify-content-between align-items-center gap-2">
-                <div class="d-flex align-items-center gap-2">
-                  <img src="/assets/product-3.png" alt="Product Icon" class="product-list-img">
-                  <span class="text-lg">Strawberry</span>
-                </div>
-                <span class="text-lg">Quantity:</span>
-                <div class="btn-group" role="group">
-                  <input type="number" value="1" class="form-control qtt">
-                </div>
-                <span class="text-lg">x RM 10.00</span>
-              </div>
-              <hr>
-              <div class="mt-3">
-                <label for="special-instructions" class="form-label mb-3">Special Instructions:</label>
-                <textarea class="form-control w-100" id="special-instructions" rows="4"></textarea>
-              </div>
+        <div class="w-75">
+            <div class="d-flex align-items-center mb-4">
+                <h3 class="w-100 text-2xl fw-bold">Table Reservation</h3>
             </div>
-            <div class="col-md-4 col-sm-6 p-4">
-                <h3 class="text-2xl fw-bold mb-2">Order Summary</h3>
-                <hr>
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2">
-                        Subtotal:
-                        <span class="">RM 10.00</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2">
-                        Tax:
-                        <span class="">RM 1.00</span>
-                    </li>
-                    <hr class="d-flex align-self-center" style="width: 90%;">
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2">
-                        Total:
-                        <span class="">RM 11.00</span>
-                    </li>
-                    <li class="list-group-item">
-                        <button class="btn btn-primary w-100 btn-block">Proceed to Checkout</button>
-                    </li>
-                </ul>
+            <div class="d-flex flex-column gap-2 mt-4">
+                <label for="fullname" class="form-label text-lg">Fullname:</label>
+                <input type="text" id="fullname" placeholder="Fullname" class="form-control text-lg">
+                
+                <label for="pax" class="form-label text-lg">Number of Pax:</label>
+                <input type="number" id="pax" placeholder="Number of Pax" class="form-control text-lg">
+                
+                <label for="phone" class="form-label text-lg">Phone Number:</label>
+                <input type="tel" id="phone" placeholder="Phone Number" class="form-control text-lg">
+                
+                <label for="reservation-time" class="form-label text-lg">Choose Slot:</label>
+            </div>
+            <div class="d-flex gap-2">
+                <div class="w-50">
+                    <input type="date" id="reservation-date" class="form-control text-lg rounded-lg">
+                </div>
+                <div class="w-50">
+                    <div class="d-flex gap-2">
+                        <input type="number" id="hours" class="form-control text-lg rounded-lg" placeholder="HH">
+                        <input type="number" id="minutes" class="form-control text-lg rounded-lg" placeholder="MM">
+                        <select id="ampm" class="form-control text-lg rounded-lg">
+                            <option value="AM">AM</option>
+                            <option value="PM">PM</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex gap-4 justify-start mt-4">
+                <button class="btn btn-outline-secondary w-25">Cancel</button>
+                <button class="btn btn-primary w-25">Book</button>
             </div>
         </div>
-      </div>    
+      </div>
     </div>
     <!-- FOOTER -->
     <div class="row p-4 align-items-center"style="background-color: #F390C7; height: 50vh;">
