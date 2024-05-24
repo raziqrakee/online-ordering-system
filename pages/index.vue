@@ -46,48 +46,44 @@
     </div>
     <!-- PRODUCT -->
     <div id="menu-section" class="m-5">
-      <div class="mx-5">
-        <h1 class="text-2xl fw-bold mb-4 text-center">Menu</h1>
-        <div class=" mb-3">
-          <el-menu
-            :default-active="activeIndex"
-            mode="horizontal"
-            @select="handleSelect"
-            class="menu"
-          >
-            <el-menu-item index="all">All</el-menu-item>
-            <el-menu-item index="dessert">Dessert</el-menu-item>
-            <el-menu-item index="korean">Korean</el-menu-item>
-            <el-menu-item index="snacks">Snacks</el-menu-item>
-            <el-menu-item index="beverages">Beverages</el-menu-item>
-          </el-menu>
-        </div>
-
-        <div class="filters mb-3">
-          <el-select v-model="selectedFilter" placeholder="Filters">
-            <el-option
-              v-for="filter in filters"
-              :key="filter.value"
-              :label="filter.label"
-              :value="filter.value"
-            ></el-option>
-          </el-select>
-        </div>
-
-        <div class="row">
+      <div class="mx-5 d-flex flex-lg-row flex-sm-column align-items-center">
+        <h1 class="text-2xl fw-bold mb-5 text-center">OUR TOP PICKS</h1>
+        <div class="row mx-5">
+          <div class="w-100 mb-4">
+            <div class="card card-main">
+              <img class="w-100" style="max-height: 500px; min-height: 300px; object-fit: cover;" src="/assets/product-7.png" />
+              <div class="card-body w-100 justify-content-between">
+                <div class="d-flex flex-column mx-2">
+                  <h2 class="card-title text-uppercase fw-bolder">samyang ramen</h2>
+                  <div class="row">
+                    <h4 class="card-text fw-bold">RM 7</h4>
+                    <h6 class="card-text text-capitalize">korean</h6>
+                    <h7 class="card-text">Sold : 600 pcs</h7>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-center mx-2">
+                  <button class="btn btn-primary" @click="addToCart(item)">
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>          
           <div
             v-for="item in filteredItems"
             :key="item.id"
-            class="col-md-3 mb-4"
+            class="col-md-6 mb-4"
           >
             <div class="card">
               <img style="max-height: 300px; min-height: 300px; object-fit: cover;" :src="item.imageUrl" class="card-img-top" :alt="item.name" />
-              <div class="card-body">
-                <div class="d-flex row">
-                  <h5 class="card-title">{{ item.name }}</h5>
-                  <p class="card-text">RM{{ item.price.toFixed(2) }}</p>
+              <div class="card-body py-5">
+                <div class="d-flex row mb-5">
+                  <h4 class="card-title fw-bold">{{ item.name }}</h4>
+                  <h5 class="card-text">RM{{ item.price.toFixed(2) }}</h5>
+                  <h6 class="card-text text-capitalize">{{ item.category}}</h6>
+                  <h7 class="card-text">Sold : {{ item.sold}} pcs</h7>
                 </div>
-                <div class="d-flex justify-content-center mt-3">
+                <div class="d-flex justify-content-center">
                   <button class="btn btn-primary" @click="addToCart(item)">
                     Add to Cart
                   </button>
@@ -96,10 +92,9 @@
             </div>
           </div>
         </div>
-
-        <div class="text-center mt-4">
-          <button class="btn btn-secondary" @click="loadMore">Load more...</button>
-        </div>
+      </div>
+      <div class="text-center mt-4">
+        <button class="btn btn-secondary" @click="loadMore">Load more products...</button>
       </div>  
     </div>
     <!-- NEWS -->
@@ -231,7 +226,8 @@ export default {
           price: 5.0,
           imageUrl: 'ice-cream.jpeg',
           category: 'dessert',
-          filters: ['vegetarian']
+          filters: ['vegetarian'],
+          sold: '300'
         },
         {
           id: 2,
@@ -239,47 +235,8 @@ export default {
           price: 8.0,
           imageUrl: 'americano.jpeg',
           category: 'beverages',
-          filters: ['vegan', 'glutenFree']
-        },
-        {
-          id: 3,
-          name: 'Strawberry',
-          price: 8.0,
-          imageUrl: 'ice-cream2.jpeg',
-          category: 'dessert',
-          filters: ['vegetarian', 'glutenFree']
-        },
-        {
-          id: 4,
-          name: 'Milo Ais',
-          price: 4.0,
-          imageUrl: 'milo.jpeg',
-          category: 'beverages',
-          filters: ['vegetarian', 'glutenFree']
-        },
-        {
-          id: 5,
-          name: 'French Fries',
-          price: 7.0,
-          imageUrl: 'fries.jpeg',
-          category: 'snacks',
-          filters: ['vegetarian']
-        },
-        {
-          id: 6,
-          name: 'Kacang Ais ABC',
-          price: 5.0,
-          imageUrl: 'ice-kacang.png',
-          category: 'dessert',
-          filters: ['vegan', 'glutenFree']
-        },
-        {
-          id: 7,
-          name: 'Samyang Ramen',
-          price: 7.0,
-          imageUrl: 'noodles.png',
-          category: 'korean',
-          filters: ['vegetarian']
+          filters: ['vegan', 'glutenFree'],
+          sold: '223'
         },
         // Add more items as needed
       ],
@@ -361,6 +318,34 @@ export default {
 </script>
 
 <style>
+h7{
+  font-size: 0.8rem;
+}
+.card{
+  flex-direction: row;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.card-main{
+  flex-direction: column;
+  transition: transform 0.3s;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.card-main .card-body{
+  flex-direction: row;
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  background-color:#F390C7;
+}
+.card-body{
+  background-color:#F390C7;
+  align-items: center;
+}
+#contact-section .card-body{
+  background-color: #F7F8FA;
+}
 .menu {
   border-bottom: 1px solid #e6e6e6;
 }
