@@ -1,15 +1,19 @@
 <template>
   <div>
-    <el-menu style="background-color: #F390C7; color: #fff;" class="el-menu-demo d-flex justify-content-around align-items-center" mode="horizontal" @select="handleSelect">
+    <el-menu style="background-color: #F390C7; color: #fff;" class="el-menu-demo d-flex justify-content-between align-items-center" mode="horizontal" @select="handleSelect">
         <div class="d-flex">
-          <el-menu-item index="4" style="color: #fff;">ORDER NOW</el-menu-item>
+          <el-menu-item  class="d-flex align-items-center" index="4" style="color: #fff;">
+            <h4 class="fw-bold text-white m-0">ORDER NOW</h4>
+          </el-menu-item>
         </div>
         <div class="d-flex">
-          <el-menu-item index="all" style="color: #fff;"><a href="./" style="text-decoration: none; color: #fff;">Home</a></el-menu-item>
-          <el-menu-item style="color: #fff;" @click="navigateTo('news')">News</el-menu-item>
-          <el-menu-item index="menu" style="color: #fff;">Menu</el-menu-item>
-          <el-menu-item index="order" style="color: #fff;">Order</el-menu-item>
-          <el-menu-item index="reservation" style="color: #fff;">Reservation</el-menu-item>
+          <el-menu-item class="d-flex justify-items-center" index="all" style="color: #fff;">
+            <a href="./" style="text-decoration: none; color: #fff;">Home</a>
+          </el-menu-item>
+          <el-menu-item class="d-flex align-items-center" style="color: #fff;" @click="navigateTo('news')">News</el-menu-item>
+          <el-menu-item class="d-flex align-items-center" index="menu" style="color: #fff;">Menu</el-menu-item>
+          <el-menu-item class="d-flex align-items-center" index="order" style="color: #fff;">Order</el-menu-item>
+          <el-menu-item class="d-flex align-items-center" index="reservation" style="color: #fff;">Reservation</el-menu-item>
         </div>
         <div class="d-flex">
           <el-submenu index="2">
@@ -362,6 +366,15 @@ export default {
 }
 .el-submenu__icon-arrow {
     display: none !important;
+}
+.el-menu-item:focus{
+  background-color: #F390C7;
+  font-weight: 700;
+  text-decoration: underline;
+}
+.el-menu-item:hover{
+  background-color: #F390C7;
+  font-weight: 700;
 }
 .main-header{
   font-size: 4rem !important;
