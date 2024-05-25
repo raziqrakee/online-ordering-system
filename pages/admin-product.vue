@@ -171,19 +171,21 @@
           </el-form-item>
         </div>
         <el-form-item label="Image" class="w-100">
-          <el-upload
-            class="w-100"
-            action=""
-            :show-file-list="false"
-            accept="image/*"
-            :on-change="handleUploadImage"
-          >
-            <div class="d-flex w-100">
-              <el-image
-                v-if="editProduct.image"
-                :src="editProduct.image"
-                style="width: auto; height: 50px; object-fit: cover;"
-              ></el-image>
+          <div v-if="editProduct.image" class="d-flex w-100">
+            <el-image
+              :src="editProduct.image"
+              style="width: auto; height: 50px; object-fit: cover;"
+            ></el-image>
+            <el-button @click="removeImage('edit')">Remove</el-button>
+          </div>
+          <div v-else>
+            <el-upload
+              class="w-100"
+              action=""
+              :show-file-list="false"
+              accept="image/*"
+              :on-change="handleEditUploadImage"
+            >
               <el-upload
                 class="mb-4 w-100 h-25 justify-content-center"
                 action="your_upload_endpoint_here"
@@ -201,22 +203,16 @@
                   Support: jpg, jpeg, png
                 </div>
               </el-upload>
-            </div>
-          </el-upload>
-        </el-form-item>  
+            </el-upload>
+          </div>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer d-flex justify-content-center">
         <el-button class="btn btn-w btn-secondary" @click="showEditModalVisible = false">Cancel</el-button>
         <el-button class="btn btn-w btn-primary" type="primary" @click="updateProduct">Update</el-button>
       </span>
     </el-dialog>
-    <el-dialog :visible.sync="showDeleteModalVisible" title="Confirm Delete">
-      <span>Are you sure you want to delete this product?</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button class="btn btn-w btn-secondary" @click="showDeleteModalVisible = false">Cancel</el-button>
-        <el-button class="btn btn-w btn-danger" type="danger" @click="deleteProduct">Delete</el-button>
-      </span>
-    </el-dialog>
+    
     <el-dialog :visible.sync="showAddModalVisible" title="Add Product">
       <el-form :model="newProduct">
         <div class="d-flex row">
@@ -242,19 +238,21 @@
           </el-form-item>
         </div>
         <el-form-item label="Image" class="w-100">
-          <el-upload
-            class="w-100"
-            action=""
-            :show-file-list="false"
-            accept="image/*"
-            :on-change="handleUploadImage"
-          >
-            <div class="d-flex w-100">
-              <el-image
-                v-if="image"
-                :src="image"
-                style="width: auto; height: 50px; object-fit: cover;"
-              ></el-image>
+          <div v-if="newProduct.image" class="d-flex w-100">
+            <el-image
+              :src="newProduct.image"
+              style="width: auto; height: 50px; object-fit: cover;"
+            ></el-image>
+            <el-button @click="removeImage('new')">Remove</el-button>
+          </div>
+          <div v-else>
+            <el-upload
+              class="w-100"
+              action=""
+              :show-file-list="false"
+              accept="image/*"
+              :on-change="handleNewUploadImage"
+            >
               <el-upload
                 class="mb-4 w-100 h-25 justify-content-center"
                 action="your_upload_endpoint_here"
@@ -272,14 +270,14 @@
                   Support: jpg, jpeg, png
                 </div>
               </el-upload>
-            </div>
-          </el-upload>
-        </el-form-item>        
+            </el-upload>
+          </div>
+        </el-form-item>
       </el-form>
-        <span slot="footer" class="dialog-footer d-flex gap-4 justify-content-center">
-          <el-button class="btn btn-w btn-secondary" :visible.sync="showAddModalVisible" @click="discardNewProduct">Discard</el-button>
-          <el-button class="btn btn-w btn-primary" :visible.sync="showAddModalVisible" type="primary" @click="saveNewProduct">Save</el-button>
-        </span>
+      <span slot="footer" class="dialog-footer d-flex gap-4 justify-content-center">
+        <el-button class="btn btn-w btn-secondary" @click="discardNewProduct">Discard</el-button>
+        <el-button class="btn btn-w btn-primary" type="primary" @click="saveNewProduct">Save</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -294,6 +292,15 @@ export default {
       showAddModalVisible: false,
       editProduct: {},
       deleteProductId: null,
+      editProduct: {
+        title: '',
+        id: '',
+        description: '',
+        price: '',
+        quantity: '',
+        category: '',
+        image: null
+      },
       newProduct: {
         title: '',
         id: '',
@@ -329,6 +336,13 @@ export default {
       this.editProduct = { ...product };
       this.showEditModalVisible = true;
     },
+    handleEditUploadImage(file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file.raw);
+      reader.onload = () => {
+        this.editProduct.image = reader.result;
+      };
+    },
     updateProduct() {
       const index = this.products.findIndex(p => p.id === this.editProduct.id);
       if (index !== -1) {
@@ -350,6 +364,20 @@ export default {
       reader.onload = () => {
         this.newProduct.image = reader.result;
       };
+    },
+    handleNewUploadImage(file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file.raw);
+      reader.onload = () => {
+        this.newProduct.image = reader.result;
+      };
+    },
+    removeImage(type) {
+      if (type === 'edit') {
+        this.editProduct.image = null;
+      } else if (type === 'new') {
+        this.newProduct.image = null;
+      }
     },
     handlePictureCardPreview(file) {
       this.previewImageUrl = file.url;
@@ -399,7 +427,6 @@ export default {
 </script>
 
 <style>
-/* Add custom styles for the admin product */
 .admin-product {
   display: flex;
   height: 100vh;
@@ -503,6 +530,9 @@ export default {
   border-color: #F390C7;
   color: #000000;
 }
+.el-dialog{
+  border-radius: 16px;
+}
 .el-button--primary:focus, .el-button--primary {
   background: #000000;
   border-color: #000000;
@@ -515,6 +545,7 @@ export default {
 }
 .el-upload{
   width: 100%;
+  padding: 10px !important;
 }
 .el-upload--picture-card{
   line-height: normal;
