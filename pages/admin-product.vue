@@ -213,7 +213,7 @@
       </span>
     </el-dialog>
     
-    <el-dialog :visible.sync="showAddModalVisible" title="Add Product">
+    <el-dialog :visible.sync="showAddModalVisible" class="fw-bolder" title="Add Product">
       <el-form :model="newProduct">
         <div class="d-flex row">
           <el-form-item label="Product Name" class="col-md-7 col-sm-6">
@@ -262,7 +262,7 @@
                 :on-remove="handleRemove"
                 ref="upload"
               >
-                <i class="el-icon-plus"></i>
+                <i class="el-icon-plus pb-3"></i>
                 <div class="el-upload__text fw-normal">
                   Drop your image here, or browse
                 </div>
@@ -532,6 +532,10 @@ export default {
 }
 .el-dialog{
   border-radius: 16px;
+  padding: 10px;
+}
+.el-upload--text{
+  padding: 0px;
 }
 .el-button--primary:focus, .el-button--primary {
   background: #000000;
@@ -545,7 +549,6 @@ export default {
 }
 .el-upload{
   width: 100%;
-  padding: 10px !important;
 }
 .el-upload--picture-card{
   line-height: normal;
