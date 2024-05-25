@@ -176,7 +176,7 @@
               :src="editProduct.image"
               style="width: auto; height: 50px; object-fit: cover;"
             ></el-image>
-            <el-button @click="removeImage('edit')">Remove</el-button>
+            <el-button type="danger" @click="removeImage('edit')">Remove</el-button>
           </div>
           <div v-else>
             <el-upload
@@ -213,7 +213,7 @@
       </span>
     </el-dialog>
     
-    <el-dialog :visible.sync="showAddModalVisible" title="Add Product">
+    <el-dialog :visible.sync="showAddModalVisible" class="fw-bolder" title="Add Product">
       <el-form :model="newProduct">
         <div class="d-flex row">
           <el-form-item label="Product Name" class="col-md-7 col-sm-6">
@@ -238,12 +238,12 @@
           </el-form-item>
         </div>
         <el-form-item label="Image" class="w-100">
-          <div v-if="newProduct.image" class="d-flex w-100">
+          <div v-if="newProduct.image" class="d-flex align-items-center w-100 gap-4">
             <el-image
               :src="newProduct.image"
-              style="width: auto; height: 50px; object-fit: cover;"
+              style="width: auto; height: 200px; object-fit: cover;"
             ></el-image>
-            <el-button @click="removeImage('new')">Remove</el-button>
+            <el-button @click="removeImage('new')" type="danger" class="btn-w" style="width: auto; height: 45px;">Remove</el-button>
           </div>
           <div v-else>
             <el-upload
@@ -262,7 +262,7 @@
                 :on-remove="handleRemove"
                 ref="upload"
               >
-                <i class="el-icon-plus"></i>
+                <i class="el-icon-plus pb-3"></i>
                 <div class="el-upload__text fw-normal">
                   Drop your image here, or browse
                 </div>
@@ -315,7 +315,7 @@ export default {
           id: 'F001',
           title: 'Coklat',
           description: 'Premium Rich and creamy chocolate ice cream, crafted from the finest cocoa beans and fresh dairy.',
-          price: 20,
+          price: 'RM 20',
           quantity: '100',
           category: 'Dessert',
           image: '/assets/product-1.png'
@@ -530,8 +530,15 @@ export default {
   border-color: #F390C7;
   color: #000000;
 }
+.btn-warning{
+  background-color: ;
+}
 .el-dialog{
   border-radius: 16px;
+  padding: 10px;
+}
+.el-upload--text{
+  padding: 0px;
 }
 .el-button--primary:focus, .el-button--primary {
   background: #000000;
@@ -545,7 +552,6 @@ export default {
 }
 .el-upload{
   width: 100%;
-  padding: 10px !important;
 }
 .el-upload--picture-card{
   line-height: normal;
