@@ -212,7 +212,13 @@
         <el-button class="btn btn-w btn-primary" type="primary" @click="updateProduct">Update</el-button>
       </span>
     </el-dialog>
-    
+    <el-dialog :visible.sync="showDeleteModalVisible" title="Confirm Delete">
+      <span>Are you sure you want to delete this product?</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button class="btn btn-w btn-secondary" @click="showDeleteModalVisible = false">Cancel</el-button>
+        <el-button class="btn btn-w btn-danger" type="danger" @click="deleteProduct">Delete</el-button>
+      </span>
+    </el-dialog>
     <el-dialog :visible.sync="showAddModalVisible" class="fw-bolder" title="Add Product">
       <el-form :model="newProduct">
         <div class="d-flex row">
@@ -500,6 +506,7 @@ export default {
 .btn-list-img {
   width: 30px;
   height: 30px;
+  cursor: pointer;
 }
 .btn-w {
   min-width: 160px;
