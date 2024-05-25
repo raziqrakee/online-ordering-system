@@ -29,47 +29,58 @@
     <!-- PRODUCT -->
     <div id="menu-section" class="m-5">
       <div class="mx-5">
-        <h1 class="text-2xl fw-bold mb-4 text-center">OUR CUSTOMER'S FAVORITE</h1>
-        <h2 class="text-xl fw-normal mb-4 text-center text-muted">Popular Items</h2>
-        
-        <div class="filters mb-3 text-center">
-          <el-select v-model="selectedFilter" placeholder="Filters">
-            <el-option
-              v-for="filter in filters"
-              :key="filter.value"
-              :label="filter.label"
-              :value="filter.value"
-            ></el-option>
-          </el-select>
-        </div>
-    
-        <div class="row">
-          <div
-            v-for="item in filteredItems"
-            :key="item.id"
-            class="col-md-3 mb-5"
+        <h1 class="text-2xl fw-bold mb-4 text-center">Menu</h1>
+          <el-menu
+            :default-active="activeIndex"
+            mode="horizontal"
+            @select="handleSelect"
+            class="menu mb-3"
           >
-            <div class="card shadow-sm border-0">
-              <img style="max-height: 300px; min-height: 300px; object-fit: cover;" :src="item.imageUrl" class="card-img-top rounded-top" :alt="item.name" />
-              <div class="card-body">
-                <div class="d-flex flex-column align-items-center">
-                  <h5 class="card-title">{{ item.name }}</h5>
-                  <p class="card-text text-success fw-bold">RM{{ item.price.toFixed(2) }}</p>
-                </div>
-                <div class="d-flex justify-content-center mt-3">
-                  <button class="btn btn-primary" @click="addToCart(item)">
-                    Add to Cart
-                  </button>
+            <el-menu-item index="all">All</el-menu-item>
+            <el-menu-item index="dessert">Dessert</el-menu-item>
+            <el-menu-item index="korean">Korean</el-menu-item>
+            <el-menu-item index="snacks">Snacks</el-menu-item>
+            <el-menu-item index="beverages">Beverages</el-menu-item>
+          </el-menu>
+        
+          <div class="filters mb-3 text-center">
+            <el-select v-model="selectedFilter" placeholder="Filters">
+              <el-option
+                v-for="filter in filters"
+                :key="filter.value"
+                :label="filter.label"
+                :value="filter.value"
+              ></el-option>
+            </el-select>
+          </div>
+      
+          <div class="row">
+            <div
+              v-for="item in filteredItems"
+              :key="item.id"
+              class="col-md-3 mb-5"
+            >
+              <div class="card shadow-sm border-0">
+                <img style="max-height: 300px; min-height: 300px; object-fit: cover;" :src="item.imageUrl" class="card-img-top rounded-top" :alt="item.name" />
+                <div class="card-body">
+                  <div class="d-flex flex-column align-items-center">
+                    <h5 class="card-title">{{ item.name }}</h5>
+                    <p class="card-text fw-bold">RM{{ item.price.toFixed(2) }}</p>
+                  </div>
+                  <div class="d-flex justify-content-center mt-3">
+                    <button class="btn btn-primary" @click="addToCart(item)">
+                      Add to Cart
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+      
+          <div class="text-center mt-4">
+            <button class="btn btn-secondary" @click="loadMore">Load more...</button>
+          </div>
         </div>
-    
-        <div class="text-center mt-4">
-          <button class="btn btn-secondary" @click="loadMore">Load more...</button>
-        </div>
-      </div>
     </div>
     <!-- FOOTER -->
     <div class="row pt-5 px-5 py-4"style="background-color: #F390C7;">
