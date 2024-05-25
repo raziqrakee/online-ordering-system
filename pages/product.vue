@@ -30,18 +30,23 @@
     <div id="menu-section" class="m-5">
       <div class="mx-5">
         <h1 class="text-2xl fw-bold mb-4 text-center">Menu</h1>
-          <el-menu
-            :default-active="activeIndex"
-            mode="horizontal"
-            @select="handleSelect"
-            class="menu mb-3"
-          >
-            <el-menu-item index="all">All</el-menu-item>
-            <el-menu-item index="dessert">Dessert</el-menu-item>
-            <el-menu-item index="korean">Korean</el-menu-item>
-            <el-menu-item index="snacks">Snacks</el-menu-item>
-            <el-menu-item index="beverages">Beverages</el-menu-item>
-          </el-menu>
+          <div class="mb-3 d-flex justify-content-between">
+            <el-menu
+              :default-active="activeIndex"
+              mode="horizontal"
+              @select="handleSelect"
+              class="menu w-100"
+            >
+              <el-menu-item index="all">All</el-menu-item>
+              <el-menu-item index="dessert">Dessert</el-menu-item>
+              <el-menu-item index="korean">Korean</el-menu-item>
+              <el-menu-item index="snacks">Snacks</el-menu-item>
+              <el-menu-item index="beverages">Beverages</el-menu-item>
+            </el-menu>
+            <div class="search menu">
+              <el-input placeholder="Search" prefix-icon="el-icon-search" v-model="searchQuery"@input="searchItems"></el-input>
+            </div>
+          </div>
         
           <div class="filters mb-3 text-center">
             <el-select v-model="selectedFilter" placeholder="Filters">
@@ -148,6 +153,7 @@ export default {
       },
       activeIndex: 'all',
       selectedFilter: '',
+      searchQuery: '',
       filters: [
         { value: '', label: 'All' },
         { value: 'vegetarian', label: 'Vegetarian' },
@@ -218,7 +224,6 @@ export default {
     }
   },
   mounted() {
-    // If there's a hash in the URL, scroll to the element with that ID
     if (this.$route.hash) {
       const element = document.querySelector(this.$route.hash);
       if (element) {
@@ -228,26 +233,35 @@ export default {
   },
   computed: {
     filteredItems() {
-      let filtered = this.items
+      let filtered = this.items;
       if (this.activeIndex !== 'all') {
         filtered = filtered.filter(
           (item) => item.category === this.activeIndex
-        )
+        );
       }
       if (this.selectedFilter) {
         filtered = filtered.filter(
           (item) => item.filters.includes(this.selectedFilter)
-        )
+        );
       }
-      return filtered.slice(0, this.currentPage * this.itemsPerPage)
+      if (this.searchQuery) {
+        const searchLower = this.searchQuery.toLowerCase();
+        filtered = filtered.filter(
+          (item) =>
+            item.name.toLowerCase().includes(searchLower) ||
+            item.category.toLowerCase().includes(searchLower) ||
+            item.filters.some(filter => filter.toLowerCase().includes(searchLower))
+        );
+      }
+      return filtered.slice(0, this.currentPage * this.itemsPerPage);
     },
   },
   methods: {
     handleSelect(index) {
-    this.activeIndex = index;
-  },
+      this.activeIndex = index;
+    },
     addToCart(item) {
-      // Add your cart logic here
+
       console.log('Added to cart:', item)
     },
     loadMore() {
@@ -256,9 +270,7 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          // Handle form submission logic here
           console.log('Form data:', this.form)
-          // Reset form after successful submission
           this.$refs[formName].resetFields()
         } else {
           console.log('Error submitting form')
@@ -285,6 +297,9 @@ export default {
           element.scrollIntoView({ behavior: 'smooth' })
         }
       }
+    },
+    searchItems() {
+      this.currentPage = 1;
     }
   },
 }
