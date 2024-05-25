@@ -174,7 +174,7 @@
           <div v-if="editProduct.image" class="d-flex w-100">
             <el-image
               :src="editProduct.image"
-              style="width: auto; height: 50px; object-fit: cover;"
+              style="width: auto; height: 200px; object-fit: cover;"
             ></el-image>
             <el-button type="danger" @click="removeImage('edit')">Remove</el-button>
           </div>
