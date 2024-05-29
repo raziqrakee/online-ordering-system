@@ -2,7 +2,7 @@
   <el-menu style="background-color: #F390C7; color: #fff;" class="el-menu-demo d-flex justify-content-between align-items-center" mode="horizontal" @select="handleSelect">
     <div class="d-flex">
       <el-menu-item class="d-flex align-items-center" index="4" style="color: #fff;">
-        <h4 class="fw-bold text-white m-0">ORDER NOW</h4>
+        <nuxt-link to="/product" class="fw-bold text-white m-0" style="text-decoration: none; color: #fff;">ORDER NOW</nuxt-link>
       </el-menu-item>
     </div>
     <div class="d-flex">

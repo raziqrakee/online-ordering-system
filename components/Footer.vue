@@ -82,4 +82,14 @@ export default {
   width: 30px;
   height: 30px;
 }
+
+/* Add the following lines to ensure text color consistency */
+.footer a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
 </style>
