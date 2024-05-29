@@ -1,36 +1,7 @@
 <!-- AdminDashboard.vue -->
 <template>
     <div class="admin-dashboard">
-      <div class="sidebar" style="padding-left: 0px; padding-right: 0px;">
-        <div class="logo">
-          <img src="~/static/logo.png" alt="Logo" class="img-fluid" width="98px">
-        </div>
-        <el-menu :default-active="activeLink" class="sidebar-menu" @select="handleSelect">
-          <el-menu-item index="dashboard" class="custom-sidebar-item">
-            <i class="el-icon-menu"></i>
-            <span>Dashboard</span>
-          </el-menu-item>
-          <el-menu-item index="product" class="custom-sidebar-item" >
-            <i class="el-icon-goods"></i>
-            <span>Product</span>
-          </el-menu-item>
-          <el-menu-item index="order" class="custom-sidebar-item">
-            <i class="el-icon-shopping-cart-2"></i>
-            <span>Order</span>
-          </el-menu-item>
-          <el-menu-item index="reservation" class="custom-sidebar-item">
-            <i class="el-icon-date"></i>
-            <span>Reservation</span>
-          </el-menu-item>
-          <el-menu-item index="report" class="custom-sidebar-item">
-            <i class="el-icon-document"></i>
-            <span>Sale Report</span>
-          </el-menu-item>
-        </el-menu>
-        <div class="logout">
-          <el-button type="danger" icon="el-icon-switch-button" round @click="logout()">Logout</el-button>
-        </div>
-      </div>
+      <Sidebar></Sidebar>
       <div class="content" style="background-color: #f6f6f6;padding: 0px;">
         <div class="header" style="background-color: #fff; padding: 20px">
           <div class="search">
@@ -113,22 +84,19 @@
   </template>
 
   <script>
+  import Sidebar from '../components/Sidebar.vue';
+
   export default {
+    components: {
+    Sidebar, // Register the Sidebar component
+
+  },
     data() {
       return {
         activeLink: 'dashboard',
       }
     },
     methods: {
-    handleSelect(index) {
-      this.activeLink = index;
-      this.$router.push(`/admin-${index}`);
-    },
-    logout(){
-            this.$cookies.remove("token")
-            // this.$router.push("/login")
-            window.location.href = "login"
-        }
     }
   }
   </script>
@@ -140,34 +108,6 @@
     display: flex;
     height: 100vh;
   }
-
-  .sidebar {
-    background-color: #FFE9F5;
-    color: #fff;
-    padding: 20px;
-    width: 200px;
-  }
-
-  .logo {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  .sidebar-menu {
-    border-right: none;
-  }
-
-  .custom-sidebar-item{
-    background-color: #FFE9F5;
-  }
-
-  .logout {
-    position: absolute;
-    bottom: 20px;
-    left: 40px;
-    right: 20px;
-  }
-
   .content {
     flex: 1;
     padding: 20px;
