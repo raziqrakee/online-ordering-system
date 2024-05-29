@@ -1,31 +1,6 @@
 <template>
   <div>
-    <el-menu style="background-color: #F390C7; color: #fff;" class="el-menu-demo d-flex justify-content-between align-items-center" mode="horizontal" @select="handleSelect">
-        <div class="d-flex">
-          <el-menu-item  class="d-flex align-items-center" index="4" style="color: #fff;">
-            <h4 class="fw-bold text-white m-0">ORDER NOW</h4>
-          </el-menu-item>
-        </div>
-        <div class="d-flex">
-          <el-menu-item class="d-flex justify-items-center" index="all" style="color: #fff;">
-            <a href="./" style="text-decoration: none; color: #fff;">Home</a>
-          </el-menu-item>
-          <el-menu-item class="d-flex align-items-center" style="color: #fff;" @click="navigateTo('news')">News</el-menu-item>
-          <el-menu-item class="d-flex align-items-center" index="menu" style="color: #fff;">Menu</el-menu-item>
-          <el-menu-item class="d-flex align-items-center" index="order" style="color: #fff;">Order</el-menu-item>
-          <el-menu-item class="d-flex align-items-center" index="reservation" style="color: #fff;">Reservation</el-menu-item>
-        </div>
-        <div class="d-flex">
-          <el-submenu index="2">
-            <template slot="title">
-              <i style="color: #fff;" class="el-icon-user-solid"></i>
-            </template>
-            <el-menu-item index="2-1" @click="$router.push('edit-profile')">Edit Profile</el-menu-item>
-            <el-menu-item index="2-1">Cart</el-menu-item>
-            <el-menu-item index="2-1" @click="logout()">Logout</el-menu-item>
-          </el-submenu>
-        </div>
-    </el-menu>
+    <Navbar></Navbar>
     <!-- PRODUCT -->
     <div id="menu-section" class="m-5">
       <div class="mx-5">
@@ -47,7 +22,7 @@
               <el-input placeholder="Search" prefix-icon="el-icon-search" v-model="searchQuery"@input="searchItems"></el-input>
             </div>
           </div>
-        
+
           <div class="filters mb-3 text-center">
             <el-select v-model="selectedFilter" placeholder="Filters">
               <el-option
@@ -58,7 +33,7 @@
               ></el-option>
             </el-select>
           </div>
-      
+
           <div class="row">
             <div
               v-for="item in filteredItems"
@@ -81,69 +56,27 @@
               </div>
             </div>
           </div>
-      
+
           <div class="text-center mt-4">
             <button class="btn btn-secondary" @click="loadMore">Load more...</button>
           </div>
         </div>
     </div>
     <!-- FOOTER -->
-    <div class="row pt-5 px-5 py-4"style="background-color: #F390C7;">
-        <div class="col-md-3 col-sm-6 d-flex justify-content-center text-white">
-          <div>
-            <h3 class="fw-bold mb-4">Operation Hour</h3>
-            <p class="mb-2">Sat-Wed: 09:00am-10:00PM</p>
-            <p class="mb-2">Thursday: 09:00am-11:00PM</p>
-            <p class="mb-2">Friday: 09:00am-8:00PM</p>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6 d-flex justify-content-center text-white">
-          <div>
-            <h3 class="fw-bold mb-4">User Link</h3>
-            <div class="mb-2" @click="navigateTo('home')">Home</div>
-            <div class="mb-2" @click="navigateTo('news')">News</div>
-            <div class="mb-2" @click="navigateTo('menu')">Menu</div>
-            <div class="mb-2"> Reservation</div>
-            <div @click="navigateTo('contact')">Contact</div>
-          </div>
-        </div>
-        <div class="col-md-5 col-sm-6 d-flex justify-content-center mb-5 text-white">
-          <div class="text-center">
-            <div class="fw-bold mb-4">
-              <img src="~/static/logo.png" width="128"></img>
-            </div>
-            <div>Danish Ice Cream Cafe</div>
-            <div class="mb-2">danishicecreamkeningau@gmail.com</div>
-            <div>Lot 2, Future city complex, Jalan Masjid, 89008 Keningau, Sabah, Malaysia</div>
-          </div>
-        </div>
-        <div class="col-md-1 col-sm-6 d-flex mb-5 text-white">
-          <!-- <h3 class="fw-bold mb-4">Follow Us</h3> -->
-          <div class="d-flex row flex-wrap justify-content-center">
-            <div class="d-flex justify-content-center">
-              <img href="" src="~/static/icon/fb.png" alt="Facebook" class="social-list-img">
-            </div>
-            <div class="d-flex justify-content-center">
-              <img href="" src="~/static/icon/ig.png" alt="Instagram" class="social-list-img">
-            </div>
-              <div class="d-flex justify-content-center">
-              <img href="" src="~/static/icon/tiktok.png" alt="Tiktok" class="social-list-img">
-            </div>
-              <div class="d-flex justify-content-center">
-              <img href="" src="~/static/icon/whatsapp.png" alt="Whatsapp" class="social-list-img">
-            </div>
-          </div>
-        </div>
-        <hr>
-        <div class="col-md-12 col-sm-6 text-center mt-2">
-          <p class="text-white fw-light m-0">Copyright @2023 Danish Ice Cream Cafe</p>
-        </div>
-      </div>
+   <Footer></Footer>
   </div>
 </template>
 
 <script>
+import Navbar from '../components/Navbar.vue';
+import Footer from '../components/Footer.vue';
+
 export default {
+  components: {
+    Navbar, // Register the Navbar component
+    Footer, // Register the Footer component
+  },
+
   data() {
     return {
       form: {
@@ -371,10 +304,5 @@ export default {
   border-color: #F390C700;
   color: #000000;
   border-radius: 50px;
-}
-.social-list-img{
-  width: 30px;
-  height: 30px;
-  
 }
 </style>
