@@ -61,14 +61,17 @@
                       Description
                     </th>
                     <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Price
+                      Price 
                     </th>
                     <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Stock Quantity
+                      Quantity
                     </th>
                     <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Category
                     </th>
+                    <!-- <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Created At
+                    </th> -->
                     <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Action
                     </th>
@@ -82,7 +85,7 @@
                           <img :src="product.image" alt="Product Icon" class="product-list-img">
                         </div>
                         <div class="ml-4">
-                          <div class="text-sm font-medium text-gray-900">{{ product.title }}</div>
+                          <div class="text-sm font-medium text-gray-900">{{ product.name }}</div>
                         </div>
                       </div>
                     </td>
@@ -121,7 +124,7 @@
       <el-form :model="editProduct">
         <div class="d-flex row">
           <el-form-item label="Product Name" class="col-md-7 col-sm-6">
-            <el-input v-model="editProduct.title"></el-input>
+            <el-input v-model="editProduct.name"></el-input>
           </el-form-item>
           <el-form-item label="ID" class="col-md-5 col-sm-6">
             <el-input v-model="editProduct.id" disabled></el-input>
@@ -194,7 +197,7 @@
       <el-form :model="newProduct">
         <div class="d-flex row">
           <el-form-item label="Product Name" class="col-md-7 col-sm-6">
-            <el-input v-model="newProduct.title"></el-input>
+            <el-input v-model="newProduct.name"></el-input>
           </el-form-item>
           <el-form-item label="ID" class="col-md-5 col-sm-6">
             <el-input v-model="newProduct.id"></el-input>
@@ -236,6 +239,7 @@
                 :auto-upload="false"
                 list-type="picture-card"
                 :on-preview="handlePictureCardPreview"
+                :file-list="fileList"
                 :on-remove="handleRemove"
                 ref="upload"
               >
@@ -260,12 +264,12 @@
 </template>
 
 <script>
-  import Sidebar from '../components/Sidebar.vue';
+import axios from 'axios';
+import Sidebar from '../components/Sidebar.vue';
 
 export default {
   components: {
-    Sidebar, // Register the Sidebar component
-
+    Sidebar,
   },
   data() {
     return {
@@ -273,40 +277,43 @@ export default {
       showEditModalVisible: false,
       showDeleteModalVisible: false,
       showAddModalVisible: false,
-      editProduct: {},
-      deleteProductId: null,
       editProduct: {
-        title: '',
+        name: '',
         id: '',
         description: '',
         price: '',
         quantity: '',
         category: '',
-        image: null
+        image: null,
       },
       newProduct: {
-        title: '',
+        name: '',
         id: '',
         description: '',
         price: '',
         quantity: '',
         category: '',
-        image: null
+        image: null,
       },
-      products: [
-        {
-          id: 'F001',
-          title: 'Coklat',
-          description: 'Premium Rich and creamy chocolate ice cream, crafted from the finest cocoa beans and fresh dairy.',
-          price: 'RM 20',
-          quantity: '100',
-          category: 'Dessert',
-          image: '/assets/product-1.png'
-        }
-      ]
+      products: [],
     };
+    
+  },
+  created() {
+    this.fetchProducts();
   },
   methods: {
+    fetchProducts() {
+      axios.get('http://localhost:8000/api/products')
+        .then(response => {
+          if (response.data.status === 200) {
+            this.products = response.data.products;
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching products:', error);
+        });
+    },
     showEditModal(product) {
       this.editProduct = { ...product };
       this.showEditModalVisible = true;
@@ -319,26 +326,32 @@ export default {
       };
     },
     updateProduct() {
-      const index = this.products.findIndex(p => p.id === this.editProduct.id);
-      if (index !== -1) {
-        this.products.splice(index, 1, this.editProduct);
-      }
-      this.showEditModalVisible = false;
+      axios.put(`http://localhost:8000/api/products/${this.editProduct.id}/edit`, this.editProduct)
+        .then(response => {
+          if (response.data.status === 200) {
+            this.fetchProducts();
+            this.showEditModalVisible = false;
+          }
+        })
+        .catch(error => {
+          console.error('Error updating product:', error);
+        });
     },
     showDeleteModal(productId) {
       this.deleteProductId = productId;
       this.showDeleteModalVisible = true;
     },
     deleteProduct() {
-      this.products = this.products.filter(p => p.id !== this.deleteProductId);
-      this.showDeleteModalVisible = false;
-    },
-    handleUploadImage(file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file.raw);
-      reader.onload = () => {
-        this.newProduct.image = reader.result;
-      };
+      axios.delete(`http://localhost:8000/api/products/${this.deleteProductId}/delete`)
+        .then(response => {
+          if (response.data.status === 200) {
+            this.fetchProducts();
+            this.showDeleteModalVisible = false;
+          }
+        })
+        .catch(error => {
+          console.error('Error deleting product:', error);
+        });
     },
     handleNewUploadImage(file) {
       const reader = new FileReader();
@@ -347,40 +360,25 @@ export default {
         this.newProduct.image = reader.result;
       };
     },
-    removeImage(type) {
-      if (type === 'edit') {
-        this.editProduct.image = null;
-      } else if (type === 'new') {
-        this.newProduct.image = null;
-      }
-    },
-    handlePictureCardPreview(file) {
-      this.previewImageUrl = file.url;
-      this.$refs.previewModal.open();
-    },
-    closePreviewModal() {
-      this.previewImageUrl = '';
-      this.$refs.previewModal.close();
-    },
-    handleRemove(file) {
-      const index = this.newProduct.images.indexOf(file);
-      this.newProduct.images.splice(index, 1);
-      this.$notify({
-        title: 'Remove',
-        message: 'Remove functionality is not implemented yet.',
-        type: 'warning'
-      });
-    },
+    handleRemove(file, fileList) {
+    console.log(file, fileList);
+  },
+  handlePictureCardPreview(file) {
+    this.dialogImageUrl = file.url;
+    this.dialogVisible = true;
+  },
     saveNewProduct() {
-      // Perform save operation, e.g., adding the new product to the list
-      const formattedPrice = parseFloat(this.newProduct.price).toLocaleString('en-MY', { style: 'currency', currency: 'MYR' });
-      this.products.push({
-        ...this.newProduct,
-        price: formattedPrice
-      });
-
-      this.clearNewProductForm();
-      this.showAddModalVisible = false;
+      axios.post('http://localhost:8000/api/products', this.newProduct)
+        .then(response => {
+          if (response.data.status === 200) {
+            this.fetchProducts();
+            this.clearNewProductForm();
+            this.showAddModalVisible = false;
+          }
+        })
+        .catch(error => {
+          console.error('Error adding new product:', error);
+        });
     },
     discardNewProduct() {
       this.clearNewProductForm();
@@ -388,18 +386,19 @@ export default {
     },
     clearNewProductForm() {
       this.newProduct = {
-        title: '',
+        name: '',
         id: '',
         description: '',
         price: '',
-        status: '',
+        quantity: '',
         category: '',
-        image: null
+        image: null,
       };
     }
   }
 };
 </script>
+
 
 <style>
 .admin-product {
@@ -485,9 +484,9 @@ export default {
   border-color: #F390C7;
   color: #000000;
 }
-.btn-warning{
+/* .btn-warning{
   background-color:  ;
-}
+} */
 .el-dialog{
   border-radius: 16px;
   padding: 10px;
