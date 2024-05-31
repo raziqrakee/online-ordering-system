@@ -25,42 +25,47 @@
       <div class="mx-5 d-flex flex-lg-row flex-sm-column align-items-center">
         <h1 class="text-2xl fw-bold mb-5 text-center">OUR TOP PICKS</h1>
         <div class="row mx-5">
-          <div class="w-100 mb-4">
+          <div v-if="topProduct" class="w-100 mb-4">
             <div class="card card-main">
-              <img class="w-100" style="max-height: 500px; min-height: 300px; object-fit: cover;" src="/assets/product-7.png" />
+              <img
+                class="w-100"
+                style="max-height: 500px; min-height: 300px; object-fit: cover;"
+                :src="topProduct.image_url"
+              />
               <div class="card-body w-100 justify-content-between">
                 <div class="d-flex flex-column mx-2">
-                  <h2 class="card-title text-uppercase fw-bolder">samyang ramen</h2>
+                  <h2 class="card-title text-uppercase fw-bolder">{{ topProduct.name }}</h2>
                   <div class="row">
-                    <h4 class="card-text fw-bold">RM 7</h4>
-                    <h6 class="card-text text-capitalize">korean</h6>
-                    <h7 class="card-text">Sold : 600 pcs</h7>
+                    <h4 class="card-text fw-bold">RM {{ topProduct.price }}</h4>
+                    <h6 class="card-text text-capitalize">{{ topProduct.category }}</h6>
+                    <h7 class="card-text">Sold: {{ topProduct.sold }} pcs</h7>
                   </div>
                 </div>
                 <div class="d-flex justify-content-center mx-2">
-                  <button class="btn btn-primary" @click="addToCart(item)">
+                  <button class="btn btn-primary" @click="addToCart(topProduct)">
                     Add to Cart
                   </button>
                 </div>
               </div>
             </div>
           </div>
-          <div
-            v-for="item in filteredItems"
-            :key="item.id"
-            class="col-md-6 mb-4"
-          >
+          <div v-for="product in products" :key="product.id" class="col-md-6 mb-4">
             <div class="card">
-              <img style="max-height: 300px; min-height: 300px; object-fit: cover;" :src="item.imageUrl" class="card-img-top" :alt="item.name" />
+              <img
+                style="max-height: 300px; min-height: 300px; object-fit: cover;"
+                :src="product.image_url"
+                class="card-img-top"
+                :alt="product.name"
+              />
               <div class="card-body py-5">
                 <div class="d-flex row mb-5">
-                  <h4 class="card-title fw-bold">{{ item.name }}</h4>
-                  <h5 class="card-text">RM{{ item.price.toFixed(2) }}</h5>
-                  <h6 class="card-text text-capitalize">{{ item.category}}</h6>
-                  <h7 class="card-text">Sold : {{ item.sold}} pcs</h7>
+                  <h4 class="card-title fw-bold">{{ product.name }}</h4>
+                  <h5 class="card-text">RM {{ product.price }}</h5>
+                  <h6 class="card-text text-capitalize">{{ product.category }}</h6>
+                  <h7 class="card-text">Sold: {{ product.sold }} pcs</h7>
                 </div>
                 <div class="d-flex justify-content-center">
-                  <button class="btn btn-primary" @click="addToCart(item)">
+                  <button class="btn btn-primary" @click="addToCart(product)">
                     Add to Cart
                   </button>
                 </div>
@@ -175,6 +180,8 @@ export default {
       ],
       itemsPerPage: 9,
       currentPage: 1,
+      topProduct: null,
+      products: []
     }
   },
   mounted() {
@@ -201,6 +208,9 @@ export default {
       }
       return filtered.slice(0, this.currentPage * this.itemsPerPage)
     },
+  },
+  created(){
+    this.fetchProducts()
   },
   methods: {
     handleSelect(index) {
@@ -243,7 +253,16 @@ export default {
       if (targetSection) {
         this.$router.push({ path: '/', hash: targetSection });
       }
-    }
+    },
+    async fetchProducts() {
+      try {
+        const response = await this.$axios.get('http://localhost:8000/api/products');
+        this.topProduct = response.data.products[0];
+        this.products = response.data.products;
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    },
   },
 }
 </script>

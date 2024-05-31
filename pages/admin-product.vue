@@ -52,6 +52,8 @@
                 <thead class="bg-gray-100 text-center rounded-xl">
                   <tr>
                     <th scope="col" class="px-6 m-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    </th>
+                    <th scope="col" class="px-6 m-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Title
                     </th>
                     <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -61,7 +63,7 @@
                       Description
                     </th>
                     <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Price 
+                      Price
                     </th>
                     <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Quantity
@@ -79,11 +81,13 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200 text-center">
                   <tr class="border-b-gray-50" v-for="product in products" :key="product.id">
+                    <td>
+                      <div class="flex-shrink-0 h-10 w-10">
+                          <img :src="product.image_url" alt="Product Icon" class="product-list-img">
+                        </div>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="flex items-center">
-                        <div class="flex-shrink-0 h-10 w-10">
-                          <img :src="product.image" alt="Product Icon" class="product-list-img">
-                        </div>
                         <div class="ml-4">
                           <div class="text-sm font-medium text-gray-900">{{ product.name }}</div>
                         </div>
@@ -145,47 +149,39 @@
           </el-form-item>
         </div>
         <el-form-item label="Image" class="w-100">
-          <div v-if="editProduct.image" class="d-flex w-100">
+          <div v-if="editProduct.image" class="d-flex w-100 align-items-center gap-4">
             <el-image
               :src="editProduct.image"
               style="width: auto; height: 200px; object-fit: cover;"
             ></el-image>
-            <el-button type="danger" @click="removeImage('edit')">Remove</el-button>
+            <el-button type="danger" @click="removeEditImage()">Remove</el-button>
           </div>
           <div v-else>
             <el-upload
-              class="w-100"
+              class="w-100 mb-4 h-25 justify-content-center"
               action=""
               :show-file-list="false"
               accept="image/*"
               :on-change="handleEditUploadImage"
+              :auto-upload="false"
+              list-type="picture-card"
+              :on-preview="handlePictureCardPreview"
+              :on-remove="handleRemove"
+              ref="upload"
             >
-              <el-upload
-                class="mb-4 w-100 h-25 justify-content-center"
-                action="your_upload_endpoint_here"
-                :auto-upload="false"
-                list-type="picture-card"
-                :on-preview="handlePictureCardPreview"
-                :on-remove="handleRemove"
-                ref="upload"
-              >
-                <i class="el-icon-plus"></i>
-                <div class="el-upload__text fw-normal">
-                  Drop your image here, or browse
-                </div>
-                <div class="el-upload__text fw-thin">
-                  Support: jpg, jpeg, png
-                </div>
-              </el-upload>
+              <i class="el-icon-plus pb-3"></i>
+              <div class="el-upload__text fw-normal">Drop your image here, or browse</div>
+              <div class="el-upload__text fw-thin">Support: jpg, jpeg, png</div>
             </el-upload>
           </div>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer d-flex justify-content-center">
         <el-button class="btn btn-w btn-secondary" @click="showEditModalVisible = false">Cancel</el-button>
-        <el-button class="btn btn-w btn-primary" type="primary" @click="updateProduct">Update</el-button>
+        <el-button class="btn btn-w btn-primary" type="primary" @click="updateEditProduct">Update</el-button>
       </span>
     </el-dialog>
+
     <el-dialog :visible.sync="showDeleteModalVisible" title="Confirm Delete">
       <span>Are you sure you want to delete this product?</span>
       <span slot="footer" class="dialog-footer">
@@ -193,6 +189,7 @@
         <el-button class="btn btn-w btn-danger" type="danger" @click="deleteProduct">Delete</el-button>
       </span>
     </el-dialog>
+
     <el-dialog :visible.sync="showAddModalVisible" class="fw-bolder" title="Add Product">
       <el-form :model="newProduct">
         <div class="d-flex row">
@@ -232,32 +229,23 @@
               :show-file-list="false"
               accept="image/*"
               :on-change="handleNewUploadImage"
+              :auto-upload="false"
+              list-type="picture-card"
+              :on-preview="handlePictureCardPreview"
+              :file-list="fileList"
+              :on-remove="handleRemove"
+              ref="upload"
             >
-              <el-upload
-                class="mb-4 w-100 h-25 justify-content-center"
-                action="your_upload_endpoint_here"
-                :auto-upload="false"
-                list-type="picture-card"
-                :on-preview="handlePictureCardPreview"
-                :file-list="fileList"
-                :on-remove="handleRemove"
-                ref="upload"
-              >
-                <i class="el-icon-plus pb-3"></i>
-                <div class="el-upload__text fw-normal">
-                  Drop your image here, or browse
-                </div>
-                <div class="el-upload__text fw-thin">
-                  Support: jpg, jpeg, png
-                </div>
-              </el-upload>
+              <i class="el-icon-plus pb-3"></i>
+              <div class="el-upload__text fw-normal">Drop your image here, or browse</div>
+              <div class="el-upload__text fw-thin">Support: jpg, jpeg, png</div>
             </el-upload>
           </div>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer d-flex gap-4 justify-content-center">
-        <el-button class="btn btn-w btn-secondary" @click="discardNewProduct">Discard</el-button>
-        <el-button class="btn btn-w btn-primary" type="primary" @click="saveNewProduct">Save</el-button>
+        <el-button class="btn btn-w btn-secondary" @click="discardNewProduct()">Discard</el-button>
+        <el-button class="btn btn-w btn-primary" type="primary" @click="insertNewProduct()">Save</el-button>
       </span>
     </el-dialog>
   </div>
@@ -296,11 +284,19 @@ export default {
         image: null,
       },
       products: [],
+      fileList: [],
     };
-    
   },
   created() {
     this.fetchProducts();
+  },
+  watch: {
+    'editProduct.image': {
+      handler(newValue, oldValue) {
+        // Your logic to handle image changes goes here
+      },
+      deep: true
+    }
   },
   methods: {
     fetchProducts() {
@@ -316,14 +312,13 @@ export default {
     },
     showEditModal(product) {
       this.editProduct = { ...product };
+      console.log("image on edit mode", this.editProduct)
+      this.editProduct.image = this.editProduct.image_url
       this.showEditModalVisible = true;
     },
-    handleEditUploadImage(file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file.raw);
-      reader.onload = () => {
-        this.editProduct.image = reader.result;
-      };
+    handleEditUploadImage(file, fileList) {
+      this.fileList = fileList;
+      this.editProduct.image = URL.createObjectURL(file.raw);
     },
     updateProduct() {
       axios.put(`http://localhost:8000/api/products/${this.editProduct.id}/edit`, this.editProduct)
@@ -353,20 +348,22 @@ export default {
           console.error('Error deleting product:', error);
         });
     },
-    handleNewUploadImage(file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file.raw);
-      reader.onload = () => {
-        this.newProduct.image = reader.result;
-      };
+    handleNewUploadImage(file, fileList) {
+      // const reader = new FileReader();
+      // reader.readAsDataURL(file.raw);
+      // reader.onload = () => {
+      //   this.newProduct.image = reader.result;
+      // };
+      this.fileList = fileList;
+      this.newProduct.image = URL.createObjectURL(file.raw);
     },
     handleRemove(file, fileList) {
     console.log(file, fileList);
-  },
-  handlePictureCardPreview(file) {
-    this.dialogImageUrl = file.url;
-    this.dialogVisible = true;
-  },
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
     saveNewProduct() {
       axios.post('http://localhost:8000/api/products', this.newProduct)
         .then(response => {
@@ -379,6 +376,80 @@ export default {
         .catch(error => {
           console.error('Error adding new product:', error);
         });
+    },
+    async updateEditProduct() {
+      try {
+        // Create a new FormData object
+        const formData = new FormData();
+
+        // Append the product data to the FormData object
+        for (const [key, value] of Object.entries(this.editProduct)) {
+          formData.append(key, value);
+        }
+
+        // Append the image file to the FormData object
+        if (this.fileList.length > 0) {
+          const file = this.fileList[0].raw;
+          formData.append('image', file, file.name);
+        }
+
+        let response;
+
+        // Check if it's an edit operation
+        if (this.editProduct.id) {
+          // Edit operation
+          response = await axios.post(`http://localhost:8000/api/product/${this.editProduct.id}`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+        }
+
+        if (response.data.status === 200) {
+          this.fetchProducts();
+          this.clearNewProductForm();
+          this.showAddModalVisible = false;
+          this.editProduct.id = null; // Reset the editProductId after a successful operation
+        } else {
+          console.error('Error with product operation:', response.data);
+        }
+      } catch (error) {
+        console.error('Error with product operation:', error);
+      }
+    },
+    async insertNewProduct() {
+      try {
+        // Create a new FormData object
+        const formData = new FormData();
+
+        // Append the product data to the FormData object
+        for (const [key, value] of Object.entries(this.newProduct)) {
+          formData.append(key, value);
+        }
+
+        // Append the image file to the FormData object
+        if (this.fileList.length > 0) {
+          const file = this.fileList[0].raw;
+          formData.append('image', file, file.name);
+        }
+
+        // Send the FormData object to the server
+        const response = await axios.post('http://localhost:8000/api/product', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        if (response.data.status === 200) {
+          this.fetchProducts();
+          this.clearNewProductForm();
+          this.showAddModalVisible = false;
+        } else {
+          console.error('Error adding new product:', response.data);
+        }
+      } catch (error) {
+        console.error('Error adding new product:', error);
+      }
     },
     discardNewProduct() {
       this.clearNewProductForm();
@@ -394,7 +465,15 @@ export default {
         category: '',
         image: null,
       };
-    }
+    },
+    removeEditImage() {
+      const product = {...this.editProduct}
+      product.image = null;
+      product.image_url = null; // Add this line
+      this.editProduct = {}
+      this.editProduct = product
+      console.log(this.editProduct);
+    },
   }
 };
 </script>
