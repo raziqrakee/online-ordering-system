@@ -41,11 +41,11 @@
               class="col-md-3 mb-5"
             >
               <div class="card shadow-sm border-0">
-                <img style="max-height: 300px; min-height: 300px; object-fit: cover;" :src="item.imageUrl" class="card-img-top rounded-top" :alt="item.name" />
+                <img style="max-height: 300px; min-height: 300px; object-fit: cover;" :src="item.image_url" class="card-img-top rounded-top" :alt="item.name" />
                 <div class="card-body">
                   <div class="d-flex flex-column align-items-center">
                     <h5 class="card-title">{{ item.name }}</h5>
-                    <p class="card-text fw-bold">RM{{ item.price.toFixed(2) }}</p>
+                    <p class="card-text fw-bold">RM{{ item.price }}</p>
                   </div>
                   <div class="d-flex justify-content-center mt-3">
                     <button class="btn btn-primary" @click="addToCart(item)">
@@ -189,6 +189,9 @@ export default {
       return filtered.slice(0, this.currentPage * this.itemsPerPage);
     },
   },
+  created(){
+    this.fetchProducts()
+  },
   methods: {
     handleSelect(index) {
       this.activeIndex = index;
@@ -199,6 +202,14 @@ export default {
     },
     loadMore() {
       this.currentPage++
+    },
+    async fetchProducts() {
+      try {
+        const response = await this.$axios.get('http://localhost:8000/api/products');
+        this.items = response.data.products;
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
