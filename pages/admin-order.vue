@@ -1,14 +1,14 @@
 <template>
-  <div class="admin-product">
+  <div class="admin-order">
     <!-- Sidebar component -->
     <Sidebar></Sidebar>
-    
+
     <div class="content">
       <div class="header">
         <div class="search">
           <el-input placeholder="Search" prefix-icon="el-icon-search"></el-input>
         </div>
-        
+
         <div class="user">
           <el-dropdown trigger="click">
             <span class="el-dropdown-link">
@@ -21,8 +21,8 @@
           </el-dropdown>
         </div>
       </div>
-      
-      <div class="admin-product-table">
+
+      <div class="admin-order-table">
         <div class="table-header">
           <h1 class="title">Orders</h1>
           <div class="actions">
@@ -34,7 +34,7 @@
             </button>
           </div>
         </div>
-        
+
         <!-- Status Filter -->
         <div class="status-filter">
           <el-radio-group v-model="selectedStatus" @change="filterOrdersByStatus">
@@ -45,7 +45,7 @@
             <el-radio-button label="Cancelled">Cancelled</el-radio-button>
           </el-radio-group>
         </div>
-        
+
         <table class="table">
           <thead>
             <tr>
@@ -237,7 +237,7 @@ export default {
 </script>
 
 <style>
-.admin-product {
+.admin-order {
   display: flex;
   height: 100vh;
 }
@@ -266,7 +266,7 @@ export default {
   cursor: pointer;
 }
 
-.admin-product-table {
+.admin-order-table {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;

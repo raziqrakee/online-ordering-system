@@ -1,5 +1,5 @@
 <template>
-  <div class="admin-product">
+  <div class="admin-sales">
     <!-- Sidebar component -->
     <Sidebar></Sidebar>
 
@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <div class="admin-product-table">
+      <div class="admin-sales-table">
         <div class="table-header">
           <h1 class="title">Sales Report</h1>
           <el-button type="primary" @click="printReport">Print Report</el-button>
@@ -115,7 +115,7 @@ export default {
     },
     printReport() {
       // Print only the table
-      const printContents = document.querySelector('.admin-product-table').innerHTML;
+      const printContents = document.querySelector('.admin-sales-table').innerHTML;
       const originalContents = document.body.innerHTML;
       document.body.innerHTML = printContents;
       window.print();
@@ -126,7 +126,7 @@ export default {
 </script>
 
 <style scoped>
-.admin-product {
+.admin-sales {
   display: flex;
   height: 100vh;
 }
@@ -148,7 +148,7 @@ export default {
   font-size: 24px;
   font-weight: bold;
 }
-.admin-product-table {
+.admin-sales-table {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;

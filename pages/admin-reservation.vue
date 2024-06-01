@@ -1,14 +1,14 @@
 <template>
-  <div class="admin-product">
+  <div class="admin-reservation">
     <!-- Sidebar component -->
     <Sidebar></Sidebar>
-    
+
     <div class="content">
       <div class="header">
         <div class="search">
           <el-input placeholder="Search" prefix-icon="el-icon-search"></el-input>
         </div>
-        
+
         <div class="user">
           <el-dropdown trigger="click">
             <span class="el-dropdown-link">
@@ -21,8 +21,8 @@
           </el-dropdown>
         </div>
       </div>
-      
-      <div class="admin-product-table">
+
+      <div class="admin-reservation-table">
         <div class="table-header">
           <h1 class="title">Reservation</h1>
           <div class="actions">
@@ -34,7 +34,7 @@
             </button>
           </div>
         </div>
-      
+
         <table class="table">
           <thead>
             <tr>
@@ -299,7 +299,7 @@ export default {
 </script>
 
 <style>
-.admin-product {
+.admin-reservation {
   display: flex;
   height: 100vh;
 }
@@ -328,7 +328,7 @@ export default {
   cursor: pointer;
 }
 
-.admin-product-table {
+.admin-reservation-table {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
