@@ -2,13 +2,13 @@
   <div class="admin-product">
     <!-- Sidebar component -->
     <Sidebar></Sidebar>
-    
+
     <div class="content">
       <div class="header">
         <div class="search">
           <el-input placeholder="Search" prefix-icon="el-icon-search"></el-input>
         </div>
-        
+
         <div class="user">
           <el-dropdown trigger="click">
             <span class="el-dropdown-link">
@@ -27,7 +27,7 @@
           <h1 class="title">Sales Report</h1>
           <el-button type="primary" @click="printReport">Print Report</el-button>
         </div>
-      
+
         <table class="table">
           <thead>
             <tr>
@@ -53,7 +53,6 @@
 
 <script>
 import Sidebar from '../components/Sidebar.vue';
-
 export default {
   components: {
     Sidebar,
@@ -68,7 +67,36 @@ export default {
     // Fetch sales report data
     this.fetchSalesReportData();
   },
+  //   created() {
+//     // Fetch sales report data for the current month
+//     const currentDate = new Date();
+//     const currentMonth = currentDate.getMonth() + 1;
+//     const currentYear = currentDate.getFullYear();
+//     this.fetchSalesReportData(currentMonth, currentYear);
+//   },
   methods: {
+    // fetchSalesReportData(month, year) {
+    // switch (month) {
+    //     case 1:
+    //     // January sales report data
+    //     this.salesReports = [
+    //         { id: 1, reportId: 'SR001', date: '2024-01-01', orderIds: ['ORD001', 'ORD002', 'ORD003'], totalSale: 500 },
+    //         // Add more sales report data for January as needed
+    //     ];
+    //     break;
+    //     case 2:
+    //     // February sales report data
+    //     this.salesReports = [
+    //         { id: 1, reportId: 'SR002', date: '2024-02-01', orderIds: ['ORD004', 'ORD005'], totalSale: 300 },
+    //         // Add more sales report data for February as needed
+    //     ];
+    //     break;
+    //     // Add cases for other months as needed
+    //     default:
+    //     // Default case (no data for other months)
+    //     this.salesReports = [];
+    // }
+    // },
     fetchSalesReportData() {
       // Example data for demo
       this.salesReports = [
