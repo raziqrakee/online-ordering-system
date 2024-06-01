@@ -20,7 +20,7 @@
         <i class="el-icon-date"></i>
         <span>Reservation</span>
       </el-menu-item>
-      <el-menu-item index="report" class="custom-sidebar-item">
+      <el-menu-item index="sales" class="custom-sidebar-item">
         <i class="el-icon-document"></i>
         <span>Sale Report</span>
       </el-menu-item>

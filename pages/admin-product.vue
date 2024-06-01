@@ -69,11 +69,11 @@
                       Quantity
                     </th>
                     <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Sold
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Category
                     </th>
-                    <!-- <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Created At
-                    </th> -->
                     <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Action
                     </th>
@@ -98,7 +98,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900 text-start">
-                        {{ product.description }}
+                        {{ product.description ?? '(No description available)'}}
                       </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -106,6 +106,9 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900">{{ product.quantity }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">{{ product.sold }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900">{{ product.category }}</div>
@@ -145,7 +148,14 @@
             <el-input v-model="editProduct.quantity"></el-input>
           </el-form-item>
           <el-form-item label="Category" class="col-md-4 col-sm-6">
-            <el-input v-model="editProduct.category"></el-input>
+            <el-select v-model="editProduct.category" filterable placeholder="Select">
+              <el-option
+                v-for="item in categories"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
         </div>
         <el-form-item label="Image" class="w-100">
@@ -191,7 +201,7 @@
     </el-dialog>
 
     <el-dialog :visible.sync="showAddModalVisible" class="fw-bolder" title="Add Product">
-      <el-form :model="newProduct">
+      <el-form :model="newProduct" ref="newProductForm">
         <div class="d-flex row">
           <el-form-item label="Product Name" class="col-md-7 col-sm-6">
             <el-input v-model="newProduct.name"></el-input>
@@ -211,7 +221,14 @@
             <el-input v-model="newProduct.quantity"></el-input>
           </el-form-item>
           <el-form-item label="Category" class="col-md-4 col-sm-6">
-            <el-input v-model="newProduct.category"></el-input>
+            <el-select v-model="newProduct.category" filterable placeholder="Select">
+              <el-option
+                v-for="item in categories"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
         </div>
         <el-form-item label="Image" class="w-100">
@@ -285,6 +302,12 @@ export default {
       },
       products: [],
       fileList: [],
+      categories: [
+        { value: 'Korean', label: 'Korean' },
+        { value: 'Snacks', label: 'Snacks' },
+        { value: 'Beverages', label: 'Beverages' },
+        { value: 'Desserts', label: 'Desserts' }
+      ],
     };
   },
   created() {
