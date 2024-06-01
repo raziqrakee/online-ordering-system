@@ -65,15 +65,11 @@
                     <input class="form-check-input" type="radio" id="direct_bank_transfer" name="payment_option" value="direct_bank_transfer">
                     <label class="form-check-label" for="direct_bank_transfer">Direct Bank Transfer</label>
                   </div>
-                    <p class="sub-text">Make payment directly through bank account</p>
-                    <input type="text" id="bank_holder_name" placeholder="Bank Holder Name" class="form-control mb-2">
-                    <input type="text" id="bank_account_number" placeholder="Bank Account Number" class="form-control mb-2">
-                    <input type="text" id="bank_name" placeholder="Bank Name" class="form-control mb-2">
-                    <label for="receipt" class="form-label">Upload Receipt:</label>
-                    <input type="file" id="receipt" class="form-control" accept="image/*">
+                    <p class="sub-text">Make payment directly through QR scan</p>
+                    <button class="btn btn-secondary btn-block" @click="openModal">Scan QR</button>
                 </div>
                 <div class="col-md-3 col-sm-12">
-                  <button class="btn btn-primary w-100 btn-block">Place Order</button>
+                  <button class="btn btn-primary w-100 btn-block" @click="placeOrder">Place Order</button>
                 </div>
             </div>
         </div>
@@ -81,20 +77,53 @@
     </div>
     <!-- FOOTER -->
     <Footer></Footer>
+    <!-- QR Modal -->
+    <el-dialog title="Scan QR Code" :visible.sync="qrModalVisible">
+      <div class="d-flex justify-content-center">
+        <img src="/_nuxt/static/qr-checkout.png" alt="QR Code" class="img-fluid qr-checkout">
+      </div>
+      <el-form class="mt-2">
+        <label for="receipt" class="form-label">Upload Receipt:</label>
+        <input type="file" id="receipt" class="form-control upload" accept="image/*">
+      </el-form>
+      <span slot="footer" class="dialog-footer d-flex justify-content-center">
+        <el-button class="btn btn-w" type="secondary" @click="qrModalVisible = false">Cancel</el-button>
+        <el-button class="btn btn-w" type="primary" @click="saveAndClose">Save</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
+
 
 <script>
 import Navbar from '../components/Navbar.vue';
 import Footer from '../components/Footer.vue';
+import VueRouter from 'vue-router';
 
 export default {
   components: {
-    Navbar, // Register the Navbar component
-    Footer, // Register the Footer component
+    Navbar,
+    Footer,
+  },
+  data() {
+    return {
+      qrModalVisible: false,
+    };
+  },
+  methods: {
+    placeOrder() {
+      this.$router.push('/order-status');
+    },
+    openModal() {
+      this.qrModalVisible = true;
+    },
+    saveAndClose() {
+      this.qrModalVisible = false;
+    },
   },
 }
 </script>
+
 <style>
 .menu {
   border-bottom: 1px solid #e6e6e6;
@@ -102,16 +131,13 @@ export default {
 .el-submenu__icon-arrow {
     display: none !important;
 }
-
 .qtt{
   width: 60px !important;
 }
-
 .btn-primary{
   background-color: #000000;
   border-color: #00000000;
 }
-
 .btn-primary:hover{
   background-color: #FFE9F5;
   border-color: #F390C7;
@@ -121,13 +147,43 @@ export default {
 .list-group-item{
   border: #00000000;
 }
-
 .product-list-img{
   width: 60px;
 }
-
 .sub-text{
   font-size: 0.75rem;
   color: #828282;
 }
+.form-control{
+  min-height: 35px !important;
+}
+.qr-checkout{
+  height: 250px !important;
+}
+.btn-w {
+  min-width: 160px;
+  justify-content: center;
+}
+.el-button--primary {
+  background: #000000;
+  border-color: #000000;
+  color: #FFFFFF;
+}
+.el-button--primary:hover {
+  background: #409EFF;
+  border-color: #409EFF;
+  color: #FFFFFF;
+}
+.el-button--secondary {
+  background: #FFE9F5;
+  border-color: #FFE9F5;
+  color: #000000;
+}
+.el-button--secondary:hover {
+  color: var(--bs-btn-hover-color);
+  background-color: #F56C6C;
+  border-color: ##F56C6C;
+  color: #FFFFFF
+}
+
 </style>
