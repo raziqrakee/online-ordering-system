@@ -24,21 +24,22 @@
             <div class="d-flex flex-row justify-content-between align-items-center my-4">
               <h1 class="text-3xl font-bold">Products</h1>
               <div class="d-flex align-items-center gap-1">
-                <div class="relative">
-                  <button onclick="toggleDropdown()" class="btn btn-outline-secondary btn-w d-flex align-items-center shadow">
+              <el-dropdown trigger="click">
+                  <button class="btn btn-outline-secondary btn-w d-flex align-items-center shadow">
                     <span>Filter</span>
-                    <img src="/assets/filter-product.svg" alt="Delete" class="btn-img cursor-pointer" onclick="toggleDropdown()">
+                    <img src="/assets/filter-product.svg" alt="Delete" class="btn-img cursor-pointer">
                   </button>
-                  <div id="dropdownMenu" class="dropdown-menu dropdown-menu-end">
-                    <button class="dropdown-item">Title</button>
-                    <button class="dropdown-item">ID</button>
-                    <button class="dropdown-item">Description</button>
-                    <button class="dropdown-item">Price</button>
-                    <button class="dropdown-item">Stock Quantity</button>
-                    <button class="dropdown-item">Category</button>
-                    <button class="dropdown-item">Action</button>
-                  </div>
-                </div>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item @click="filterBy('title', 'asc')">Title (A-Z)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('title', 'desc')">Title (Z-A)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('id', 'asc')">ID (Low-High)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('id', 'desc')">ID (High-Low)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('price', 'asc')">Price (Low-High)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('price', 'desc')">Price (High-Low)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('category', 'asc')">Category (A-Z)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('category', 'desc')">Category (Z-A)</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
                 <button @click="showAddModalVisible = true" class="btn btn-secondary btn-w d-flex align-items-center shadow">
                   <span>Add Product</span>
                   <svg xmlns="http://www.w3.org/2000/svg" class="btn-img" viewBox="0 0 20 20" fill="currentColor">
@@ -291,6 +292,10 @@ export default {
       showEditModalVisible: false,
       showDeleteModalVisible: false,
       showAddModalVisible: false,
+      showDropdown: false,
+      filterByField: '',
+      filteredProducts: [],
+      sortedProducts: [],
       editProduct: {
         name: '',
         id: '',
@@ -324,7 +329,11 @@ export default {
       return Math.ceil(this.products.length / this.pageSize);
     },
     paginatedProducts() {
-      return this.products.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+      if (this.filterByField) {
+        return this.filteredProducts.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+      } else {
+        return this.products.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+      }
     },
   },
   created() {
@@ -338,6 +347,36 @@ export default {
     }
   },
   methods: {
+    filterBy(field, order) {
+      this.filterByField = field;
+      this.sortedProducts = this.products.slice().sort((a, b) => {
+        if (order === 'asc') {
+          if (field === 'title') {
+            return a.name.localeCompare(b.name);
+          } else if (field === 'id') {
+            return a.id - b.id;
+          } else if (field === 'price') {
+            return a.price - b.price;
+          } else if (field === 'category') {
+            return a.category.localeCompare(b.category);
+          }
+        } else if (order === 'desc') {
+          if (field === 'title') {
+            return b.name.localeCompare(a.name);
+          } else if (field === 'id') {
+            return b.id - a.id;
+          } else if (field === 'price') {
+            return b.price - a.price;
+          } else if (field === 'category') {
+            return b.category.localeCompare(a.category);
+          }
+        }
+      });
+      this.filteredProducts = this.sortedProducts;
+    },
+    toggleDropdown() {
+      this.showDropdown =!this.showDropdown;
+    },
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
