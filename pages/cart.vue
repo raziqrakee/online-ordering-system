@@ -14,11 +14,18 @@
                   <img src="/assets/product-3.png" alt="Product Icon" class="product-list-img">
                   <span class="text-lg">Strawberry</span>
                 </div>
-                <span class="text-lg">Quantity:</span>
-                <div class="btn-group" role="group">
-                  <input type="number" value="1" class="form-control qtt">
+                <div class="d-flex justify-content-end gap-2">
+                  <div class="d-flex align-items-center gap-2">
+                  <span class="text-lg">Quantity:</span>
+                    <div class="btn-group" role="group">
+                      <input type="number" value="1" class="form-control qtt">
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="text-lg">x</span>
+                    <span class="text-lg">RM 10.00</span>
+                  </div>
                 </div>
-                <span class="text-lg">x RM 10.00</span>
               </div>
               <hr>
               <div class="mt-3">
