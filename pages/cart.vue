@@ -54,7 +54,7 @@
                 <span class="">RM {{ calculateTotal() }}</span>
               </li>
               <li class="list-group-item">
-                <button class="btn btn-primary w-100 btn-block">Proceed to Checkout</button>
+                <button class="btn btn-primary w-100 btn-block" @click="proceedToCheckout">Proceed to Checkout</button>
               </li>
             </ul>
           </div>
@@ -89,6 +89,9 @@ export default {
     };
   },
   methods: {
+    proceedToCheckout() {
+      this.$router.push('/checkout');
+    },
     toggleDelete() {
       this.showDelete = !this.showDelete;
     },
