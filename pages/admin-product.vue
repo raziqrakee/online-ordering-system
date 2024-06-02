@@ -1,8 +1,8 @@
 <template>
   <div class="admin-product">
     <Sidebar></Sidebar>
-    <div class="content" style="background-color: #f6f6f6;padding: 0px;">
-      <div class="header" style="background-color: #fff; padding: 20px">
+    <div class="content" style="background-color:#f6f6f6; height:100vh; padding: 0px;">
+      <div class="header" style="background-color: #fff; height:10vh; padding: 20px">
         <div class="search">
           <el-input placeholder="Search" prefix-icon="el-icon-search"></el-input>
         </div>
@@ -18,27 +18,28 @@
           </el-dropdown>
         </div>
       </div>
-      <div class="admin-product bg-light" style="padding:20px; height: 80vh; margin: 0 20px;">
-        <div class="row w-100">
-          <div class="col-12">
+      <div class="admin-product bg-light" style="padding:20px; height:90vh">
+        <div class="row w-100 h-100">
+          <div class="col-12 h-100">
             <div class="d-flex flex-row justify-content-between align-items-center my-4">
               <h1 class="text-3xl font-bold">Products</h1>
               <div class="d-flex align-items-center gap-1">
-                <div class="relative">
-                  <button onclick="toggleDropdown()" class="btn btn-outline-secondary btn-w d-flex align-items-center shadow">
+              <el-dropdown trigger="click">
+                  <button class="btn btn-outline-secondary btn-w d-flex align-items-center shadow">
                     <span>Filter</span>
-                    <img src="/assets/filter-product.svg" alt="Delete" class="btn-img cursor-pointer" onclick="toggleDropdown()">
+                    <img src="/assets/filter-product.svg" alt="Delete" class="btn-img cursor-pointer">
                   </button>
-                  <div id="dropdownMenu" class="dropdown-menu dropdown-menu-end">
-                    <button class="dropdown-item">Title</button>
-                    <button class="dropdown-item">ID</button>
-                    <button class="dropdown-item">Description</button>
-                    <button class="dropdown-item">Price</button>
-                    <button class="dropdown-item">Stock Quantity</button>
-                    <button class="dropdown-item">Category</button>
-                    <button class="dropdown-item">Action</button>
-                  </div>
-                </div>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item @click="filterBy('title', 'asc')">Title (A-Z)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('title', 'desc')">Title (Z-A)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('id', 'asc')">ID (Low-High)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('id', 'desc')">ID (High-Low)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('price', 'asc')">Price (Low-High)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('price', 'desc')">Price (High-Low)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('category', 'asc')">Category (A-Z)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('category', 'desc')">Category (Z-A)</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
                 <button @click="showAddModalVisible = true" class="btn btn-secondary btn-w d-flex align-items-center shadow">
                   <span>Add Product</span>
                   <svg xmlns="http://www.w3.org/2000/svg" class="btn-img" viewBox="0 0 20 20" fill="currentColor">
@@ -47,7 +48,7 @@
                 </button>
               </div>
             </div>
-            <div class="row bg-white p-4 gap-4 mt-4 rounded-xl">
+            <div class="col-12 bg-white p-4 gap-4 mt-4 rounded-xl">
               <table class="table">
                 <thead class="bg-gray-100 text-center rounded-xl">
                   <tr>
@@ -80,7 +81,7 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200 text-center">
-                  <tr class="border-b-gray-50" v-for="product in products" :key="product.id">
+                  <tr class="border-b-gray-50" v-for="product in paginatedProducts" :key="product.id">
                     <td>
                       <div class="flex-shrink-0 h-10 w-10">
                           <img :src="product.image_url" alt="Product Icon" class="product-list-img">
@@ -122,6 +123,11 @@
                   </tr>
                 </tbody>
               </table>
+              <div class="pagination justify-content-center" v-if="products.length > pageSize">
+                <button class="btn btn-secondary me-2" @click="prevPage" :disabled="currentPage === 1">Previous</button>
+                <button class="btn btn-secondary me-2" v-for="page in totalPages" :key="page" @click="gotoPage(page)" :class="{ 'active': currentPage === page }">{{ page }}</button>
+                <button class="btn btn-secondary me-2" @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+              </div>
             </div>
           </div>
         </div>
@@ -279,10 +285,17 @@ export default {
   },
   data() {
     return {
+      products: [],
+      currentPage: 1,
+      pageSize: 5,
       activeLink: 'product',
       showEditModalVisible: false,
       showDeleteModalVisible: false,
       showAddModalVisible: false,
+      showDropdown: false,
+      filterByField: '',
+      filteredProducts: [],
+      sortedProducts: [],
       editProduct: {
         name: '',
         id: '',
@@ -311,18 +324,72 @@ export default {
       ],
     };
   },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.products.length / this.pageSize);
+    },
+    paginatedProducts() {
+      if (this.filterByField) {
+        return this.filteredProducts.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+      } else {
+        return this.products.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+      }
+    },
+  },
   created() {
     this.fetchProducts();
   },
   watch: {
     'editProduct.image': {
       handler(newValue, oldValue) {
-        // Your logic to handle image changes goes here
       },
       deep: true
     }
   },
   methods: {
+    filterBy(field, order) {
+      this.filterByField = field;
+      this.sortedProducts = this.products.slice().sort((a, b) => {
+        if (order === 'asc') {
+          if (field === 'title') {
+            return a.name.localeCompare(b.name);
+          } else if (field === 'id') {
+            return a.id - b.id;
+          } else if (field === 'price') {
+            return a.price - b.price;
+          } else if (field === 'category') {
+            return a.category.localeCompare(b.category);
+          }
+        } else if (order === 'desc') {
+          if (field === 'title') {
+            return b.name.localeCompare(a.name);
+          } else if (field === 'id') {
+            return b.id - a.id;
+          } else if (field === 'price') {
+            return b.price - a.price;
+          } else if (field === 'category') {
+            return b.category.localeCompare(a.category);
+          }
+        }
+      });
+      this.filteredProducts = this.sortedProducts;
+    },
+    toggleDropdown() {
+      this.showDropdown =!this.showDropdown;
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    gotoPage(page) {
+      this.currentPage = page;
+    },
     fetchProducts() {
       axios.get('http://localhost:8000/api/products')
         .then(response => {
@@ -373,11 +440,6 @@ export default {
         });
     },
     handleNewUploadImage(file, fileList) {
-      // const reader = new FileReader();
-      // reader.readAsDataURL(file.raw);
-      // reader.onload = () => {
-      //   this.newProduct.image = reader.result;
-      // };
       this.fileList = fileList;
       this.newProduct.image = URL.createObjectURL(file.raw);
     },
@@ -403,15 +465,12 @@ export default {
     },
     async updateEditProduct() {
       try {
-        // Create a new FormData object
         const formData = new FormData();
 
-        // Append the product data to the FormData object
         for (const [key, value] of Object.entries(this.editProduct)) {
           formData.append(key, value);
         }
 
-        // Append the image file to the FormData object
         if (this.fileList.length > 0) {
           const file = this.fileList[0].raw;
           formData.append('image', file, file.name);
@@ -419,9 +478,7 @@ export default {
 
         let response;
 
-        // Check if it's an edit operation
         if (this.editProduct.id) {
-          // Edit operation
           response = await axios.post(`http://localhost:8000/api/product/${this.editProduct.id}`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -433,44 +490,36 @@ export default {
           this.fetchProducts();
           this.clearNewProductForm();
           this.showAddModalVisible = false;
-          this.editProduct.id = null; // Reset the editProductId after a successful operation
+          this.editProduct.id = null; 
 
-          // Show success message
           Message.success('Product Updated Successfully');
 
-          // Close the edit modal after a delay
           setTimeout(() => {
             this.showEditModalVisible = false;
-          }, 2000); // Close after 2 seconds (adjust as needed)
+          }, 1000);
         } else {
           console.error('Error with product operation:', response.data);
-          // Optionally show an error message
           Message.error('Error updating product. Please try again.');
         }
       } catch (error) {
         console.error('Error with product operation:', error);
-        // Optionally show an error message
         Message.error('Error updating product. Please try again.');
       }
     },
 
     async insertNewProduct() {
       try {
-        // Create a new FormData object
         const formData = new FormData();
 
-        // Append the product data to the FormData object
         for (const [key, value] of Object.entries(this.newProduct)) {
           formData.append(key, value);
         }
 
-        // Append the image file to the FormData object
         if (this.fileList.length > 0) {
           const file = this.fileList[0].raw;
           formData.append('image', file, file.name);
         }
 
-        // Send the FormData object to the server
         const response = await axios.post('http://localhost:8000/api/product', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -506,7 +555,7 @@ export default {
     removeEditImage() {
       const product = {...this.editProduct}
       product.image = null;
-      product.image_url = null; // Add this line
+      product.image_url = null;
       this.editProduct = {}
       this.editProduct = product
       console.log(this.editProduct);
@@ -515,13 +564,11 @@ export default {
 };
 </script>
 
-
 <style>
 .admin-product {
   display: flex;
   height: 100vh;
 }
-
 .content {
   flex: 1;
   padding: 20px;
@@ -530,7 +577,6 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
 }
 .search {
   width: 300px;
@@ -589,7 +635,9 @@ export default {
   border-color: #FFE9F5;
 }
 .product-list-img {
-  width: 60px;
+  width: 50px;
+  max-height: 50px;
+  object-fit: cover;
 }
 .btn-primary{
   background-color: #000000;
@@ -600,9 +648,6 @@ export default {
   border-color: #F390C7;
   color: #000000;
 }
-/* .btn-warning{
-  background-color:  ;
-} */
 .el-dialog{
   border-radius: 16px;
   padding: 10px;
