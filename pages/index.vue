@@ -22,52 +22,57 @@
     </div>
     <!-- PRODUCT -->
     <div id="menu-section" class="m-5">
-      <div class="mx-5 d-flex flex-lg-row flex-sm-column align-items-center">
-        <h1 class="text-2xl fw-bold mb-5 text-center">OUR TOP PICKS</h1>
-        <div class="row mx-5">
+      <div class="d-flex gap-5 flex-md-row flex-xs-column align-items-center">
+        <h1 class="text-2xl fw-bold mb-2 text-center">OUR TOP PICKS</h1>
+        <!-- Main product card -->
+        <div class="d-flex row">
+          <div class="row w-100">
           <div v-if="topProduct" class="w-100 mb-4">
             <div class="card card-main">
               <img
-                class="w-100"
-                style="max-height: 500px; min-height: 300px; object-fit: cover;"
-                :src="topProduct.image_url"
-              />
-              <div class="card-body w-100 justify-content-between">
-                <div class="d-flex flex-column mx-2">
-                  <h2 class="card-title text-uppercase fw-bolder">{{ topProduct.name }}</h2>
-                  <div class="row">
-                    <h4 class="card-text fw-bold">RM {{ topProduct.price }}</h4>
-                    <h6 class="card-text text-capitalize">{{ topProduct.category }}</h6>
-                    <h7 class="card-text">Sold: {{ topProduct.sold }} pcs</h7>
+                  class="w-100"
+                  style="max-height: 300px; min-height: 300px; object-fit: cover;"
+                  :src="topProduct.image_url"
+                />
+                <div class="card-body d-flex w-100 justify-content-between">
+                  <div class="d-flex flex-column mx-2">
+                    <h2 class="card-title text-uppercase fw-bolder">{{ topProduct.name }}</h2>
+                    <div class="row">
+                      <h4 class="card-text fw-bold">RM {{ topProduct.price }}</h4>
+                      <h6 class="card-text text-capitalize">{{ topProduct.category }}</h6>
+                      <h7 class="card-text">Sold: {{ topProduct.sold }} pcs</h7>
+                    </div>
                   </div>
-                </div>
-                <div class="d-flex justify-content-center mx-2">
-                  <button class="btn btn-primary" @click="addToCart(topProduct)">
-                    Add to Cart
-                  </button>
+                  <div class="d-flex justify-content-center mx-2">
+                    <button class="btn btn-primary" @click="addToCart(topProduct)">
+                      Add to Cart
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div v-for="product in products" :key="product.id" class="col-md-6 mb-4">
-            <div class="card">
-              <img
-                style="max-height: 300px; min-height: 300px; object-fit: cover;"
-                :src="product.image_url"
-                class="card-img-top"
-                :alt="product.name"
-              />
-              <div class="card-body py-5">
-                <div class="d-flex row mb-5">
-                  <h4 class="card-title fw-bold">{{ product.name }}</h4>
-                  <h5 class="card-text">RM {{ product.price }}</h5>
-                  <h6 class="card-text text-capitalize">{{ product.category }}</h6>
-                  <h7 class="card-text">Sold: {{ product.sold }} pcs</h7>
-                </div>
-                <div class="d-flex justify-content-center">
-                  <button class="btn btn-primary" @click="addToCart(product)">
-                    Add to Cart
-                  </button>
+          <!-- Additional picks cards -->
+          <div class="row">
+            <div v-for="product in products" :key="product.id" class="col-md-6 mb-4">
+              <div class="card-below col-12">
+                <img
+                  :src="product.image_url"
+                  class="card-img-below"
+                  :alt="product.name"
+                />
+                <div class="card-body row d-flex py-5">
+                  <div class="column mb-5">
+                    <h4 class="card-title fw-bold">{{ product.name }}</h4>
+                    <h5 class="card-text">RM {{ product.price }}</h5>
+                    <h6 class="card-text text-capitalize">{{ product.category }}</h6>
+                    <h7 class="card-text">Sold: {{ product.sold }} pcs</h7>
+                  </div>
+                  <div class="d-flex justify-content-center">
+                    <button class="btn btn-primary" @click="addToCart(product)">
+                      Add to Cart
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -276,13 +281,26 @@ h7{
   border-radius: 10px;
   overflow: hidden;
 }
+.card-below{
+  flex-direction: row;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  max-height: 300px;
+  min-height: 250px;
+}
+.card-img-below{
+  width: 300px;
+  min-width: 300px;
+  object-fit: cover;
+}
 .card-main{
   flex-direction: column;
   transition: transform 0.3s;
   border-radius: 10px;
   overflow: hidden;
 }
-.card-main .card-body{
+.card-main .card-body,{
   flex-direction: row;
   display: flex;
   position: absolute;
