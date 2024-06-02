@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar" style="padding-left: 0px; padding-right: 0px;">
+  <div class="sidebar" style="padding-left: 0px; height: 100vh; padding-right: 0px;">
     <div class="logo">
       <img src="~/static/logo.png" alt="Logo" class="img-fluid" width="98px">
     </div>
