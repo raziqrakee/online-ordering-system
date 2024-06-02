@@ -50,32 +50,29 @@
           <thead>
             <tr>
               <th scope="col">Order ID</th>
-              <th scope="col">Type</th>
-              <th scope="col">Total Amount (RM)</th>
-              <th scope="col">Customer Name</th>
-              <th scope="col">Customer Phone</th>
               <th scope="col">Order Details</th>
-              <th scope="col">Order Status</th>
-              <th scope="col">Action</th>
+              <th scope="col">Type</th>
+              <th scope="col">Total(RM)</th>
+              <th scope="col" class="text-center">Order Status</th>
+              <th scope="col" class="text-center">Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="order in filteredOrders" :key="order.id">
+            <tr v-for="order in paginatedOrders" :key="order.id">
               <td>{{ order.id }}</td>
-              <td>{{ order.type }}</td>
-              <td>{{ order.amount }}</td>
-              <td>{{ order.customer }}</td>
-              <td>{{ order.customer_phone }}</td>
               <td>
                 <div v-for="(item, index) in order.details" :key="index">
                   {{ item.quantity }} x {{ item.name }}
                 </div>
               </td>
-              <td>
+              <td>{{ order.type }}</td>
+              <td>{{ order.amount }}</td>
+              <td class="text-center">
                 <el-button :type="statusButtonColor(order.status)">{{ statusText(order.status) }}</el-button>
               </td>
               <td>
-                <div class="d-flex gap-1">
+                <div class="d-flex gap-1 justify-content-center">
+                  <button class="btn btn-eye" @click="viewCustomerDetails(order)">👁️</button>
                   <button class="btn btn-accept" @click="acceptOrder(order.id)">✔</button>
                   <button class="btn btn-reject" @click="rejectOrder(order.id)">✖</button>
                 </div>
@@ -83,6 +80,11 @@
             </tr>
           </tbody>
         </table>
+        <div class="pagination justify-content-center" v-if="filteredOrders.length > pageSize">
+          <button class="btn btn-secondary me-2" @click="prevPage" :disabled="currentPage === 1">Previous</button>
+          <button class="btn btn-secondary me-2" v-for="page in totalPages" :key="page" @click="gotoPage(page)" :class="{ 'active': currentPage === page }">{{ page }}</button>
+          <button class="btn btn-secondary me-2" @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+        </div>
       </div>
     </div>
 
@@ -122,6 +124,21 @@
         <el-button type="primary" @click="insertNewOrder">Save</el-button>
       </span>
     </el-dialog>
+
+    <!-- Customer Details Modal -->
+    <el-dialog :visible.sync="showCustomerDetailsModalVisible" class="bolder" title="Customer Details">
+      <div>
+        <p><strong>Customer Name:</strong> {{ selectedOrder.customer }}</p>
+        <p><strong>Customer Phone:</strong> {{ selectedOrder.customer_phone }}</p>
+        <div v-for="(item, index) in selectedOrder.details" :key="index">
+          <p><strong>Product:</strong> {{ item.name }}</p>
+          <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showCustomerDetailsModalVisible = false">Close</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -135,13 +152,27 @@ export default {
   },
   data() {
     return {
+      products: [],
+      currentPage: 1,
+      pageSize: 5,
       activeLink: 'orders',
       showAddModalVisible: false,
+      showCustomerDetailsModalVisible: false,
       newOrder: {
         id: '',
         type: '',
         amount: '',
         customer: '',
+        customer_phone: '',
+        details: [],
+        status: '',
+      },
+      selectedOrder: {
+        id: '',
+        type: '',
+        amount: '',
+        customer: '',
+        customer_phone: '',
         details: [],
         status: '',
       },
@@ -151,64 +182,55 @@ export default {
         { id: '002', type: 'Takeaway', amount: '120.00', customer: 'Jane Smith', customer_phone: '0134533378', details: [{ name: 'Ice Cream Strawberry', quantity: 1 }, { name: 'Ice Americano', quantity: 2 }], status: 'Completed' },
         { id: '003', type: 'Dine-in', amount: '450.00', customer: 'Alice Brown', customer_phone: '0198105991', details: [{ name: 'Ice Americano', quantity: 3 }], status: 'In-Process' },
         { id: '004', type: 'Takeaway', amount: '200.00', customer: 'Bob Johnson', customer_phone: '0198400668', details: [{ name: 'French Fries', quantity: 2 }], status: 'Cancelled' },
-        { id: '005', type: 'Dine-in', amount: '300.00', customer: 'Charlie Lee', customer_phone: '0148652834', details: [{ name: 'Samyang Ramen', quantity: 1 }], status: 'Pending' },
+        { id: '005', type: 'Dine-in', amount: '300.00', customer: 'Charlie Lee', customer_phone: '0148652834', details: [{ name: 'Samyang Ramen', quantity: 1 }, { name: 'Ice Americano', quantity: 1 }], status: 'Pending' },
+        { id: '006', type: 'Dine-in', amount: '200.00', customer: 'David Kim', customer_phone: '0138997665', details: [{ name: 'Chicken Wings', quantity: 2 }, { name: 'Ice Americano', quantity: 1 }], status: 'In-Process' },
+        { id: '007', type: 'Takeaway', amount: '100.00', customer: 'Eve Green', customer_phone: '0126735844', details: [{ name: 'French Fries', quantity: 1 }], status: 'Pending' },
       ],
-      filteredOrders: [],
     };
   },
-  mounted() {
-    this.filterOrdersByStatus();
+  computed: {
+    filteredOrders() {
+      if (this.selectedStatus === 'All') {
+        return this.orders;
+      } else {
+        return this.orders.filter(order => order.status === this.selectedStatus);
+      }
+    },
+    totalPages() {
+      return Math.ceil(this.filteredOrders.length / this.pageSize);
+    },
+    paginatedOrders() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.filteredOrders.slice(start, end);
+    },
   },
   methods: {
-    fetchOrders() {
-      // Uncomment and use when integrating with an API
-      // axios.get('http://localhost:8000/api/orders')
-      //   .then(response => {
-      //     if (response.data.status === 200) {
-      //       this.orders = response.data.orders;
-      //       this.filterOrdersByStatus();
-      //     }
-      //   })
-      //   .catch(error => {
-      //     console.error('Error fetching orders:', error);
-      //   });
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
     },
-    insertNewOrder() {
-      // Uncomment and use when integrating with an API
-      // axios.post('http://localhost:8000/api/orders', this.newOrder)
-      //   .then(response => {
-      //     if (response.data.status === 200) {
-      //       this.fetchOrders();
-      //       this.showAddModalVisible = false;
-      //     }
-      //   })
-      //   .catch(error => {
-      //     console.error('Error adding new order:', error);
-      //   });
-
-      // For demonstration purposes, adding new order to mock data
-      this.orders.push({ ...this.newOrder, id: this.orders.length + 1 });
-      this.filterOrdersByStatus();
-      this.showAddModalVisible = false;
-      this.newOrder = { id: '', type: '', amount: '', customer: '', details: [], status: '' };
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
     },
-    acceptOrder(orderId) {
-      // Logic to accept the order
-      const order = this.orders.find(order => order.id === orderId);
-      if (order) order.status = 'In-Process';
-      this.filterOrdersByStatus();
+    gotoPage(page) {
+      this.currentPage = page;
     },
-    rejectOrder(orderId) {
-      // Logic to reject the order
-      const order = this.orders.find(order => order.id === orderId);
-      if (order) order.status = 'Cancelled';
-      this.filterOrdersByStatus();
-    },
-    filterOrdersByStatus() {
-      if (this.selectedStatus === 'All') {
-        this.filteredOrders = this.orders;
-      } else {
-        this.filteredOrders = this.orders.filter(order => order.status === this.selectedStatus);
+    statusText(status) {
+      switch (status) {
+        case 'Pending':
+          return 'Pending';
+        case 'Completed':
+          return 'Completed';
+        case 'In-Process':
+          return 'In-Process';
+        case 'Cancelled':
+          return 'Cancelled';
+        default:
+          return 'Unknown';
       }
     },
     statusButtonColor(status) {
@@ -217,25 +239,45 @@ export default {
           return 'warning';
         case 'Completed':
           return 'success';
+        case 'In-Process':
+          return 'primary';
         case 'Cancelled':
           return 'danger';
-        case 'In Process':
-          return '';
         default:
           return '';
       }
     },
-    statusText(status) {
-      switch (status) {
-        case 'In-Process':
-          return 'In-Process';
-        case 'In-Process':
-          return 'In-Process';
-        case 'Cancelled':
-          return 'Rejected';
-        default:
-          return status;
+    filterOrdersByStatus() {
+      this.currentPage = 1;
+    },
+    viewCustomerDetails(order) {
+      this.selectedOrder = order;
+      this.showCustomerDetailsModalVisible = true;
+    },
+    acceptOrder(orderId) {
+      const order = this.orders.find(order => order.id === orderId);
+      if (order) {
+        order.status = 'Completed';
       }
+    },
+    rejectOrder(orderId) {
+      const order = this.orders.find(order => order.id === orderId);
+      if (order) {
+        order.status = 'Cancelled';
+      }
+    },
+    insertNewOrder() {
+      this.orders.push({ ...this.newOrder });
+      this.showAddModalVisible = false;
+      this.newOrder = {
+        id: '',
+        type: '',
+        amount: '',
+        customer: '',
+        customer_phone: '',
+        details: [],
+        status: '',
+      };
     },
   },
 };
@@ -246,13 +288,11 @@ export default {
   display: flex;
   height: 100vh;
 }
-
 .content {
   flex: 1;
   background-color: #f6f6f6;
   padding: 0 20px;
 }
-
 .header {
   display: flex;
   justify-content: space-between;
@@ -262,40 +302,33 @@ export default {
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .search {
   width: 300px;
 }
-
 .user {
   cursor: pointer;
 }
-
 .admin-order-table {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
-
 .title {
   font-size: 24px;
   font-weight: bold;
 }
-
 .actions {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-
 .btn {
   display: flex;
   align-items: center;
@@ -305,50 +338,45 @@ export default {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
+.btn-secondary {
+  background-color: #FFE9F5;
+  color: #000000;
+  border-color: #FFE9F5;
+}
 .btn span {
   margin-right: 8px;
 }
-
 .btn-icon {
   width: 20px;
   height: 20px;
 }
-
 .btn-filter {
   background-color: #fff;
   color: #000;
 }
-
 .btn-filter:hover {
   background-color: #f0f0f0;
 }
-
 .dropdown-menu {
   display: none;
 }
-
 .btn-add {
   background-color: #FFE9F5;
   color: #000000;
 }
-
 .btn-add:hover {
   background-color: #6c757d;
-  color: #ffffff
+  color: #ffffff;
 }
-
 .table {
   width: 100%;
   border-collapse: collapse;
 }
-
 .table th, .table td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
-
 .btn-accept {
   color: white;
   padding: 1px 5px;
@@ -356,11 +384,9 @@ export default {
   border: none;
   cursor: pointer;
 }
-
 .btn-accept:hover {
   background-color: #67C23A;
 }
-
 .btn-reject {
   color: white;
   padding: 1px 5px;
@@ -368,29 +394,34 @@ export default {
   border: none;
   cursor: pointer;
 }
-
 .btn-reject:hover {
   background-color: #F56C6C;
 }
-
+.btn-eye {
+  color: white;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+.btn-eye:hover {
+  background-color: #409EFF;
+}
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
 }
-
 .status-filter {
   margin-bottom: 20px;
   display: flex;
   justify-content: flex-start;
   gap: 10px;
 }
-
 .status-filter .el-radio-group {
   display: flex;
   gap: 10px;
 }
-
 .table .el-button {
   padding: 4px 10px;
   border-radius: 60px;
