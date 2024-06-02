@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="admin-product bg-light" style="padding:20px; height: 80vh; margin: 0 20px;">
-        <div class="row">
+        <div class="row w-100">
           <div class="col-12">
             <div class="d-flex flex-row justify-content-between align-items-center my-4">
               <h1 class="text-3xl font-bold">Products</h1>
