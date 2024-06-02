@@ -53,9 +53,10 @@
                 Total:
                 <span class="">RM {{ calculateTotal() }}</span>
               </li>
-              <li class="list-group-item">
-                <button class="btn btn-primary w-100 btn-block" @click="proceedToCheckout">Proceed to Checkout</button>
-              </li>
+              <div class="list-group-item">
+                <button v-if="cart.length > 0" class="btn btn-primary w-100 btn-block" @click="proceedToCheckout">Proceed to Checkout</button>
+                <span v-else @click="showEmptyCartMessage">Cart is empty. Nothing to checkout.</span>
+              </div>
             </ul>
           </div>
         </div>
@@ -90,7 +91,14 @@ export default {
   },
   methods: {
     proceedToCheckout() {
-      this.$router.push('/checkout');
+      if (this.cart.length > 0) {
+        this.$router.push('/checkout');
+      } else {
+        this.$nuxt.$emit('message', { type: 'error', text: 'Cart is empty. Nothing to checkout.' });
+      }
+    },
+    showEmptyCartMessage() {
+      this.$nuxt.$emit('message', { type: 'error', text: 'Cart is empty. Nothing to checkout.' });
     },
     toggleDelete() {
       this.showDelete = !this.showDelete;
