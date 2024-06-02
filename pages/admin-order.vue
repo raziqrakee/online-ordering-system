@@ -53,6 +53,7 @@
               <th scope="col">Order Details</th>
               <th scope="col">Type</th>
               <th scope="col">Total(RM)</th>
+              <th scope="col">Payment Method</th>
               <th scope="col" class="text-center">Order Status</th>
               <th scope="col" class="text-center">Action</th>
             </tr>
@@ -67,6 +68,7 @@
               </td>
               <td>{{ order.type }}</td>
               <td>{{ order.amount }}</td>
+              <td>{{ order.payment_method }}</td>
               <td class="text-center">
                 <el-button :type="statusButtonColor(order.status)">{{ statusText(order.status) }}</el-button>
               </td>
@@ -110,6 +112,12 @@
         <el-form-item label="Order Details">
           <el-input v-model="newOrder.details"></el-input>
         </el-form-item>
+        <el-form-item label="Payment Method">
+          <el-select v-model="newOrder.payment_method" placeholder="Select payment method">
+            <el-option label="Cash" value="Cash"></el-option>
+            <el-option label="QR" value="QR"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="Order Status">
           <el-select v-model="newOrder.status" placeholder="Select status">
             <el-option label="Pending" value="Pending"></el-option>
@@ -126,13 +134,14 @@
     </el-dialog>
 
     <!-- Customer Details Modal -->
-    <el-dialog :visible.sync="showCustomerDetailsModalVisible" class="bolder" title="Customer Details">
+    <el-dialog :visible.sync="showCustomerDetailsModalVisible" class="bolder" title="Order Details">
       <div>
         <p><strong>Customer Name:</strong> {{ selectedOrder.customer }}</p>
         <p><strong>Customer Phone:</strong> {{ selectedOrder.customer_phone }}</p>
+        <p><strong>Payment Method:</strong> {{ selectedOrder.payment_method }}</p>
+        <p><strong>Product:</strong></p>
         <div v-for="(item, index) in selectedOrder.details" :key="index">
-          <p><strong>Product:</strong> {{ item.name }}</p>
-          <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+          <p>{{ item.name }} x {{ item.quantity }}</p>
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -165,6 +174,7 @@ export default {
         customer: '',
         customer_phone: '',
         details: [],
+        payment_method: '',
         status: '',
       },
       selectedOrder: {
@@ -174,17 +184,18 @@ export default {
         customer: '',
         customer_phone: '',
         details: [],
+        payment_method: '',
         status: '',
       },
       selectedStatus: 'All',
       orders: [
-        { id: '001', type: 'Dine-in', amount: '250.00', customer: 'John Doe', customer_phone: '01123422089', details: [{ name: 'Ice Americano', quantity: 2 }], status: 'Pending' },
-        { id: '002', type: 'Takeaway', amount: '120.00', customer: 'Jane Smith', customer_phone: '0134533378', details: [{ name: 'Ice Cream Strawberry', quantity: 1 }, { name: 'Ice Americano', quantity: 2 }], status: 'Completed' },
-        { id: '003', type: 'Dine-in', amount: '450.00', customer: 'Alice Brown', customer_phone: '0198105991', details: [{ name: 'Ice Americano', quantity: 3 }], status: 'In-Process' },
-        { id: '004', type: 'Takeaway', amount: '200.00', customer: 'Bob Johnson', customer_phone: '0198400668', details: [{ name: 'French Fries', quantity: 2 }], status: 'Cancelled' },
-        { id: '005', type: 'Dine-in', amount: '300.00', customer: 'Charlie Lee', customer_phone: '0148652834', details: [{ name: 'Samyang Ramen', quantity: 1 }, { name: 'Ice Americano', quantity: 1 }], status: 'Pending' },
-        { id: '006', type: 'Dine-in', amount: '200.00', customer: 'David Kim', customer_phone: '0138997665', details: [{ name: 'Chicken Wings', quantity: 2 }, { name: 'Ice Americano', quantity: 1 }], status: 'In-Process' },
-        { id: '007', type: 'Takeaway', amount: '100.00', customer: 'Eve Green', customer_phone: '0126735844', details: [{ name: 'French Fries', quantity: 1 }], status: 'Pending' },
+        { id: '001', type: 'Dine-in', amount: '250.00', customer: 'John Doe', customer_phone: '01123422089', details: [{ name: 'Iced Americano', quantity: 2 }], payment_method: 'Cash', status: 'Pending' },
+        { id: '002', type: 'Takeaway', amount: '120.00', customer: 'Jane Smith', customer_phone: '0134533378', details: [{ name: 'Iced Cream Strawberry', quantity: 1 }, { name: 'Ice Americano', quantity: 2 }], payment_method: 'Cash', status: 'Completed' },
+        { id: '003', type: 'Dine-in', amount: '450.00', customer: 'Alice Brown', customer_phone: '0198105991', details: [{ name: 'Iced Americano', quantity: 3 }], payment_method: 'QR', status: 'In-Process' },
+        { id: '004', type: 'Takeaway', amount: '200.00', customer: 'Bob Johnson', customer_phone: '0198400668', details: [{ name: 'French Fries', quantity: 2 }], payment_method: 'Cash', status: 'Cancelled' },
+        { id: '005', type: 'Dine-in', amount: '300.00', customer: 'Charlie Lee', customer_phone: '0148652834', details: [{ name: 'Samyang Ramen', quantity: 1 }, { name: 'Ice Americano', quantity: 1 }], payment_method: 'QR', status: 'Pending' },
+        { id: '006', type: 'Dine-in', amount: '200.00', customer: 'David Kim', customer_phone: '0138997665', details: [{ name: 'Chicken Wings', quantity: 2 }, { name: 'Ice Americano', quantity: 1 }], payment_method: 'QR', status: 'In-Process' },
+        { id: '007', type: 'Takeaway', amount: '100.00', customer: 'Eve Green', customer_phone: '0126735844', details: [{ name: 'French Fries', quantity: 1 }], payment_method: 'Cash', status: 'Pending' },
       ],
     };
   },
@@ -193,19 +204,41 @@ export default {
       if (this.selectedStatus === 'All') {
         return this.orders;
       } else {
-        return this.orders.filter(order => order.status === this.selectedStatus);
+        return this.orders.filter((order) => order.status === this.selectedStatus);
       }
-    },
-    totalPages() {
-      return Math.ceil(this.filteredOrders.length / this.pageSize);
     },
     paginatedOrders() {
       const start = (this.currentPage - 1) * this.pageSize;
       const end = start + this.pageSize;
       return this.filteredOrders.slice(start, end);
     },
+    totalPages() {
+      return Math.ceil(this.filteredOrders.length / this.pageSize);
+    },
   },
   methods: {
+    statusButtonColor(status) {
+      if (status === 'Pending') {
+        return 'primary';
+      } else if (status === 'Completed') {
+        return 'success';
+      } else if (status === 'In-Process') {
+        return 'warning';
+      } else if (status === 'Cancelled') {
+        return 'danger';
+      }
+    },
+    statusText(status) {
+      if (status === 'Pending') {
+        return 'Pending';
+      } else if (status === 'Completed') {
+        return 'Completed';
+      } else if (status === 'In-Process') {
+        return 'In-Process';
+      } else if (status === 'Cancelled') {
+        return 'Cancelled';
+      }
+    },
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
@@ -219,34 +252,6 @@ export default {
     gotoPage(page) {
       this.currentPage = page;
     },
-    statusText(status) {
-      switch (status) {
-        case 'Pending':
-          return 'Pending';
-        case 'Completed':
-          return 'Completed';
-        case 'In-Process':
-          return 'In-Process';
-        case 'Cancelled':
-          return 'Cancelled';
-        default:
-          return 'Unknown';
-      }
-    },
-    statusButtonColor(status) {
-      switch (status) {
-        case 'Pending':
-          return 'warning';
-        case 'Completed':
-          return 'success';
-        case 'In-Process':
-          return 'primary';
-        case 'Cancelled':
-          return 'danger';
-        default:
-          return '';
-      }
-    },
     filterOrdersByStatus() {
       this.currentPage = 1;
     },
@@ -254,20 +259,8 @@ export default {
       this.selectedOrder = order;
       this.showCustomerDetailsModalVisible = true;
     },
-    acceptOrder(orderId) {
-      const order = this.orders.find(order => order.id === orderId);
-      if (order) {
-        order.status = 'Completed';
-      }
-    },
-    rejectOrder(orderId) {
-      const order = this.orders.find(order => order.id === orderId);
-      if (order) {
-        order.status = 'Cancelled';
-      }
-    },
     insertNewOrder() {
-      this.orders.push({ ...this.newOrder });
+      this.orders.push(this.newOrder);
       this.showAddModalVisible = false;
       this.newOrder = {
         id: '',
@@ -276,8 +269,21 @@ export default {
         customer: '',
         customer_phone: '',
         details: [],
+        payment_method: '',
         status: '',
       };
+    },
+    acceptOrder(orderId) {
+      const order = this.orders.find((order) => order.id === orderId);
+      if (order) {
+        order.status = 'Completed';
+      }
+    },
+    rejectOrder(orderId) {
+      const order = this.orders.find((order) => order.id === orderId);
+      if (order) {
+        order.status = 'Cancelled';
+      }
     },
   },
 };
