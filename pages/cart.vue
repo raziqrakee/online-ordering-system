@@ -3,7 +3,7 @@
 <Navbar></Navbar>
     <!-- navigation menue end -->
     <!-- MAIN -->
-    <div id="home-section" style="min-height: 60vh;">
+    <div id="cart" style="min-height: 60vh;">
       <div class="bg-white text-dark px-4 py-5 mx-5">
         <div class="row">
             <div class="col-md-8 col-sm-6 p-4">
