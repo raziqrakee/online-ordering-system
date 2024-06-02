@@ -271,6 +271,7 @@
 <script>
 import axios from 'axios';
 import Sidebar from '../components/Sidebar.vue';
+import { Message } from 'element-ui';
 
 export default {
   components: {
@@ -433,13 +434,26 @@ export default {
           this.clearNewProductForm();
           this.showAddModalVisible = false;
           this.editProduct.id = null; // Reset the editProductId after a successful operation
+
+          // Show success message
+          Message.success('Product Updated Successfully');
+
+          // Close the edit modal after a delay
+          setTimeout(() => {
+            this.showEditModalVisible = false;
+          }, 2000); // Close after 2 seconds (adjust as needed)
         } else {
           console.error('Error with product operation:', response.data);
+          // Optionally show an error message
+          Message.error('Error updating product. Please try again.');
         }
       } catch (error) {
         console.error('Error with product operation:', error);
+        // Optionally show an error message
+        Message.error('Error updating product. Please try again.');
       }
     },
+
     async insertNewProduct() {
       try {
         // Create a new FormData object
