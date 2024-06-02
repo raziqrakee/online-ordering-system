@@ -53,6 +53,7 @@
               <th scope="col">Type</th>
               <th scope="col">Total Amount (RM)</th>
               <th scope="col">Customer Name</th>
+              <th scope="col">Customer Phone</th>
               <th scope="col">Order Details</th>
               <th scope="col">Order Status</th>
               <th scope="col">Action</th>
@@ -64,6 +65,7 @@
               <td>{{ order.type }}</td>
               <td>{{ order.amount }}</td>
               <td>{{ order.customer }}</td>
+              <td>{{ order.customer_phone }}</td>
               <td>
                 <div v-for="(item, index) in order.details" :key="index">
                   {{ item.quantity }} x {{ item.name }}
@@ -99,6 +101,9 @@
         </el-form-item>
         <el-form-item label="Customer Name">
           <el-input v-model="newOrder.customer"></el-input>
+        </el-form-item>
+        <el-form-item label="Customer Phone">
+          <el-input v-model="newOrder.customer_phone"></el-input>
         </el-form-item>
         <el-form-item label="Order Details">
           <el-input v-model="newOrder.details"></el-input>
@@ -142,11 +147,11 @@ export default {
       },
       selectedStatus: 'All',
       orders: [
-        { id: '001', type: 'Dine-in', amount: '250.00', customer: 'John Doe', details: [{ name: 'Ice Americano', quantity: 2 }], status: 'Pending' },
-        { id: '002', type: 'Takeaway', amount: '120.00', customer: 'Jane Smith', details: [{ name: 'Ice Cream Strawberry', quantity: 1 }, { name: 'Ice Americano', quantity: 2 }], status: 'Completed' },
-        { id: '003', type: 'Dine-in', amount: '450.00', customer: 'Alice Brown', details: [{ name: 'Ice Americano', quantity: 3 }], status: 'In-Process' },
-        { id: '004', type: 'Takeaway', amount: '200.00', customer: 'Bob Johnson', details: [{ name: 'French Fries', quantity: 2 }], status: 'Cancelled' },
-        { id: '005', type: 'Dine-in', amount: '300.00', customer: 'Charlie Lee', details: [{ name: 'Samyang Ramen', quantity: 1 }], status: 'Pending' },
+        { id: '001', type: 'Dine-in', amount: '250.00', customer: 'John Doe', customer_phone: '01123422089', details: [{ name: 'Ice Americano', quantity: 2 }], status: 'Pending' },
+        { id: '002', type: 'Takeaway', amount: '120.00', customer: 'Jane Smith', customer_phone: '0134533378', details: [{ name: 'Ice Cream Strawberry', quantity: 1 }, { name: 'Ice Americano', quantity: 2 }], status: 'Completed' },
+        { id: '003', type: 'Dine-in', amount: '450.00', customer: 'Alice Brown', customer_phone: '0198105991', details: [{ name: 'Ice Americano', quantity: 3 }], status: 'In-Process' },
+        { id: '004', type: 'Takeaway', amount: '200.00', customer: 'Bob Johnson', customer_phone: '0198400668', details: [{ name: 'French Fries', quantity: 2 }], status: 'Cancelled' },
+        { id: '005', type: 'Dine-in', amount: '300.00', customer: 'Charlie Lee', customer_phone: '0148652834', details: [{ name: 'Samyang Ramen', quantity: 1 }], status: 'Pending' },
       ],
       filteredOrders: [],
     };
