@@ -1,7 +1,6 @@
 <template>
-
   <div>
-  <Navbar></Navbar> <!-- Include Navbar.vue -->
+    <Navbar></Navbar>
     <!-- HEADER -->
     <div id="home-section" class="d-flex align-items-center" style="min-height: 70vh; background-color: #D1E6FB;">
       <div class="row mx-5 w-100 d-flex justify-content-between align-items-center">
@@ -10,10 +9,6 @@
           <h5 class="mx-5 text-white">
             Embrace the Flavours of the Future with Danish Ice Cream Cafe, We Serve Gen Z's Palate with Modern Taste Sensations!
           </h5>
-          <!-- <div class="d-flex align-items-center pt-3 mx-5">
-            <input type="text" placeholder="Search food..." class="form-control">
-            <button class="btn btn-primary-search">Search</button>
-          </div>         -->
         </div>
         <div class="col-6 text-center">
           <img src="~/static/logo.png"/>
@@ -27,48 +22,23 @@
         <!-- Main product card -->
         <div class="d-flex row">
           <div class="row w-100">
-          <div v-if="topProduct" class="w-100 mb-4">
-            <div class="card card-main">
-              <img
+            <div v-for="(product, index) in topProducts" :key="product.id" class="w-100 mb-4 col-md-4">
+              <div class="card card-main">
+                <img
                   class="w-100"
                   style="max-height: 300px; min-height: 300px; object-fit: cover;"
-                  :src="topProduct.image_url"
+                  :src="product.image_url"
                 />
                 <div class="card-body d-flex w-100 justify-content-between">
                   <div class="d-flex flex-column mx-2">
-                    <h2 class="card-title text-uppercase fw-bolder">{{ topProduct.name }}</h2>
+                    <h2 class="card-title text-uppercase fw-bolder">{{ product.name }}</h2>
                     <div class="row">
-                      <h4 class="card-text fw-bold">RM {{ topProduct.price }}</h4>
-                      <h6 class="card-text text-capitalize">{{ topProduct.category }}</h6>
-                      <h7 class="card-text">Sold: {{ topProduct.sold }} pcs</h7>
+                      <h4 class="card-text fw-bold">RM {{ product.price }}</h4>
+                      <h6 class="card-text text-capitalize">{{ product.category }}</h6>
+                      <h7 class="card-text">Sold: {{ product.sold }} pcs</h7>
                     </div>
                   </div>
                   <div class="d-flex justify-content-center mx-2">
-                    <button class="btn btn-primary" @click="addToCart(topProduct)">
-                      Add to Cart
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Additional picks cards -->
-          <div class="row">
-            <div v-for="product in products" :key="product.id" class="col-md-6 mb-4">
-              <div class="card-below col-12">
-                <img
-                  :src="product.image_url"
-                  class="card-img-below"
-                  :alt="product.name"
-                />
-                <div class="card-body row d-flex py-5">
-                  <div class="column mb-5">
-                    <h4 class="card-title fw-bold">{{ product.name }}</h4>
-                    <h5 class="card-text">RM {{ product.price }}</h5>
-                    <h6 class="card-text text-capitalize">{{ product.category }}</h6>
-                    <h7 class="card-text">Sold: {{ product.sold }} pcs</h7>
-                  </div>
-                  <div class="d-flex justify-content-center">
                     <button class="btn btn-primary" @click="addToCart(product)">
                       Add to Cart
                     </button>
@@ -134,9 +104,10 @@
       </div>
     </div>
     <!-- FOOTER -->
-    <Footer></Footer> <!-- Include Footer.vue -->
+    <Footer></Footer>
   </div>
 </template>
+
 
 <script>
 import Navbar from '../components/Navbar.vue';
@@ -162,31 +133,10 @@ export default {
         { value: 'vegan', label: 'Vegan' },
         { value: 'glutenFree', label: 'Gluten-Free' },
       ],
-      items: [
-        {
-          id: 1,
-          name: 'Chocolate',
-          price: 5.0,
-          imageUrl: 'ice-cream.jpeg',
-          category: 'dessert',
-          filters: ['vegetarian'],
-          sold: '300'
-        },
-        {
-          id: 2,
-          name: 'Ice Americano',
-          price: 8.0,
-          imageUrl: 'americano.jpeg',
-          category: 'beverages',
-          filters: ['vegan', 'glutenFree'],
-          sold: '223'
-        },
-        // Add more items as needed
-      ],
+      items: [],
       itemsPerPage: 9,
       currentPage: 1,
-      topProduct: null,
-      products: []
+      topProducts: [], // Top 3 products
     }
   },
   mounted() {
@@ -197,36 +147,48 @@ export default {
         element.scrollIntoView({ behavior: 'smooth' });
       }
     }
+    this.fetchProducts();
   },
   computed: {
     filteredItems() {
-      let filtered = this.items
+      let filtered = this.items;
+
       if (this.activeIndex !== 'all') {
         filtered = filtered.filter(
-          (item) => item.category === this.activeIndex
-        )
+          (item) => item.category.toLowerCase() === this.activeIndex.toLowerCase()
+        );
       }
+
       if (this.selectedFilter) {
         filtered = filtered.filter(
-          (item) => item.filters.includes(this.selectedFilter)
-        )
+          (item) => item.filters && item.filters.includes(this.selectedFilter)
+        );
       }
-      return filtered.slice(0, this.currentPage * this.itemsPerPage)
+
+      if (this.searchQuery) {
+        const searchLower = this.searchQuery.toLowerCase();
+        filtered = filtered.filter(
+          (item) =>
+            item.name.toLowerCase().includes(searchLower) ||
+            item.category.toLowerCase().includes(searchLower) ||
+            (item.filters && item.filters.some((filter) => filter.toLowerCase().includes(searchLower)))
+        );
+      }
+
+      return filtered.slice(0, this.currentPage * this.itemsPerPage);
     },
-  },
-  created(){
-    this.fetchProducts()
   },
   methods: {
     handleSelect(index) {
-    this.activeIndex = index;
-  },
+      this.activeIndex = index;
+      this.currentPage = 1;
+    },
     addToCart(item) {
       // Add your cart logic here
       console.log('Added to cart:', item)
     },
     loadMore() {
-      this.currentPage++
+      this.currentPage++;
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
@@ -241,17 +203,15 @@ export default {
         }
       })
     },
-    logout(){
-        this.$cookies.remove("token")
-        // this.$router.push("/login")
-        window.location.href = "login"
+    logout() {
+      this.$cookies.remove("token")
+      window.location.href = "login"
     },
     navigateTo(section) {
       const sectionMap = {
         home: '#home-section',
-        about: '#about-section',
+        news: '#news-section',
         menu: '#menu-section',
-        reservation: '#reservation-section',
         contact: '#contact-section'
       }
       const targetSection = sectionMap[section]
@@ -262,8 +222,14 @@ export default {
     async fetchProducts() {
       try {
         const response = await this.$axios.get('http://localhost:8000/api/products');
-        this.topProduct = response.data.products[0];
-        this.products = response.data.products;
+        const products = response.data.products;
+
+        // Sort products by sold count and get the top 3
+        products.sort((a, b) => b.sold - a.sold);
+        this.topProducts = products.slice(0, 3);
+
+        // Set the rest of the products
+        this.items = products.slice(3);
       } catch (error) {
         console.error('Error fetching products:', error);
       }
@@ -273,15 +239,15 @@ export default {
 </script>
 
 <style>
-h7{
+h7 {
   font-size: 0.8rem;
 }
-.card{
+.card {
   flex-direction: row;
   border-radius: 10px;
   overflow: hidden;
 }
-.card-below{
+.card-below {
   flex-direction: row;
   border-radius: 10px;
   overflow: hidden;
@@ -289,29 +255,29 @@ h7{
   max-height: 300px;
   min-height: 250px;
 }
-.card-img-below{
+.card-img-below {
   width: 300px;
   min-width: 300px;
   object-fit: cover;
 }
-.card-main{
+.card-main {
   flex-direction: column;
   transition: transform 0.3s;
   border-radius: 10px;
   overflow: hidden;
 }
-.card-main .card-body,{
+.card-main .card-body {
   flex-direction: row;
   display: flex;
   position: absolute;
   bottom: 0;
   background-color:#F390C7;
 }
-.card-body{
+.card-body {
   background-color:#F390C7;
   align-items: center;
 }
-#contact-section .card-body{
+#contact-section .card-body {
   background-color: #F7F8FA;
 }
 .menu {
@@ -320,61 +286,61 @@ h7{
 .el-submenu__icon-arrow {
     display: none !important;
 }
-.el-menu-item:focus{
+.el-menu-item:focus {
   background-color: #F390C7;
   font-weight: 700;
   text-decoration: underline;
 }
-.el-menu-item:hover{
+.el-menu-item:hover {
   background-color: #F390C7;
   font-weight: 700;
 }
-.main-header{
+.main-header {
   font-size: 4rem !important;
 }
 #home-section .form-control,
-#home-section .btn-primary-search{
+#home-section .btn-primary-search {
   min-height: 45px;
 }
-#home-section .form-control{
+#home-section .form-control {
   border-radius: 10px 0 0 10px;
   max-width: 300px;
   border-color: #6c757d20;
 }
-#home-section .btn-primary-search{
+#home-section .btn-primary-search {
   border-radius: 0 10px 10px 0;
   min-width: 80px;
 }
-.btn-primary-search{
+.btn-primary-search {
   background-color: #F390C7;
   border-color: #F390C7;
   color: #FFFFFF;
 }
-.btn-primary-search:hover{
+.btn-primary-search:hover {
   background-color: #6c757d;
   border-color: #6c757d;
   color: #000000;
 }
-.btn-primary{
+.btn-primary {
   background-color: #000000;
   border-color: #00000000;
   border-radius: 50px;
   min-width: 120px;
 }
-.btn-primary:hover{
+.btn-primary:hover {
   background-color: #FFE9F5;
   border-color: #F390C7;
   color: #000000;
   border-radius: 50px;
   min-width: 120px;
 }
-.btn-secondary{
+.btn-secondary {
   background-color: #00000000;
   border-color: #6c757d;
   color: #6c757d;
   border-radius: 50px;
 }
-.btn-secondary:hover{
+.btn-secondary:hover {
   background-color: #FFE9F5;
   border-color: #F390C700;
   color: #000000;

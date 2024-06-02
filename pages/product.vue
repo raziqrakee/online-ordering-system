@@ -13,17 +13,17 @@
             class="menu-custom w-100"
           >
             <el-menu-item index="all">All</el-menu-item>
-            <el-menu-item index="dessert">Dessert</el-menu-item>
             <el-menu-item index="korean">Korean</el-menu-item>
             <el-menu-item index="snacks">Snacks</el-menu-item>
             <el-menu-item index="beverages">Beverages</el-menu-item>
+            <el-menu-item index="desserts">Desserts</el-menu-item>
           </el-menu>
           <div class="search-custom menu-custom">
             <el-input placeholder="Search" prefix-icon="el-icon-search" v-model="searchQuery" @input="searchItems"></el-input>
           </div>
         </div>
 
-        <div class="filters-custom mb-3 text-center">
+        <!-- <div class="filters-custom mb-3 text-center">
           <el-select v-model="selectedFilter" placeholder="Filters" @change="filterItems">
             <el-option
               v-for="filter in filters"
@@ -32,7 +32,7 @@
               :value="filter.value"
             ></el-option>
           </el-select>
-        </div>
+        </div> -->
 
         <div class="row">
           <div
@@ -87,14 +87,15 @@ export default {
       activeIndex: 'all',
       selectedFilter: '',
       searchQuery: '',
-      filters: [
-        { value: '', label: 'All' },
-        { value: 'Vegetarian', label: 'Vegetarian' },
-        { value: 'Vegan', label: 'Vegan' },
-        { value: 'glutenFree', label: 'Gluten-Free' },
-      ],
+      // filters: [
+      //   { value: '', label: 'All' },
+      //   { value: 'korean', label: 'Korean' },
+      //   { value: 'snacks', label: 'Snacks' },
+      //   { value: 'beverages', label: 'Beverages' },
+      //   { value: 'desserts', label: 'Desserts' },
+      // ],
       items: [],
-      itemsPerPage: 9,
+      itemsPerPage: 8, // 2 rows x 4 columns
       currentPage: 1,
     }
   },
@@ -111,31 +112,35 @@ export default {
     filteredItems() {
       let filtered = this.items;
 
+      // Filter by category
       if (this.activeIndex !== 'all') {
-        filtered = filtered.filter((item) => item.category === this.activeIndex);
+        filtered = filtered.filter((item) => item.category.toLowerCase() === this.activeIndex.toLowerCase());
       }
 
+      // Filter by additional filters
       if (this.selectedFilter) {
-        filtered = filtered.filter((item) => item.filters.includes(this.selectedFilter));
+        filtered = filtered.filter((item) => item.filters && item.filters.includes(this.selectedFilter));
       }
 
+      // Filter by search query
       if (this.searchQuery) {
         const searchLower = this.searchQuery.toLowerCase();
         filtered = filtered.filter(
           (item) =>
             item.name.toLowerCase().includes(searchLower) ||
             item.category.toLowerCase().includes(searchLower) ||
-            item.filters.some(filter => filter.toLowerCase().includes(searchLower))
+            (item.filters && item.filters.some((filter) => filter.toLowerCase().includes(searchLower)))
         );
       }
 
+      // Pagination
       return filtered.slice(0, this.currentPage * this.itemsPerPage);
     },
   },
   methods: {
     handleSelect(index) {
       this.activeIndex = index;
-      this.filterItems(); // Trigger the filtering whenever a new category is selected
+      this.currentPage = 1; // Reset to the first page whenever a category is selected
     },
     filterItems() {
       this.currentPage = 1;
@@ -152,36 +157,6 @@ export default {
         this.items = response.data.products;
       } catch (error) {
         console.error('Error fetching products:', error);
-      }
-    },
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          console.log('Form data:', this.form);
-          this.$refs[formName].resetFields();
-        } else {
-          console.log('Error submitting form');
-          return false;
-        }
-      });
-    },
-    logout() {
-      this.$cookies.remove("token");
-      window.location.href = "login";
-    },
-    navigateTo(section) {
-      const sectionMap = {
-        home: '#home-section',
-        news: '#news-section',
-        menu: '#menu-section',
-        contact: '#contact-section'
-      };
-      const targetSection = sectionMap[section];
-      if (targetSection) {
-        const element = document.querySelector(targetSection);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
       }
     },
     searchItems() {
@@ -255,15 +230,15 @@ export default {
   display: flex;
   position: absolute;
   bottom: 0;
-  background-color:#0000000;
+  background: color #000;;
 }
 .card-body-custom{
-  background-color:#0000000;
+  background: color #000;;
   align-items: center;
 }
 .card-img-top-custom{
-  max-height: 300px; 
-  min-height: 300px; 
+  max-height: 300px;
+  min-height: 300px;
   object-fit: cover;
 }
 </style>
