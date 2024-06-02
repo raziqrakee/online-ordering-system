@@ -9,9 +9,9 @@
             <h3 class="text-2xl fw-bold mb-2">Customer Information</h3>
             <hr>
             <div class="mb-3">
-              <input type="text" id="fullname" placeholder="Fullname" class="form-control mb-2">
-              <input type="text" id="email" placeholder="Email" class="form-control mb-2">
-              <input type="tel" id="phone" placeholder="Phone Number" class="form-control mb-2">
+              <input type="text" v-model="form.fullname" id="name" placeholder="Fullname" class="form-control mb-2">
+              <input type="text" v-model="form.email" id="email" placeholder="Email" class="form-control mb-2">
+              <input type="tel" v-model="form.phone" id="contact_number" placeholder="Phone Number" class="form-control mb-2">
             </div>
             <h4 class="text-2xl fw-normal mb-2">Order Options</h4>
             <div id="order-options" class="row d-flex mb-3">
@@ -110,9 +110,36 @@ export default {
     return {
       qrModalVisible: false,
       selectedOrderOption: '',
+      form: {
+        name: '',
+        email: '',
+        contact_number: ''
+      },
     };
   },
+  created() {
+    this.getProfile();
+  },
   methods: {
+    async getProfile() {
+      try {
+        const userId = this.$cookies.get('id');
+        const token = this.$cookies.get('token');
+        const response = await this.$axios(`http://localhost:8000/api/users/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        this.form = {
+          fullname: response.data.name,
+          email: response.data.email,
+          phone: response.data.contact_number,
+        };
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+      }
+    },
     selectOrderOption(option) {
       this.selectedOrderOption = option;
     },
