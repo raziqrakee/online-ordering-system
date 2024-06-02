@@ -216,10 +216,15 @@ export default {
       this.newOrder = { id: '', type: '', amount: '', customer: '', customer_phone: '', details: [], status: '' };
     },
     acceptOrder(orderId) {
-      // Logic to accept the order
       const order = this.orders.find(order => order.id === orderId);
-      if (order) order.status = 'In-Process';
-      this.filterOrdersByStatus();
+      if (order) {
+        if (order.status === 'Pending') {
+          order.status = 'In-Process';
+        } else if (order.status === 'In-Process') {
+          order.status = 'Completed';
+        }
+        this.filterOrdersByStatus();
+      }
     },
     rejectOrder(orderId) {
       // Logic to reject the order
