@@ -50,11 +50,9 @@
           <thead>
             <tr>
               <th scope="col">Order ID</th>
+              <th scope="col">Order Details</th>
               <th scope="col">Type</th>
               <th scope="col">Total Amount (RM)</th>
-              <th scope="col">Customer Name</th>
-              <th scope="col">Customer Phone</th>
-              <th scope="col">Order Details</th>
               <th scope="col">Order Status</th>
               <th scope="col">Action</th>
             </tr>
@@ -62,20 +60,19 @@
           <tbody>
             <tr v-for="order in filteredOrders" :key="order.id">
               <td>{{ order.id }}</td>
-              <td>{{ order.type }}</td>
-              <td>{{ order.amount }}</td>
-              <td>{{ order.customer }}</td>
-              <td>{{ order.customer_phone }}</td>
               <td>
                 <div v-for="(item, index) in order.details" :key="index">
                   {{ item.quantity }} x {{ item.name }}
                 </div>
               </td>
+              <td>{{ order.type }}</td>
+              <td>{{ order.amount }}</td>
               <td>
                 <el-button :type="statusButtonColor(order.status)">{{ statusText(order.status) }}</el-button>
               </td>
               <td>
                 <div class="d-flex gap-1">
+                  <button class="btn btn-eye" @click="viewCustomerDetails(order)">👁️</button>
                   <button class="btn btn-accept" @click="acceptOrder(order.id)">✔</button>
                   <button class="btn btn-reject" @click="rejectOrder(order.id)">✖</button>
                 </div>
@@ -122,6 +119,21 @@
         <el-button type="primary" @click="insertNewOrder">Save</el-button>
       </span>
     </el-dialog>
+
+    <!-- Customer Details Modal -->
+    <el-dialog :visible.sync="showCustomerDetailsModalVisible" title="Customer Details">
+      <div>
+        <p><strong>Customer Name:</strong> {{ selectedOrder.customer }}</p>
+        <p><strong>Customer Phone:</strong> {{ selectedOrder.customer_phone }}</p>
+        <div v-for="(item, index) in selectedOrder.details" :key="index">
+          <p><strong>Product:</strong> {{ item.name }}</p>
+          <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showCustomerDetailsModalVisible = false">Close</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -137,11 +149,22 @@ export default {
     return {
       activeLink: 'orders',
       showAddModalVisible: false,
+      showCustomerDetailsModalVisible: false,
       newOrder: {
         id: '',
         type: '',
         amount: '',
         customer: '',
+        customer_phone: '',
+        details: [],
+        status: '',
+      },
+      selectedOrder: {
+        id: '',
+        type: '',
+        amount: '',
+        customer: '',
+        customer_phone: '',
         details: [],
         status: '',
       },
@@ -190,7 +213,7 @@ export default {
       this.orders.push({ ...this.newOrder, id: this.orders.length + 1 });
       this.filterOrdersByStatus();
       this.showAddModalVisible = false;
-      this.newOrder = { id: '', type: '', amount: '', customer: '', details: [], status: '' };
+      this.newOrder = { id: '', type: '', amount: '', customer: '', customer_phone: '', details: [], status: '' };
     },
     acceptOrder(orderId) {
       // Logic to accept the order
@@ -229,13 +252,15 @@ export default {
       switch (status) {
         case 'In-Process':
           return 'In-Process';
-        case 'In-Process':
-          return 'In-Process';
         case 'Cancelled':
           return 'Rejected';
         default:
           return status;
       }
+    },
+    viewCustomerDetails(order) {
+      this.selectedOrder = { ...order };
+      this.showCustomerDetailsModalVisible = true;
     },
   },
 };
@@ -335,7 +360,7 @@ export default {
 
 .btn-add:hover {
   background-color: #6c757d;
-  color: #ffffff
+  color: #ffffff;
 }
 
 .table {
@@ -371,6 +396,18 @@ export default {
 
 .btn-reject:hover {
   background-color: #F56C6C;
+}
+
+.btn-eye {
+  color: white;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-eye:hover {
+  background-color: #409EFF;
 }
 
 .dialog-footer {
