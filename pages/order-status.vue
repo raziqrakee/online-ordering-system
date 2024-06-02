@@ -1,33 +1,42 @@
 <template>
-  <div class="container d-flex align-items-center justify-content-center" style="height: 100vh">
-    <div class="row justify-content-center w-80">
-      <div class="col-md-12">
-        <div class="text-center m-4">
-          <img src="~/static/logo.png" alt="Logo" class="img-fluid" style="max-width: 150px;">
-        </div>
-        <div class="timeline-horizontal d-flex align-items-center justify-content-between gap-4">
-          <div class="timeline-item" :class="{ 'completed': status === 'accepted', 'inactive': status !== 'accepted' }">
-            <div class="timeline-icon" :class="{ 'pulse': status === 'accepted' }">
-              <i class="bi bi-check-circle-fill"></i>
-            </div>
-            <div class="timeline-content mt-2" :class="{ 'text-muted': status !== 'accepted' }">
-              <h5>Order Accepted</h5>
-            </div>
+  <div>
+    <div class="header shadow">
+      <div class="container d-flex align-items-center">
+        <img src="@/static/logo.png" alt="Logo" class="logo">
+        <h2 class="header-title">Your Order Status</h2>
+      </div>
+    </div>
+    <div class="container d-flex mt-5 justify-content-center" style="height: 100vh">
+      <div class="row justify-content-center w-80 mt-5 ">
+        <div class="col-md-12">
+          <div class="text-center m-4 visual-status">
+            <img :src="statusImage" alt="Status Image" class="img-fluid" style="max-width: 150px;">
+            <h5 class="mt-4">{{ statusText }}</h5>
           </div>
-          <div class="timeline-item" :class="{ 'completed': status === 'preparing', 'inactive': status !== 'preparing' }">
-            <div class="timeline-icon" :class="{ 'pulse': status === 'preparing' }">
-              <i class="bi bi-hourglass-split"></i>
+          <div class="timeline-horizontal d-flex align-items-center justify-content-between gap-4">
+            <div class="timeline-item" :class="{ 'completed': status === 'accepted', 'inactive': status !== 'accepted' }">
+              <div class="timeline-icon" :class="{ 'pulse': status === 'accepted' }">
+                <img :src="acceptedIcon" alt="Accepted Icon" class="w-100" :style="{ filter: status !== 'accepted' ? 'grayscale(100%)' : 'none' }">
+              </div>
+              <div class="timeline-content mt-2 text-center" :class="{ 'text-muted': status !== 'accepted' }">
+                <p>Received</p>
+              </div>
             </div>
-            <div class="timeline-content mt-2" :class="{ 'text-muted': status !== 'preparing' }">
-              <h5>Preparing Your Order</h5>
+            <div class="timeline-item" :class="{ 'completed': status === 'preparing', 'inactive': status !== 'preparing' }">
+              <div class="timeline-icon" :class="{ 'pulse': status === 'preparing' }">
+                <img :src="preparingIcon" alt="Preparing Icon" class="w-100" :style="{ filter: status !== 'preparing' ? 'grayscale(100%)' : 'none' }">
+              </div>
+              <div class="timeline-content mt-2 text-center" :class="{ 'text-muted': status !== 'preparing' }">
+                <p>Preparing</p>
+              </div>
             </div>
-          </div>
-          <div class="timeline-item" :class="{ 'completed': status === 'ready', 'inactive': status !== 'ready' }">
-            <div class="timeline-icon" :class="{ 'pulse': status === 'ready' }">
-              <i class="bi bi-check-circle-fill"></i>
-            </div>
-            <div class="timeline-content mt-2" :class="{ 'text-muted': status !== 'ready' }">
-              <h5>Order Ready for Pickup</h5>
+            <div class="timeline-item" :class="{ 'completed': status === 'ready', 'inactive': status !== 'ready' }">
+              <div class="timeline-icon" :class="{ 'pulse': status === 'ready' }">
+                <img :src="readyIcon" alt="Ready Icon" class="w-100" :style="{ filter: status !== 'ready' ? 'grayscale(100%)' : 'none' }">
+              </div>
+              <div class="timeline-content mt-2 text-center" :class="{ 'text-muted': status !== 'ready' }">
+                <p>Ready</p>
+              </div>
             </div>
           </div>
         </div>
@@ -43,17 +52,63 @@ export default {
       status: 'accepted',
     };
   },
+  computed: {
+    statusImage() {
+      switch (this.status) {
+        case 'accepted':
+          return require('@/static/assets/order-accepted.png');
+        case 'preparing':
+          return require('@/static/assets/preparing-order.png');
+        case 'ready':
+          return require('@/static/assets/order-pickup.png');
+        default:
+          return require('@/static/logo.png');
+      }
+    },
+    statusText() {
+      switch (this.status) {
+        case 'accepted':
+          return 'Your Order Has Been Accepted';
+        case 'preparing':
+          return 'We Are Preparing Your Order';
+        case 'ready':
+          return 'Your Order Ready for Pickup';
+        default:
+          return 'Welcome to Danish Iz';
+      }
+    },
+    acceptedIcon() {
+      return require('@/static/icon/done.png');
+    },
+    preparingIcon() {
+      return require('@/static/icon/done.png');
+    },
+    readyIcon() {
+      return require('@/static/icon/done.png');
+    }
+  }
 };
 </script>
 
 <style scoped>
+.header {
+  background-color: #FFE9F5;
+  padding: 15px 0;
+}
+.logo {
+  width: 50px;
+  height: 50px;
+  margin-right: 15px;
+}
+.header-title {
+  margin: 0;
+}
 .timeline-horizontal {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
 }
-
 .timeline-item {
   display: flex;
   flex-direction: column;
@@ -61,48 +116,39 @@ export default {
   padding: 20px;
   transition: transform 0.3s ease-in-out;
 }
-
 .timeline-item.completed {
   transform: scale(1.1);
 }
-
 .timeline-item.inactive .timeline-icon {
   background-color: #ccc;
 }
-
 .timeline-item .timeline-icon {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: #007bff;
   display: flex;
   justify-content: center;
   align-items: center;
   transition: background-color 0.3s ease-in-out;
 }
-
 .timeline-item.completed .timeline-icon {
-  background-color: #28a745;
-}
 
+}
 .timeline-item h5 {
   margin: 0;
 }
-
 .timeline-item:last-child {
   margin-bottom: 0;
 }
-
 .pulse {
   animation: pulse 1s infinite alternate;
 }
-
 @keyframes pulse {
   from {
     transform: scale(1);
   }
   to {
-    transform: scale(1.1);
+    transform: scale(1.3);
   }
 }
 </style>
