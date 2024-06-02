@@ -58,7 +58,9 @@ export default {
 .el-submenu__icon-arrow {
     display: none !important;
 }
-
+.el-menu-item *{
+  vertical-align: unset;
+}
 .el-menu-item:focus, .el-menu-item:hover {
   background-color: #F390C7;
   font-weight: 700;
