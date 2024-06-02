@@ -24,7 +24,7 @@
             <el-col :span="8" style="margin-bottom:20px">
               <el-card shadow="hover">
                 <div class="stat-card">
-                  <i class="el-icon-goods stat-icon"></i>
+                  <img src="~/static/icon/total-product.png" class="stat-icon" alt="Total Products" />
                   <div class="stat-info">
                     <span class="stat-value">20</span>
                     <span class="stat-label">Total Products</span>
@@ -35,7 +35,7 @@
             <el-col :span="8" style="margin-bottom:20px">
               <el-card shadow="hover">
                 <div class="stat-card">
-                  <i class="el-icon-goods stat-icon"></i>
+                  <img src="~/static/icon/total-cust.png" class="stat-icon" alt="Total Customers" />
                   <div class="stat-info">
                     <span class="stat-value">20</span>
                     <span class="stat-label">Total Customers</span>
@@ -46,7 +46,7 @@
             <el-col :span="8" style="margin-bottom:20px">
               <el-card shadow="hover">
                 <div class="stat-card">
-                  <i class="el-icon-goods stat-icon"></i>
+                  <img src="~/static/icon/total-order.png" class="stat-icon" alt="Total Orders" />
                   <div class="stat-info">
                     <span class="stat-value">20</span>
                     <span class="stat-label">Total Orders</span>
@@ -57,7 +57,7 @@
             <el-col :span="8" style="margin-bottom:20px">
               <el-card shadow="hover">
                 <div class="stat-card">
-                  <i class="el-icon-goods stat-icon"></i>
+                  <img src="~/static/icon/total-sales-rsvr.png" class="stat-icon" alt="Total Sales" />
                   <div class="stat-info">
                     <span class="stat-value">20</span>
                     <span class="stat-label">Total Sales</span>
@@ -68,7 +68,7 @@
             <el-col :span="8" style="margin-bottom:20px">
               <el-card shadow="hover">
                 <div class="stat-card">
-                  <i class="el-icon-goods stat-icon"></i>
+                  <img src="~/static/icon/total-sales-rsvr.png" class="stat-icon" alt="Total Reservation" />
                   <div class="stat-info">
                     <span class="stat-value">20</span>
                     <span class="stat-label">Total Reservation</span>
@@ -102,8 +102,6 @@
   </script>
 
   <style>
-
-  /* Add custom styles for the admin dashboard */
   .admin-dashboard {
     display: flex;
     height: 100vh;
