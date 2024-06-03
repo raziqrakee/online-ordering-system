@@ -5,13 +5,13 @@
     <div id="home-section" class="d-flex align-items-center" style="min-height: 70vh; background-color: #D1E6FB;">
       <div class="row mx-5 w-100 d-flex justify-content-between align-items-center">
         <div class="col-6 p-4">
-          <h1 class="mx-5 text-white fw-bold fs-1 main-header">Danish Ice</br>Cream Cafe</h1>
+          <h1 class="mx-5 text-white fw-bold fs-1 main-header">Danish Ice<br />Cream Cafe</h1>
           <h5 class="mx-5 text-white">
             Embrace the Flavours of the Future with Danish Ice Cream Cafe, We Serve Gen Z's Palate with Modern Taste Sensations!
           </h5>
         </div>
         <div class="col-6 text-center">
-          <img src="~/static/logo.png"/>
+          <img src="~/static/logo.png" />
         </div>
       </div>
     </div>
@@ -35,7 +35,7 @@
                     <div class="row">
                       <h4 class="card-text fw-bold">RM {{ product.price }}</h4>
                       <h6 class="card-text text-capitalize">{{ product.category }}</h6>
-                      <h7 class="card-text">Sold: {{ product.sold }} pcs</h7>
+                      <p class="card-text" style="font-size: 0.8rem;">Sold: {{ product.sold }} pcs</p>
                     </div>
                   </div>
                   <div class="d-flex justify-content-center mx-2">
@@ -61,14 +61,14 @@
           <div class="col-md-8 col-sm-6">
             <h4 class="fw-bold">Danish Ice Cream | Promosi Aidiladha</h4>
             <h6>Quis hendrerit nibh mauris sed faucibus. Quis hendrerit nibh mauris sed faucibus is sed faucibus.</h6>
-            <img class="w-100" src="~/static/news1.jpeg"/>
+            <img class="w-100" src="~/static/news1.jpeg" />
           </div>
           <div class="col-md-4 col-sm-6">
             <div class="mb-4">
-              <img class="w-100" src="~/static/news2.jpeg"/>
+              <img class="w-100" src="~/static/news2.jpeg" />
             </div>
             <div>
-              <img class="w-100" src="~/static/news3.jpeg"/>
+              <img class="w-100" src="~/static/news3.jpeg" />
             </div>
           </div>
         </div>
@@ -84,14 +84,14 @@
               <p class="card-text mb-4">Fill this form and we will contact you next 48 hours.</p>
               <el-form ref="form" :model="form" label-position="top">
                 <div class="d-flex">
-                  <el-form-item style="width: 50%; margin-right: 10px;"  label="Your Name" prop="name" :rules="[{ required: true, message: 'Please enter your name' }]">
+                  <el-form-item style="width: 50%; margin-right: 10px;" name="name" label="Your Name" prop="name" :rules="[{ required: true, message: 'Please enter your name' }]">
                     <el-input v-model="form.name"></el-input>
                   </el-form-item>
-                  <el-form-item style="width: 50%; margin-left: 10px;"  label="Your e-mail" prop="email" :rules="[{ required: true, message: 'Please enter your email', type: 'email' }]">
+                  <el-form-item style="width: 50%; margin-left: 10px;" name="email" label="Your e-mail" prop="email" :rules="[{ required: true, message: 'Please enter your email', type: 'email' }]">
                     <el-input v-model="form.email"></el-input>
                   </el-form-item>
                 </div>
-                <el-form-item label="Your message" prop="message">
+                <el-form-item label="Your message" prop="message" name="message">
                   <el-input v-model="form.message" type="textarea" rows="4"></el-input>
                 </el-form-item>
                 <div class="text-center">
@@ -108,10 +108,10 @@
   </div>
 </template>
 
-
 <script>
 import Navbar from '../components/Navbar.vue';
 import Footer from '../components/Footer.vue';
+import axios from 'axios'; // Ensure axios is imported
 
 export default {
   components: {
@@ -129,9 +129,10 @@ export default {
       selectedFilter: '',
       filters: [
         { value: '', label: 'All' },
-        { value: 'vegetarian', label: 'Vegetarian' },
-        { value: 'vegan', label: 'Vegan' },
-        { value: 'glutenFree', label: 'Gluten-Free' },
+        { value: 'korean', label: 'Korean' },
+        { value: 'snacks', label: 'Snacks' },
+        { value: 'beverages', label: 'Beverages' },
+        { value: 'desserts', label: 'Desserts' },
       ],
       items: [],
       itemsPerPage: 9,
@@ -190,18 +191,29 @@ export default {
     loadMore() {
       this.currentPage++;
     },
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+    async submitForm(formName) {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          // Handle form submission logic here
-          console.log('Form data:', this.form)
-          // Reset form after successful submission
-          this.$refs[formName].resetFields()
+          try {
+            // Log form data before sending
+            console.log('Form data:', this.form);
+
+            // Send form data to the backend
+            const response = await axios.post('http://localhost:8000/api/catering-service', this.form);
+
+            // Log backend response
+            console.log('Form submitted successfully:', response.data);
+            this.$message.success('Request submitted successfully');
+            this.$refs[formName].resetFields();
+          } catch (error) {
+            console.error('Error submitting form:', error);
+            this.$message.error('Error submitting form. Please try again.');
+          }
         } else {
-          console.log('Error submitting form')
-          return false
+          console.log('Error submitting form');
+          return false;
         }
-      })
+      });
     },
     logout() {
       this.$cookies.remove("token")
@@ -233,15 +245,15 @@ export default {
       } catch (error) {
         console.error('Error fetching products:', error);
       }
-    },
+    }
   },
 }
 </script>
 
 <style>
-h7 {
+/* h7 {
   font-size: 0.8rem;
-}
+} */
 .card {
   flex-direction: row;
   border-radius: 10px;
@@ -271,10 +283,10 @@ h7 {
   display: flex;
   position: absolute;
   bottom: 0;
-  background-color:#F390C7;
+  background-color: #F390C7;
 }
 .card-body {
-  background-color:#F390C7;
+  background-color: #F390C7;
   align-items: center;
 }
 #contact-section .card-body {
@@ -284,7 +296,7 @@ h7 {
   border-bottom: 1px solid #e6e6e6;
 }
 .el-submenu__icon-arrow {
-    display: none !important;
+  display: none !important;
 }
 .el-menu-item:focus {
   background-color: #F390C7;
