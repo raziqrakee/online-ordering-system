@@ -143,9 +143,21 @@
         <div v-for="(item, index) in selectedOrder.details" :key="index">
           <p>{{ item.name }} x {{ item.quantity }}</p>
         </div>
+        <p v-if="selectedOrder.payment_method === 'QR' && selectedOrder.receipt">
+          <strong>Receipt:</strong>
+          <a href="#" @click="openReceiptModal(selectedOrder.receipt)">View Receipt</a>
+        </p>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="showCustomerDetailsModalVisible = false">Close</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog :visible.sync="showReceiptModal" class="receipt-modal" title="Receipt">
+      <div class="d-flex justify-content-center">
+        <img :src="selectedReceiptImageUrl" alt="Receipt" class="receipt-image img-fluid">
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showReceiptModal = false">Close</el-button>
       </span>
     </el-dialog>
   </div>
@@ -161,6 +173,8 @@ export default {
   },
   data() {
     return {
+      showReceiptModal: false,
+      selectedReceiptImageUrl: '~/static/sample-receipt.png', //sample
       products: [],
       currentPage: 1,
       pageSize: 5,
@@ -176,6 +190,7 @@ export default {
         details: [],
         payment_method: '',
         status: '',
+        receipt: '',
       },
       selectedOrder: {
         id: '',
@@ -186,15 +201,16 @@ export default {
         details: [],
         payment_method: '',
         status: '',
+        receipt: '',
       },
       selectedStatus: 'All',
       orders: [
         { id: '001', type: 'Dine-in', amount: '250.00', customer: 'John Doe', customer_phone: '01123422089', details: [{ name: 'Iced Americano', quantity: 2 }], payment_method: 'Cash', status: 'Pending' },
         { id: '002', type: 'Takeaway', amount: '120.00', customer: 'Jane Smith', customer_phone: '0134533378', details: [{ name: 'Iced Cream Strawberry', quantity: 1 }, { name: 'Ice Americano', quantity: 2 }], payment_method: 'Cash', status: 'Completed' },
-        { id: '003', type: 'Dine-in', amount: '450.00', customer: 'Alice Brown', customer_phone: '0198105991', details: [{ name: 'Iced Americano', quantity: 3 }], payment_method: 'QR', status: 'In-Process' },
+        { id: '003', type: 'Dine-in', amount: '450.00', customer: 'Alice Brown', customer_phone: '0198105991', details: [{ name: 'Iced Americano', quantity: 3 }], payment_method: 'QR', status: 'In-Process', receipt: '~/static/sample-receipt.png' },
         { id: '004', type: 'Takeaway', amount: '200.00', customer: 'Bob Johnson', customer_phone: '0198400668', details: [{ name: 'French Fries', quantity: 2 }], payment_method: 'Cash', status: 'Cancelled' },
-        { id: '005', type: 'Dine-in', amount: '300.00', customer: 'Charlie Lee', customer_phone: '0148652834', details: [{ name: 'Samyang Ramen', quantity: 1 }, { name: 'Ice Americano', quantity: 1 }], payment_method: 'QR', status: 'Pending' },
-        { id: '006', type: 'Dine-in', amount: '200.00', customer: 'David Kim', customer_phone: '0138997665', details: [{ name: 'Chicken Wings', quantity: 2 }, { name: 'Ice Americano', quantity: 1 }], payment_method: 'QR', status: 'In-Process' },
+        { id: '005', type: 'Dine-in', amount: '300.00', customer: 'Charlie Lee', customer_phone: '0148652834', details: [{ name: 'Samyang Ramen', quantity: 1 }, { name: 'Ice Americano', quantity: 1 }], payment_method: 'QR', status: 'Pending', receipt: '~/static/sample-receipt.png' },
+        { id: '006', type: 'Dine-in', amount: '200.00', customer: 'David Kim', customer_phone: '0138997665', details: [{ name: 'Chicken Wings', quantity: 2 }, { name: 'Ice Americano', quantity: 1 }], payment_method: 'QR', status: 'In-Process', receipt: '~/static/sample-receipt.png' },
         { id: '007', type: 'Takeaway', amount: '100.00', customer: 'Eve Green', customer_phone: '0126735844', details: [{ name: 'French Fries', quantity: 1 }], payment_method: 'Cash', status: 'Pending' },
       ],
     };
@@ -217,6 +233,10 @@ export default {
     },
   },
   methods: {
+    openReceiptModal(receiptImageUrl) {
+      this.selectedReceiptImageUrl = receiptImageUrl;
+      this.showReceiptModal = true;
+    },
     statusButtonColor(status) {
       if (status === 'Pending') {
         return 'primary';
@@ -256,7 +276,17 @@ export default {
       this.currentPage = 1;
     },
     viewCustomerDetails(order) {
-      this.selectedOrder = order;
+      this.selectedOrder = {
+        id: order.id,
+        type: order.type,
+        amount: order.amount,
+        customer: order.customer,
+        customer_phone: order.customer_phone,
+        details: order.details,
+        payment_method: order.payment_method,
+        status: order.status,
+        receipt: order.receipt,
+      };
       this.showCustomerDetailsModalVisible = true;
     },
     insertNewOrder() {
@@ -290,6 +320,9 @@ export default {
 </script>
 
 <style>
+.receipt-image{
+  width: 300px;
+}
 .admin-order {
   display: flex;
   height: 100vh;
