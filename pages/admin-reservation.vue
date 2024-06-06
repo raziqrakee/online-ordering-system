@@ -1,14 +1,11 @@
 <template>
   <div class="admin-reservation">
-    <!-- Sidebar component -->
     <Sidebar></Sidebar>
-
     <div class="content">
       <div class="header">
         <div class="search">
           <el-input placeholder="Search" prefix-icon="el-icon-search"></el-input>
         </div>
-
         <div class="user">
           <el-dropdown trigger="click">
             <span class="el-dropdown-link">
@@ -21,12 +18,11 @@
           </el-dropdown>
         </div>
       </div>
-
       <div class="admin-reservation-table">
         <div class="table-header">
           <h1 class="title">Reservation</h1>
           <div class="actions">
-            <button class="btn btn-add" @click="showAddModalVisible = true">
+            <button class="btn btn-add" @click="openAddModal">
               <span>Add Reservation</span>
               <svg xmlns="http://www.w3.org/2000/svg" class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 2a1 1 0 00-1 1v6H3a1 1 0 100 2h6v6a1 1 0 102 0v-6h6a1 1 0 100-2h-6V3a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -34,12 +30,11 @@
             </button>
           </div>
         </div>
-
         <table class="table">
           <thead>
             <tr>
               <th scope="col">Customer Name</th>
-              <th scope="col">Time</th>
+              <th scope="col">Time Slot</th>
               <th scope="col">Date</th>
               <th scope="col">No. Pax</th>
               <th scope="col">Phone Number</th>
@@ -50,15 +45,15 @@
           <tbody>
             <tr v-for="reservation in reservations" :key="reservation.id">
               <td>{{ reservation.customer }}</td>
-              <td>{{ reservation.time }}</td>
+              <td>{{ reservation.time_slot }}</td>
               <td>{{ reservation.date }}</td>
               <td>{{ reservation.pax }}</td>
               <td>{{ reservation.phone }}</td>
               <td>
                 <div class="d-flex gap-1">
-                  <button class="btn btn-accept" @click="acceptReservation(reservation.id)">✔</button>
-                  <button class="btn btn-reject" @click="rejectReservation(reservation.id)">✖</button>
-                  <button class="btn btn-edit" @click="editReservation(reservation.id)">✎</button>
+                  <button class="btn btn-accept" @click="updateReservationStatus(reservation.id, 'Confirmed')">✔</button>
+                  <button class="btn btn-reject" @click="updateReservationStatus(reservation.id, 'Cancelled')">✖</button>
+                  <button class="btn btn-edit" @click="editReservation(reservation)">✎</button>
                 </div>
               </td>
               <td>
@@ -69,28 +64,19 @@
         </table>
       </div>
     </div>
-
-    <!-- Modals (Edit, Delete, Add) -->
     <el-dialog :visible.sync="showAddModalVisible" title="Add Reservation">
       <el-form :model="newReservation">
-        <!-- Form content for new reservation -->
         <el-form-item label="Customer Name">
           <el-input v-model="newReservation.customer"></el-input>
         </el-form-item>
-        <div class="el-form-item">
-          <label for="reservation-date">Date</label>
-          <div class="w-50">
-            <input type="date" id="reservation-date" v-model="newReservation.date" class="form-control text-lg rounded-lg">
-          </div>
-        </div>
-        <div class="el-form-item">
-          <label for="reservation-time">Time</label>
-          <div class="w-50">
-            <div class="d-flex gap-2">
-              <input type="time" class="form-control text-lg rounded-lg" @change="validateTime">
-            </div>
-          </div>
-        </div>
+        <el-form-item label="Date">
+          <el-date-picker v-model="newReservation.date" type="date" @change="fetchAvailableSlots('new')"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="Time Slot">
+          <el-select v-model="newReservation.time_slot" placeholder="Select time slot">
+            <el-option v-for="slot in availableSlots.new" :key="slot" :label="slot" :value="slot"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="No. Pax">
           <el-input v-model="newReservation.pax" type="number"></el-input>
         </el-form-item>
@@ -100,55 +86,46 @@
         <el-form-item label="Reservation Status">
           <el-select v-model="newReservation.status" placeholder="Select status">
             <el-option label="Pending" value="Pending"></el-option>
-            <el-option label="Completed" value="Completed"></el-option>
-            <el-option label="In-Process" value="In-Process"></el-option>
+            <el-option label="Confirmed" value="Confirmed"></el-option>
             <el-option label="Cancelled" value="Cancelled"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="showAddModalVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="insertNewReservation">Save</el-button>
+        <el-button type="primary" @click="saveReservation">Save</el-button>
       </span>
     </el-dialog>
     <el-dialog :visible.sync="showEditModalVisible" title="Edit Reservation">
       <el-form :model="editedReservation">
-        <!-- Form content for new reservation -->
         <el-form-item label="Customer Name">
-          <el-input v-model="newReservation.customer"></el-input>
+          <el-input v-model="editedReservation.customer"></el-input>
         </el-form-item>
-        <div class="el-form-item">
-          <label for="reservation-date">Date</label>
-          <div class="w-50">
-            <input type="date" id="reservation-date" v-model="newReservation.date" class="form-control text-lg rounded-lg">
-          </div>
-        </div>
-        <div class="el-form-item">
-          <label for="reservation-time">Time</label>
-          <div class="w-50">
-            <div class="d-flex gap-2">
-              <input type="time" class="form-control text-lg rounded-lg" @change="validateTime">
-            </div>
-          </div>
-        </div>
+        <el-form-item label="Date">
+          <el-date-picker v-model="editedReservation.date" type="date" @change="fetchAvailableSlots('edit')"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="Time Slot">
+          <el-select v-model="editedReservation.time_slot" placeholder="Select time slot">
+            <el-option v-for="slot in availableSlots.edit" :key="slot" :label="slot" :value="slot"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="No. Pax">
-          <el-input v-model="newReservation.pax" type="number"></el-input>
+          <el-input v-model="editedReservation.pax" type="number"></el-input>
         </el-form-item>
         <el-form-item label="Phone Number">
-          <el-input v-model="newReservation.phone"></el-input>
+          <el-input v-model="editedReservation.phone"></el-input>
         </el-form-item>
         <el-form-item label="Reservation Status">
-          <el-select v-model="newReservation.status" placeholder="Select status">
+          <el-select v-model="editedReservation.status" placeholder="Select status">
             <el-option label="Pending" value="Pending"></el-option>
-            <el-option label="Completed" value="Completed"></el-option>
-            <el-option label="In-Process" value="In-Process"></el-option>
+            <el-option label="Confirmed" value="Confirmed"></el-option>
             <el-option label="Cancelled" value="Cancelled"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="showEditModalVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="saveEditedReservation">Save</el-button>
+        <el-button type="primary" @click="updateReservation">Save</el-button>
       </span>
     </el-dialog>
   </div>
@@ -164,137 +141,107 @@ export default {
   },
   data() {
     return {
-      activeLink: 'reservations',
       showAddModalVisible: false,
+      showEditModalVisible: false,
       newReservation: {
         customer: '',
-        time: '',
         date: '',
+        time_slot: '',
         pax: '',
         phone: '',
-        details: [],
-        status: '',
-        hours: '',
-        minutes: '',
-        ampm: ''
+        status: 'Pending'
       },
-      reservations: [
-        { id: 1, customer: 'John Doe', time: '09:00 AM', date: '01 06 2024', pax: '4', phone: '123-456-7890', details: [{ name: 'Ice Americano', quantity: 2 }], status: 'Pending' },
-        { id: 2, customer: 'Jane Smith', time: '12:30 PM', date: '02 06 2024', pax: '2', phone: '234-567-8901', details: [{ name: 'Ice Cream Strawberry', quantity: 1 }, { name: 'Ice Americano', quantity: 2 }], status: 'Completed' },
-      ],
       editedReservation: {
         id: '',
         customer: '',
-        time: '',
         date: '',
+        time_slot: '',
         pax: '',
         phone: '',
-        details: [],
-        status: '',
+        status: ''
       },
+      reservations: [],
+      availableSlots: {
+        new: [],
+        edit: []
+      }
     };
   },
   methods: {
-    fetchReservations() {
-      // Fetch reservations from API
+    async fetchReservations() {
+      const response = await axios.get('http://localhost:8000/api/reservations');
+      this.reservations = response.data;
     },
-    insertNewReservation() {
-      const newReservationId = this.reservations.length + 1; // Generate a unique ID for the new reservation
-      const newReservation = { ...this.newReservation, id: newReservationId }; // Add the generated ID to the new reservation
-      this.reservations.push(newReservation); // Add the new reservation to the reservations array
-      this.showAddModalVisible = false; // Close the modal after saving
-      // Reset the newReservation object for next entry
-      this.newReservation = {
-        customer: '',
-        time: '',
-        date: '',
-        pax: '',
-        phone: '',
-        details: [],
-        status: '',
-        hours: '',
-        minutes: '',
-        ampm: ''
-      };
-    },
-    acceptReservation(reservationId) {
-      // Find the reservation by ID and update its status to "Accepted"
-      const reservationIndex = this.reservations.findIndex(reservation => reservation.id === reservationId);
-      if (reservationIndex !== -1) {
-        this.reservations[reservationIndex].status = 'Accepted';
+    async fetchAvailableSlots(type) {
+      const date = type === 'new' ? this.newReservation.date : this.editedReservation.date;
+      if (!date) return;
+      const formattedDate = new Date(date).toISOString().split('T')[0]; // Format the date as YYYY-MM-DD
+      console.log('Fetching available slots for date:', formattedDate); // Debugging log
+      try {
+        const response = await axios.get(`http://localhost:8000/api/available-slots/${formattedDate}`);
+        this.availableSlots[type] = response.data;
+        console.log('Available slots:', this.availableSlots[type]); // Debugging log
+      } catch (error) {
+        console.error('Failed to fetch available slots:', error);
       }
     },
-    rejectReservation(reservationId) {
-      // Find the reservation by ID and update its status to "Rejected"
-      const reservationIndex = this.reservations.findIndex(reservation => reservation.id === reservationId);
-      if (reservationIndex !== -1) {
-        this.reservations[reservationIndex].status = 'Rejected';
+    openAddModal() {
+      this.showAddModalVisible = true;
+      this.newReservation.date = ''; // Reset the date to ensure fresh fetching of slots
+      this.newReservation.time_slot = ''; // Reset the time slot to ensure fresh fetching of slots
+      this.availableSlots.new = []; // Clear available slots
+    },
+    async saveReservation() {
+      try {
+        const reservationData = { ...this.newReservation, date: new Date(this.newReservation.date).toISOString().split('T')[0] }; // Format the date as YYYY-MM-DD
+        console.log('Saving new reservation:', reservationData); // Debugging log
+        await axios.post('http://localhost:8000/api/reservations', reservationData);
+        this.fetchReservations();
+        this.showAddModalVisible = false;
+      } catch (error) {
+        alert('Failed to save reservation: ' + (error.response?.data?.error || error.message));
+      }
+    },
+    async updateReservation() {
+      try {
+        const reservationData = { ...this.editedReservation, date: new Date(this.editedReservation.date).toISOString().split('T')[0] }; // Format the date as YYYY-MM-DD
+        console.log('Updating reservation:', reservationData); // Debugging log
+        await axios.put(`http://localhost:8000/api/reservations/${reservationData.id}`, reservationData);
+        this.fetchReservations();
+        this.showEditModalVisible = false;
+      } catch (error) {
+        alert('Failed to update reservation: ' + (error.response?.data?.error || error.message));
+      }
+    },
+    async updateReservationStatus(id, status) {
+      try {
+        await axios.put(`http://localhost:8000/api/reservations/${id}`, { status });
+        this.fetchReservations();
+      } catch (error) {
+        alert('Failed to update reservation status: ' + (error.response?.data?.error || error.message));
       }
     },
     editReservation(reservation) {
-      // Set the editedReservation object with the data of the selected reservation
       this.editedReservation = { ...reservation };
-      // Show the edit modal
       this.showEditModalVisible = true;
-    },
-    saveEditedReservation() {
-      // Find the index of the edited reservation in the reservations array
-      const index = this.reservations.findIndex(reservation => reservation.id === this.editedReservation.id);
-      if (index !== -1) {
-        // Update the reservation in the reservations array
-        this.reservations[index] = { ...this.editedReservation };
-      }
-      // Close the edit modal after saving
-      this.showEditModalVisible = false;
-      // Clear the editedReservation object
-      this.editedReservation = {
-        id: '',
-        customer: '',
-        time: '',
-        date: '',
-        pax: '',
-        phone: '',
-        details: [],
-        status: '',
-      };
+      this.fetchAvailableSlots('edit');
     },
     statusButtonColor(status) {
       switch (status) {
         case 'Pending':
           return 'warning';
-        case 'Completed':
+        case 'Confirmed':
           return 'success';
-        case 'In-Process':
-          return 'info';
         case 'Cancelled':
           return 'danger';
-        case 'Accepted':
-          return 'success'; // Add custom color for Accepted status
-        case 'Rejected':
-          return 'danger'; // Add custom color for Rejected status
         default:
           return 'primary';
       }
-    },
-    validateTime() {
-      const { hours, minutes, ampm } = this.newReservation;
-      // Ensure hours are between 01 and 12
-      if (parseInt(hours) < 1 || parseInt(hours) > 12) {
-        this.newReservation.hours = '';
-      }
-      // Ensure minutes are between 00 and 59
-      if (parseInt(minutes) < 0 || parseInt(minutes) > 59) {
-        this.newReservation.minutes = '';
-      }
-      // Ensure both hours and minutes are entered before selecting AM/PM
-      if ((hours !== '' && minutes === '') || (hours === '' && minutes !== '')) {
-        this.newReservation.ampm = '';
-      }
-    },
-    statusText(status) {
-      // Status text logic
-    },
+    }
   },
+  mounted() {
+    this.fetchReservations();
+  }
 };
 </script>
 
