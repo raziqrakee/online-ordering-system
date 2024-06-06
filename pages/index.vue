@@ -189,7 +189,7 @@ export default {
       console.log('Added to cart:', item)
     },
     loadMore() {
-      this.currentPage++;
+      this.$router.push('/product');
     },
     async submitForm(formName) {
       this.$refs[formName].validate(async (valid) => {
