@@ -4,7 +4,12 @@
     <div class="content" style="background-color:#f6f6f6; height:100vh; padding: 0px;">
       <div class="header" style="background-color: #fff; height:10vh; padding: 20px">
         <div class="search">
-          <el-input placeholder="Search" prefix-icon="el-icon-search"></el-input>
+          <el-input
+            placeholder="Search"
+            prefix-icon="el-icon-search"
+            v-model="searchQuery"
+            @input="searchProducts"
+          ></el-input>
         </div>
         <div class="user">
           <el-dropdown trigger="click">
@@ -24,14 +29,14 @@
             <div class="d-flex flex-row justify-content-between align-items-center my-4">
               <h1 class="text-3xl font-bold">Products</h1>
               <div class="d-flex align-items-center gap-1">
-              <el-dropdown trigger="click">
+                <el-dropdown trigger="click">
                   <button class="btn btn-outline-secondary btn-w d-flex align-items-center shadow">
                     <span>Filter</span>
                     <img src="/assets/filter-product.svg" alt="Delete" class="btn-img cursor-pointer">
                   </button>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item @click="filterBy('title', 'asc')">Title (A-Z)</el-dropdown-item>
-                    <el-dropdown-item @click="filterBy('title', 'desc')">Title (Z-A)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('name', 'asc')">Title (A-Z)</el-dropdown-item>
+                    <el-dropdown-item @click="filterBy('name', 'desc')">Title (Z-A)</el-dropdown-item>
                     <el-dropdown-item @click="filterBy('id', 'asc')">ID (Low-High)</el-dropdown-item>
                     <el-dropdown-item @click="filterBy('id', 'desc')">ID (High-Low)</el-dropdown-item>
                     <el-dropdown-item @click="filterBy('price', 'asc')">Price (Low-High)</el-dropdown-item>
@@ -254,7 +259,6 @@
               :on-change="handleNewUploadImage"
               :auto-upload="false"
               list-type="picture-card"
-              :on-preview="handlePictureCardPreview"
               :file-list="fileList"
               :on-remove="handleRemove"
               ref="upload"
@@ -296,6 +300,7 @@ export default {
       filterByField: '',
       filteredProducts: [],
       sortedProducts: [],
+      searchQuery: '', // Added for search functionality
       editProduct: {
         name: '',
         id: '',
@@ -314,7 +319,6 @@ export default {
         category: '',
         image: null,
       },
-      products: [],
       fileList: [],
       categories: [
         { value: 'Korean', label: 'Korean' },
@@ -326,32 +330,29 @@ export default {
   },
   computed: {
     totalPages() {
-      return Math.ceil(this.products.length / this.pageSize);
+      return Math.ceil(this.filteredProducts.length / this.pageSize);
     },
     paginatedProducts() {
-      if (this.filterByField) {
-        return this.filteredProducts.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
-      } else {
-        return this.products.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
-      }
+      return this.filteredProducts.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
     },
   },
   created() {
     this.fetchProducts();
   },
-  watch: {
-    'editProduct.image': {
-      handler(newValue, oldValue) {
-      },
-      deep: true
-    }
-  },
   methods: {
+    searchProducts() {
+      const searchLower = this.searchQuery.toLowerCase();
+      this.filteredProducts = this.products.filter(product =>
+        product.name.toLowerCase().includes(searchLower) ||
+        product.description.toLowerCase().includes(searchLower) ||
+        product.category.toLowerCase().includes(searchLower)
+      );
+      this.currentPage = 1; // Reset to first page after search
+    },
     filterBy(field, order) {
-      this.filterByField = field;
-      this.sortedProducts = this.products.slice().sort((a, b) => {
+      this.filteredProducts.sort((a, b) => {
         if (order === 'asc') {
-          if (field === 'title') {
+          if (field === 'name') {
             return a.name.localeCompare(b.name);
           } else if (field === 'id') {
             return a.id - b.id;
@@ -361,7 +362,7 @@ export default {
             return a.category.localeCompare(b.category);
           }
         } else if (order === 'desc') {
-          if (field === 'title') {
+          if (field === 'name') {
             return b.name.localeCompare(a.name);
           } else if (field === 'id') {
             return b.id - a.id;
@@ -372,10 +373,7 @@ export default {
           }
         }
       });
-      this.filteredProducts = this.sortedProducts;
-    },
-    toggleDropdown() {
-      this.showDropdown =!this.showDropdown;
+      this.currentPage = 1; // Reset to first page after filtering
     },
     prevPage() {
       if (this.currentPage > 1) {
@@ -395,6 +393,7 @@ export default {
         .then(response => {
           if (response.data.status === 200) {
             this.products = response.data.products;
+            this.filteredProducts = [...this.products]; // Initialize filteredProducts with all products
           }
         })
         .catch(error => {
@@ -403,8 +402,7 @@ export default {
     },
     showEditModal(product) {
       this.editProduct = { ...product };
-      console.log("image on edit mode", this.editProduct)
-      this.editProduct.image = this.editProduct.image_url
+      this.editProduct.image = this.editProduct.image_url;
       this.showEditModalVisible = true;
     },
     handleEditUploadImage(file, fileList) {
@@ -444,7 +442,7 @@ export default {
       this.newProduct.image = URL.createObjectURL(file.raw);
     },
     handleRemove(file, fileList) {
-    console.log(file, fileList);
+      console.log(file, fileList);
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
@@ -490,7 +488,7 @@ export default {
           this.fetchProducts();
           this.clearNewProductForm();
           this.showAddModalVisible = false;
-          this.editProduct.id = null; 
+          this.editProduct.id = null;
 
           Message.success('Product Updated Successfully');
 
@@ -553,11 +551,11 @@ export default {
       };
     },
     removeEditImage() {
-      const product = {...this.editProduct}
+      const product = { ...this.editProduct };
       product.image = null;
       product.image_url = null;
-      this.editProduct = {}
-      this.editProduct = product
+      this.editProduct = {};
+      this.editProduct = product;
       console.log(this.editProduct);
     },
   }

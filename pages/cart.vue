@@ -13,14 +13,13 @@
             <hr>
             <div v-for="(item, index) in cart" :key="index" class="d-flex justify-content-between align-items-center gap-2">
               <div class="d-flex align-items-center gap-2">
-                <img :src="item.image" alt="Product Icon" class="product-list-img">
                 <span class="text-lg">{{ item.name }}</span>
               </div>
               <div class="d-flex justify-content-end gap-2">
                 <div class="d-flex align-items-center gap-2">
                   <span class="text-lg">Quantity:</span>
                   <div class="btn-group" role="group">
-                    <input type="number" v-model="item.quantity" :readonly="!showDelete" class="form-control qtt" min="1">
+                    <input type="number" v-model.number="item.quantity" :readonly="!showDelete" class="form-control qtt" min="1" @change="updateQuantity(item)">
                   </div>
                 </div>
                 <div class="d-flex align-items-center gap-2">
@@ -33,7 +32,7 @@
             <hr>
             <div class="mt-3">
               <label for="special-instructions" class="form-label mb-3">Special Instructions:</label>
-              <textarea class="form-control w-100" id="special-instructions" rows="4"></textarea>
+              <textarea class="form-control w-100" id="special-instructions" rows="4" v-model="specialInstructions"></textarea>
             </div>
           </div>
           <div class="col-md-4 col-sm-6 p-4">
@@ -78,20 +77,24 @@ export default {
   data() {
     return {
       showDelete: false,
-      cart: [
-        {
-          name: 'Strawberry',
-          image: '/assets/product-3.png',
-          description: 'Description of the product',
-          quantity: 1,
-          price: 10.00,
-        },
-      ],
+      cart: [],
+      specialInstructions: ''
     };
   },
+  mounted() {
+    this.loadCart();
+  },
   methods: {
+    loadCart() {
+      this.cart = JSON.parse(localStorage.getItem('cart')) || [];
+    },
+    saveCart() {
+      localStorage.setItem('cart', JSON.stringify(this.cart));
+      localStorage.setItem('specialInstructions', this.specialInstructions); // Save special instructions
+    },
     proceedToCheckout() {
       if (this.cart.length > 0) {
+        this.saveCart();
         this.$router.push('/checkout');
       } else {
         this.$nuxt.$emit('message', { type: 'error', text: 'Cart is empty. Nothing to checkout.' });
@@ -105,6 +108,14 @@ export default {
     },
     removeProduct(index) {
       this.cart.splice(index, 1);
+      this.saveCart();
+    },
+    updateQuantity(item) {
+      const index = this.cart.findIndex(i => i.id === item.id);
+      if (index !== -1) {
+        this.cart[index].quantity = item.quantity;
+        this.saveCart();
+      }
     },
     calculateSubtotal() {
       return this.cart.reduce((acc, item) => acc + (item.quantity * item.price), 0).toFixed(2);

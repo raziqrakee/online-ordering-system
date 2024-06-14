@@ -50,7 +50,7 @@
         </div>
       </div>
       <div class="text-center mt-4">
-        <button class="btn btn-secondary" @click="loadMore">Load more products...</button>
+        <button class="btn btn-secondary" @click="loadMore">See more products...</button>
       </div>
     </div>
     <!-- NEWS -->
@@ -111,7 +111,7 @@
 <script>
 import Navbar from '../components/Navbar.vue';
 import Footer from '../components/Footer.vue';
-import axios from 'axios'; // Ensure axios is imported
+import { Notification } from 'element-ui'; // Import the Notification component
 
 export default {
   components: {
@@ -185,8 +185,20 @@ export default {
       this.currentPage = 1;
     },
     addToCart(item) {
-      // Add your cart logic here
-      console.log('Added to cart:', item)
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const product = cart.find((product) => product.id === item.id);
+      if (product) {
+        product.quantity++;
+      } else {
+        item.quantity = 1;
+        cart.push(item);
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      Notification({
+        title: 'Success',
+        message: 'Item added to cart',
+        type: 'success'
+      });
     },
     loadMore() {
       this.$router.push('/product');

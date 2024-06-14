@@ -1,14 +1,11 @@
 <template>
   <div class="admin-order">
-    <!-- Sidebar component -->
     <Sidebar></Sidebar>
-
     <div class="content">
       <div class="header">
         <div class="search">
-          <el-input placeholder="Search" prefix-icon="el-icon-search"></el-input>
+          <el-input v-model="searchQuery" placeholder="Search" prefix-icon="el-icon-search" @input="searchOrders"></el-input>
         </div>
-
         <div class="user">
           <el-dropdown trigger="click">
             <span class="el-dropdown-link">
@@ -21,12 +18,11 @@
           </el-dropdown>
         </div>
       </div>
-
       <div class="admin-order-table">
         <div class="table-header">
           <h1 class="title">Orders</h1>
           <div class="actions">
-            <button class="btn btn-add" @click="showAddModalVisible = true">
+            <button class="btn btn-add" @click="prepareNewOrder">
               <span>Add Order</span>
               <svg xmlns="http://www.w3.org/2000/svg" class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 2a1 1 0 00-1 1v6H3a1 1 0 100 2h6v6a1 1 0 102 0v-6h6a1 1 0 100-2h-6V3a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -34,18 +30,15 @@
             </button>
           </div>
         </div>
-
-        <!-- Status Filter -->
         <div class="status-filter">
           <el-radio-group v-model="selectedStatus" @change="filterOrdersByStatus">
             <el-radio-button label="All">All</el-radio-button>
             <el-radio-button label="Pending">Pending</el-radio-button>
-            <el-radio-button label="Completed">Completed</el-radio-button>
             <el-radio-button label="In-Process">In-Process</el-radio-button>
+            <el-radio-button label="Completed">Completed</el-radio-button>
             <el-radio-button label="Cancelled">Cancelled</el-radio-button>
           </el-radio-group>
         </div>
-
         <table class="table">
           <thead>
             <tr>
@@ -62,21 +55,23 @@
             <tr v-for="order in paginatedOrders" :key="order.id">
               <td>{{ order.id }}</td>
               <td>
-                <div v-for="(item, index) in order.details" :key="index">
-                  {{ item.quantity }} x {{ item.name }}
+                <div v-for="(item, index) in order.items" :key="index">
+                  {{ item.quantity }} x {{ item.product.name }}
                 </div>
               </td>
-              <td>{{ order.type }}</td>
-              <td>{{ order.amount }}</td>
+              <td>{{ order.order_type }}</td>
+              <td>{{ order.total_amount }}</td>
               <td>{{ order.payment_method }}</td>
               <td class="text-center">
-                <el-button :type="statusButtonColor(order.status)">{{ statusText(order.status) }}</el-button>
+                <el-button :type="statusButtonColor(order.order_status)" @click="changeOrderStatus(order)">
+                  {{ statusText(order.order_status) }}
+                </el-button>
               </td>
               <td>
                 <div class="d-flex gap-1 justify-content-center">
                   <button class="btn btn-eye" @click="viewCustomerDetails(order)">👁️</button>
-                  <button class="btn btn-accept" @click="acceptOrder(order.id)">✔</button>
-                  <button class="btn btn-reject" @click="rejectOrder(order.id)">✖</button>
+                  <button class="btn btn-accept" @click="acceptOrder(order)">✔</button>
+                  <button class="btn btn-reject" @click="rejectOrder(order)">✖</button>
                 </div>
               </td>
             </tr>
@@ -89,41 +84,43 @@
         </div>
       </div>
     </div>
-
-    <!-- Modals (Edit, Delete, Add) -->
     <el-dialog :visible.sync="showAddModalVisible" title="Add Order">
       <el-form :model="newOrder">
-        <!-- Form content for new order -->
-        <el-form-item label="Order ID">
-          <el-input v-model="newOrder.id"></el-input>
+        <el-form-item label="User ID" v-if="!newOrder.user_id">
+          <el-input v-model="newOrder.user_id" placeholder="Enter User ID"></el-input>
         </el-form-item>
         <el-form-item label="Type">
-          <el-input v-model="newOrder.type"></el-input>
-        </el-form-item>
-        <el-form-item label="Total Amount (RM)">
-          <el-input v-model="newOrder.amount"></el-input>
-        </el-form-item>
-        <el-form-item label="Customer Name">
-          <el-input v-model="newOrder.customer"></el-input>
-        </el-form-item>
-        <el-form-item label="Customer Phone">
-          <el-input v-model="newOrder.customer_phone"></el-input>
+          <el-select v-model="newOrder.order_type" placeholder="Select order type">
+            <el-option label="Dine-In" value="dine-in"></el-option>
+            <el-option label="Takeaway" value="takeaway"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="Order Details">
-          <el-input v-model="newOrder.details"></el-input>
+          <div v-for="(item, index) in newOrder.items" :key="index" class="product-selection">
+            <el-select v-model="item.product" placeholder="Select product" @change="updateTotalAmount">
+              <el-option v-for="product in products" :key="product.id" :label="product.name" :value="product">
+                {{ product.name }} - RM{{ product.price }}
+              </el-option>
+            </el-select>
+            <div class="quantity-selector">
+              <el-button @click="decrementQuantity(index)">-</el-button>
+              <el-input-number v-model="item.quantity" min="1" @change="updateTotalAmount"></el-input-number>
+              <el-button @click="incrementQuantity(index)">+</el-button>
+            </div>
+            <el-button type="danger" @click="removeProduct(index)">Remove</el-button>
+          </div>
+          <el-button type="primary" @click="addProduct">Add Product</el-button>
+        </el-form-item>
+        <el-form-item label="Total Amount (RM)">
+          <el-input v-model="newOrder.total_amount" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="Special Instructions">
+          <el-input type="textarea" v-model="newOrder.special_instructions"></el-input>
         </el-form-item>
         <el-form-item label="Payment Method">
           <el-select v-model="newOrder.payment_method" placeholder="Select payment method">
-            <el-option label="Cash" value="Cash"></el-option>
-            <el-option label="QR" value="QR"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Order Status">
-          <el-select v-model="newOrder.status" placeholder="Select status">
-            <el-option label="Pending" value="Pending"></el-option>
-            <el-option label="Completed" value="Completed"></el-option>
-            <el-option label="In-Process" value="In-Process"></el-option>
-            <el-option label="Cancelled" value="Cancelled"></el-option>
+            <el-option label="Cash" value="cash"></el-option>
+            <el-option label="Direct Bank Transfer" value="direct_bank_transfer"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -133,25 +130,26 @@
       </span>
     </el-dialog>
 
-    <!-- Customer Details Modal -->
-    <el-dialog :visible.sync="showCustomerDetailsModalVisible" class="bolder" title="Order Details">
+    <el-dialog :visible.sync="showCustomerDetailsModalVisible" title="Order Details">
       <div>
-        <p><strong>Customer Name:</strong> {{ selectedOrder.customer }}</p>
-        <p><strong>Customer Phone:</strong> {{ selectedOrder.customer_phone }}</p>
-        <p><strong>Payment Method:</strong> {{ selectedOrder.payment_method }}</p>
-        <p><strong>Product:</strong></p>
-        <div v-for="(item, index) in selectedOrder.details" :key="index">
-          <p>{{ item.name }} x {{ item.quantity }}</p>
+        <p><strong>Customer Name:</strong> {{ selectedOrder.user.name }}</p>
+        <p><strong>Customer Phone:</strong> {{ selectedOrder.user.contact_number }}</p>
+        <p><strong>Special Instructions:</strong> {{ selectedOrder.special_instructions }}</p>
+        <p><strong>Order Items:</strong></p>
+        <div v-for="(item, index) in selectedOrder.items" :key="index">
+          <p>{{ item.product.name }} x {{ item.quantity }}</p>
         </div>
-        <p v-if="selectedOrder.payment_method === 'QR' && selectedOrder.receipt">
+        <p><strong>Total Amount:</strong> RM {{ selectedOrder.total_amount }}</p>
+        <p v-if="selectedOrder.payment_method === 'direct_bank_transfer' && selectedOrder.receipt_path">
           <strong>Receipt:</strong>
-          <a href="#" @click="openReceiptModal(selectedOrder.receipt)">View Receipt</a>
+          <a href="#" @click="openReceiptModal(selectedOrder.receipt_path)">View Receipt</a>
         </p>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="showCustomerDetailsModalVisible = false">Close</el-button>
       </span>
     </el-dialog>
+
     <el-dialog :visible.sync="showReceiptModal" class="receipt-modal" title="Receipt">
       <div class="d-flex justify-content-center">
         <img :src="selectedReceiptImageUrl" alt="Receipt" class="receipt-image img-fluid">
@@ -174,54 +172,61 @@ export default {
   data() {
     return {
       showReceiptModal: false,
-      selectedReceiptImageUrl: '~/static/sample-receipt.png', //sample
+      selectedReceiptImageUrl: '',
       products: [],
       currentPage: 1,
       pageSize: 5,
       activeLink: 'orders',
       showAddModalVisible: false,
       showCustomerDetailsModalVisible: false,
+      searchQuery: '', // Added search query data property
       newOrder: {
-        id: '',
-        type: '',
-        amount: '',
-        customer: '',
-        customer_phone: '',
-        details: [],
+        user_id: '',
+        order_type: '',
+        total_amount: 0,
+        items: [],
+        special_instructions: '',
         payment_method: '',
-        status: '',
-        receipt: '',
+        order_status: 'Pending',
       },
       selectedOrder: {
         id: '',
-        type: '',
-        amount: '',
-        customer: '',
-        customer_phone: '',
-        details: [],
+        order_type: '',
+        total_amount: 0,
+        user: {
+          name: '',
+          contact_number: '',
+        },
+        items: [],
         payment_method: '',
-        status: '',
-        receipt: '',
+        special_instructions: '',
+        order_status: '',
+        receipt_path: '', // Added to ensure receipt path is handled
       },
       selectedStatus: 'All',
-      orders: [
-        { id: '001', type: 'Dine-in', amount: '250.00', customer: 'John Doe', customer_phone: '01123422089', details: [{ name: 'Iced Americano', quantity: 2 }], payment_method: 'Cash', status: 'Pending' },
-        { id: '002', type: 'Takeaway', amount: '120.00', customer: 'Jane Smith', customer_phone: '0134533378', details: [{ name: 'Iced Cream Strawberry', quantity: 1 }, { name: 'Ice Americano', quantity: 2 }], payment_method: 'Cash', status: 'Completed' },
-        { id: '003', type: 'Dine-in', amount: '450.00', customer: 'Alice Brown', customer_phone: '0198105991', details: [{ name: 'Iced Americano', quantity: 3 }], payment_method: 'QR', status: 'In-Process', receipt: '~/static/sample-receipt.png' },
-        { id: '004', type: 'Takeaway', amount: '200.00', customer: 'Bob Johnson', customer_phone: '0198400668', details: [{ name: 'French Fries', quantity: 2 }], payment_method: 'Cash', status: 'Cancelled' },
-        { id: '005', type: 'Dine-in', amount: '300.00', customer: 'Charlie Lee', customer_phone: '0148652834', details: [{ name: 'Samyang Ramen', quantity: 1 }, { name: 'Ice Americano', quantity: 1 }], payment_method: 'QR', status: 'Pending', receipt: '~/static/sample-receipt.png' },
-        { id: '006', type: 'Dine-in', amount: '200.00', customer: 'David Kim', customer_phone: '0138997665', details: [{ name: 'Chicken Wings', quantity: 2 }, { name: 'Ice Americano', quantity: 1 }], payment_method: 'QR', status: 'In-Process', receipt: '~/static/sample-receipt.png' },
-        { id: '007', type: 'Takeaway', amount: '100.00', customer: 'Eve Green', customer_phone: '0126735844', details: [{ name: 'French Fries', quantity: 1 }], payment_method: 'Cash', status: 'Pending' },
-      ],
+      orders: [],
     };
   },
   computed: {
     filteredOrders() {
-      if (this.selectedStatus === 'All') {
-        return this.orders;
-      } else {
-        return this.orders.filter((order) => order.status === this.selectedStatus);
+      let filtered = this.orders;
+
+      // Apply status filter
+      if (this.selectedStatus !== 'All') {
+        filtered = filtered.filter(order => order.order_status === this.selectedStatus.toLowerCase());
       }
+
+      // Apply search filter
+      if (this.searchQuery) {
+        filtered = filtered.filter(order =>
+          order.id.toString().includes(this.searchQuery) ||
+          order.order_type.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          order.payment_method.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          order.user.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+      }
+
+      return filtered;
     },
     paginatedOrders() {
       const start = (this.currentPage - 1) * this.pageSize;
@@ -232,30 +237,55 @@ export default {
       return Math.ceil(this.filteredOrders.length / this.pageSize);
     },
   },
+  created() {
+    this.fetchOrders();
+    this.fetchProducts();
+  },
   methods: {
+    async fetchOrders() {
+      try {
+        const token = this.$cookies.get('token');
+        const response = await this.$axios.get('http://localhost:8000/api/orders', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        this.orders = response.data;
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    },
+    async fetchProducts() {
+      try {
+        const response = await axios.get('http://localhost:8000/api/products');
+        this.products = response.data.products;
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    },
     openReceiptModal(receiptImageUrl) {
-      this.selectedReceiptImageUrl = receiptImageUrl;
+      this.selectedReceiptImageUrl = `http://localhost:8000/${receiptImageUrl}`;
       this.showReceiptModal = true;
     },
     statusButtonColor(status) {
-      if (status === 'Pending') {
+      if (status === 'pending') {
         return 'primary';
-      } else if (status === 'Completed') {
+      } else if (status === 'completed') {
         return 'success';
-      } else if (status === 'In-Process') {
+      } else if (status === 'in-process') {
         return 'warning';
-      } else if (status === 'Cancelled') {
+      } else if (status === 'cancelled') {
         return 'danger';
       }
     },
     statusText(status) {
-      if (status === 'Pending') {
+      if (status === 'pending') {
         return 'Pending';
-      } else if (status === 'Completed') {
+      } else if (status === 'completed') {
         return 'Completed';
-      } else if (status === 'In-Process') {
+      } else if (status === 'in-process') {
         return 'In-Process';
-      } else if (status === 'Cancelled') {
+      } else if (status === 'cancelled') {
         return 'Cancelled';
       }
     },
@@ -276,51 +306,139 @@ export default {
       this.currentPage = 1;
     },
     viewCustomerDetails(order) {
-      this.selectedOrder = {
-        id: order.id,
-        type: order.type,
-        amount: order.amount,
-        customer: order.customer,
-        customer_phone: order.customer_phone,
-        details: order.details,
-        payment_method: order.payment_method,
-        status: order.status,
-        receipt: order.receipt,
-      };
+      this.selectedOrder = { ...order };
       this.showCustomerDetailsModalVisible = true;
     },
-    insertNewOrder() {
-      this.orders.push(this.newOrder);
-      this.showAddModalVisible = false;
+    updateTotalAmount() {
+      const total = this.newOrder.items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+      const tax = total * 0.1;
+      this.newOrder.total_amount = (total + tax).toFixed(2);
+    },
+    addProduct() {
+      this.newOrder.items.push({ product: null, quantity: 1 });
+    },
+    removeProduct(index) {
+      this.newOrder.items.splice(index, 1);
+      this.updateTotalAmount();
+    },
+    incrementQuantity(index) {
+      this.newOrder.items[index].quantity++;
+      this.updateTotalAmount();
+    },
+    decrementQuantity(index) {
+      if (this.newOrder.items[index].quantity > 1) {
+        this.newOrder.items[index].quantity--;
+        this.updateTotalAmount();
+      }
+    },
+    prepareNewOrder() {
       this.newOrder = {
-        id: '',
-        type: '',
-        amount: '',
-        customer: '',
-        customer_phone: '',
-        details: [],
+        user_id: '',
+        order_type: '',
+        total_amount: 0,
+        items: [],
+        special_instructions: '',
         payment_method: '',
-        status: '',
+        order_status: 'Pending',
       };
+      this.showAddModalVisible = true;
     },
-    acceptOrder(orderId) {
-      const order = this.orders.find((order) => order.id === orderId);
-      if (order) {
-        order.status = 'Completed';
+    async insertNewOrder() {
+      try {
+        const token = this.$cookies.get('token');
+        const newOrderData = {
+          ...this.newOrder,
+          items: this.newOrder.items.map(item => ({
+            product_id: item.product.id,
+            quantity: item.quantity,
+            price: item.product.price
+          }))
+        };
+        const response = await this.$axios.post('http://localhost:8000/api/orders', newOrderData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        this.orders.push(response.data);
+        this.showAddModalVisible = false;
+        this.newOrder = {
+          user_id: '',
+          order_type: '',
+          total_amount: 0,
+          items: [],
+          special_instructions: '',
+          payment_method: '',
+          order_status: 'Pending',
+        };
+      } catch (error) {
+        console.error('Error adding new order:', error);
       }
     },
-    rejectOrder(orderId) {
-      const order = this.orders.find((order) => order.id === orderId);
-      if (order) {
-        order.status = 'Cancelled';
+    async acceptOrder(order) {
+      if (order.order_status === 'pending') {
+        order.order_status = 'in-process';
+        await this.updateOrderStatus(order);
+      } else if (order.order_status === 'in-process') {
+        order.order_status = 'completed';
+        await this.updateOrderStatus(order);
       }
     },
+    async rejectOrder(order) {
+      order.order_status = 'cancelled';
+      await this.updateOrderStatus(order);
+    },
+    async changeOrderStatus(order) {
+      try {
+        let updatedStatus;
+        if (order.order_status === 'pending') {
+          updatedStatus = 'in-process';
+        } else if (order.order_status === 'in-process') {
+          updatedStatus = 'completed';
+        } else if (order.order_status === 'cancelled') {
+          updatedStatus = 'cancelled';
+        }
+
+        const token = this.$cookies.get('token');
+        const response = await this.$axios.put(`http://localhost:8000/api/orders/${order.id}/status`, {
+          order_status: updatedStatus,
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        order.order_status = response.data.order_status;
+        order.customer_order_status = response.data.customer_order_status;
+      } catch (error) {
+        console.error('Error updating order status:', error);
+      }
+    },
+    async updateOrderStatus(order) {
+      try {
+        const token = this.$cookies.get('token');
+        const response = await this.$axios.put(`http://localhost:8000/api/orders/${order.id}/status`, {
+          order_status: order.order_status,
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        order.order_status = response.data.order_status;
+        order.customer_order_status = response.data.customer_order_status;
+      } catch (error) {
+        console.error('Error updating order status:', error);
+      }
+    },
+    searchOrders() {
+      this.currentPage = 1;
+    }
   },
 };
 </script>
 
 <style>
-.receipt-image{
+.receipt-image {
   width: 300px;
 }
 .admin-order {
@@ -464,5 +582,16 @@ export default {
 .table .el-button {
   padding: 4px 10px;
   border-radius: 60px;
+}
+.product-selection {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 </style>

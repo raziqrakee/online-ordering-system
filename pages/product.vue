@@ -1,7 +1,6 @@
 <template>
   <div>
     <Navbar></Navbar>
-    <!-- PRODUCT -->
     <div id="menu" class="m-5">
       <div class="mx-5">
         <h1 class="text-2xl fw-bold mb-4 text-center">Menu</h1>
@@ -22,17 +21,6 @@
             <el-input placeholder="Search" prefix-icon="el-icon-search" v-model="searchQuery" @input="searchItems"></el-input>
           </div>
         </div>
-
-        <!-- <div class="filters-custom mb-3 text-center">
-          <el-select v-model="selectedFilter" placeholder="Filters" @change="filterItems">
-            <el-option
-              v-for="filter in filters"
-              :key="filter.value"
-              :label="filter.label"
-              :value="filter.value"
-            ></el-option>
-          </el-select>
-        </div> -->
 
         <div class="row">
           <div
@@ -62,7 +50,6 @@
         </div>
       </div>
     </div>
-    <!-- FOOTER -->
     <Footer></Footer>
   </div>
 </template>
@@ -76,26 +63,12 @@ export default {
     Navbar,
     Footer,
   },
-
   data() {
     return {
-      form: {
-        name: '',
-        email: '',
-        message: ''
-      },
       activeIndex: 'all',
-      selectedFilter: '',
       searchQuery: '',
-      // filters: [
-      //   { value: '', label: 'All' },
-      //   { value: 'korean', label: 'Korean' },
-      //   { value: 'snacks', label: 'Snacks' },
-      //   { value: 'beverages', label: 'Beverages' },
-      //   { value: 'desserts', label: 'Desserts' },
-      // ],
       items: [],
-      itemsPerPage: 8, // 2 rows x 4 columns
+      itemsPerPage: 8,
       currentPage: 1,
     }
   },
@@ -112,41 +85,42 @@ export default {
     filteredItems() {
       let filtered = this.items;
 
-      // Filter by category
       if (this.activeIndex !== 'all') {
         filtered = filtered.filter((item) => item.category.toLowerCase() === this.activeIndex.toLowerCase());
       }
 
-      // Filter by additional filters
-      if (this.selectedFilter) {
-        filtered = filtered.filter((item) => item.filters && item.filters.includes(this.selectedFilter));
-      }
-
-      // Filter by search query
       if (this.searchQuery) {
         const searchLower = this.searchQuery.toLowerCase();
         filtered = filtered.filter(
           (item) =>
             item.name.toLowerCase().includes(searchLower) ||
-            item.category.toLowerCase().includes(searchLower) ||
-            (item.filters && item.filters.some((filter) => filter.toLowerCase().includes(searchLower)))
+            item.category.toLowerCase().includes(searchLower)
         );
       }
 
-      // Pagination
       return filtered.slice(0, this.currentPage * this.itemsPerPage);
     },
   },
   methods: {
     handleSelect(index) {
       this.activeIndex = index;
-      this.currentPage = 1; // Reset to the first page whenever a category is selected
-    },
-    filterItems() {
       this.currentPage = 1;
     },
     addToCart(item) {
-      console.log('Added to cart:', item);
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const product = cart.find((product) => product.id === item.id);
+      if (product) {
+        product.quantity++;
+      } else {
+        item.quantity = 1;
+        cart.push(item);
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      this.$notify({
+        title: 'Success',
+        message: 'Item added to cart',
+        type: 'success'
+      });
     },
     loadMore() {
       this.currentPage++;
