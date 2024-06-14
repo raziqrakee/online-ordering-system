@@ -14,11 +14,11 @@
             <h5 class="mt-4">{{ statusText }}</h5>
           </div>
           <div class="timeline-horizontal d-flex align-items-center justify-content-between gap-4">
-            <div class="timeline-item" :class="{ 'completed': status === 'accepted', 'inactive': status !== 'accepted' }">
-              <div class="timeline-icon" :class="{ 'pulse': status === 'accepted' }">
-                <img :src="acceptedIcon" alt="Accepted Icon" class="w-100" :style="{ filter: status !== 'accepted' ? 'grayscale(100%)' : 'none' }">
+            <div class="timeline-item" :class="{ 'completed': status === 'received', 'inactive': status !== 'received' }">
+              <div class="timeline-icon" :class="{ 'pulse': status === 'received' }">
+                <img :src="receivedIcon" alt="Received Icon" class="w-100" :style="{ filter: status !== 'received' ? 'grayscale(100%)' : 'none' }">
               </div>
-              <div class="timeline-content mt-2 text-center" :class="{ 'text-muted': status !== 'accepted' }">
+              <div class="timeline-content mt-2 text-center" :class="{ 'text-muted': status !== 'received' }">
                 <p>Received</p>
               </div>
             </div>
@@ -47,15 +47,30 @@
 
 <script>
 export default {
-  data() {
-    return {
-      status: 'accepted',
-    };
+  async asyncData({ params, $axios, $cookies }) {
+    const orderId = params.id;
+    if (!orderId) {
+      console.error('Order ID is not provided');
+      return;
+    }
+
+    try {
+      const token = $cookies.get('token');
+      const response = await $axios.get(`http://localhost:8000/api/orders/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return { status: response.data.customer_order_status };
+    } catch (error) {
+      console.error('Error fetching order status:', error);
+      return { status: '' };
+    }
   },
   computed: {
     statusImage() {
       switch (this.status) {
-        case 'accepted':
+        case 'received':
           return require('@/static/assets/order-accepted.png');
         case 'preparing':
           return require('@/static/assets/preparing-order.png');
@@ -67,17 +82,17 @@ export default {
     },
     statusText() {
       switch (this.status) {
-        case 'accepted':
-          return 'Your Order Has Been Accepted';
+        case 'received':
+          return 'Your Order Has Been Received';
         case 'preparing':
           return 'We Are Preparing Your Order';
         case 'ready':
-          return 'Your Order Ready for Pickup';
+          return 'Your Order is Ready for Pickup';
         default:
-          return 'Welcome to Danish Iz';
+          return 'Please Order Again';
       }
     },
-    acceptedIcon() {
+    receivedIcon() {
       return require('@/static/icon/done.png');
     },
     preparingIcon() {

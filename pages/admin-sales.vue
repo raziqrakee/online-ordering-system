@@ -38,11 +38,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="report in salesReports" :key="report.id">
-              <td>{{ report.reportId }}</td>
+            <tr v-for="(report, index) in salesReports" :key="index">
+              <td>{{ index + 1 }}</td>
               <td>{{ report.date }}</td>
               <td>{{ report.orderIds.join(', ') }}</td>
-              <td>{{ convertToRM(report.totalSale) }}</td>
+              <td>{{ formatCurrency(report.totalSale) }}</td>
             </tr>
           </tbody>
         </table>
@@ -52,7 +52,9 @@
 </template>
 
 <script>
+import axios from 'axios';
 import Sidebar from '../components/Sidebar.vue';
+
 export default {
   components: {
     Sidebar,
@@ -60,58 +62,29 @@ export default {
   data() {
     return {
       salesReports: [],
-      exchangeRate: 4.10, // Example exchange rate: 1 USD = 4.10 RM
     };
   },
   created() {
     // Fetch sales report data
     this.fetchSalesReportData();
   },
-  //   created() {
-//     // Fetch sales report data for the current month
-//     const currentDate = new Date();
-//     const currentMonth = currentDate.getMonth() + 1;
-//     const currentYear = currentDate.getFullYear();
-//     this.fetchSalesReportData(currentMonth, currentYear);
-//   },
   methods: {
-    // fetchSalesReportData(month, year) {
-    // switch (month) {
-    //     case 1:
-    //     // January sales report data
-    //     this.salesReports = [
-    //         { id: 1, reportId: 'SR001', date: '2024-01-01', orderIds: ['ORD001', 'ORD002', 'ORD003'], totalSale: 500 },
-    //         // Add more sales report data for January as needed
-    //     ];
-    //     break;
-    //     case 2:
-    //     // February sales report data
-    //     this.salesReports = [
-    //         { id: 1, reportId: 'SR002', date: '2024-02-01', orderIds: ['ORD004', 'ORD005'], totalSale: 300 },
-    //         // Add more sales report data for February as needed
-    //     ];
-    //     break;
-    //     // Add cases for other months as needed
-    //     default:
-    //     // Default case (no data for other months)
-    //     this.salesReports = [];
-    // }
-    // },
     fetchSalesReportData() {
-      // Example data for demo
-      this.salesReports = [
-        { id: 1, reportId: 'SR001', date: '2024-01-01', orderIds: ['ORD001', 'ORD002', 'ORD003'], totalSale: 500 },
-        { id: 2, reportId: 'SR002', date: '2024-02-01', orderIds: ['ORD004', 'ORD005'], totalSale: 300 },
-        { id: 3, reportId: 'SR003', date: '2024-03-01', orderIds: ['ORD006', 'ORD007'], totalSale: 600 },
-        { id: 4, reportId: 'SR004', date: '2024-04-01', orderIds: ['ORD008', 'ORD009'], totalSale: 700 },
-        { id: 5, reportId: 'SR005', date: '2024-05-01', orderIds: ['ORD010', 'ORD011'], totalSale: 400 },
-      ];
+      axios.get('http://localhost:8000/api/sales-reports')
+        .then(response => {
+          if (response.data.status === 200) {
+            this.salesReports = response.data.salesReports;
+          } else {
+            console.error('Failed to fetch sales report data:', response.data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching sales report data:', error.response ? error.response.data : error.message);
+        });
     },
-    convertToRM(totalSaleUSD) {
-      // Convert total sale from USD to RM using the exchange rate
-      const totalSaleRM = totalSaleUSD * this.exchangeRate;
+    formatCurrency(amount) {
       // Format the total sale in RM currency format
-      return `RM ${totalSaleRM.toFixed(2)}`;
+      return `RM ${amount.toFixed(2)}`;
     },
     printReport() {
       // Print only the table

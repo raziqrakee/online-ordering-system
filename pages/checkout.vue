@@ -1,7 +1,6 @@
 <template>
   <div>
     <Navbar></Navbar>
-    <!-- MAIN -->
     <div id="checkout" style="min-height: 60vh;">
       <div class="bg-white text-dark px-4 py-5 mx-5">
         <div class="row">
@@ -16,39 +15,40 @@
             <h4 class="text-2xl fw-normal mb-2">Order Options</h4>
             <div id="order-options" class="row d-flex mb-3">
               <div class="col-6 position-relative">
-                <button class="btn btn-order-option btn-block" @click="selectOrderOption('dine-in')">Dine-In</button>
-                <img v-if="selectedOrderOption === 'dine-in'" src="@/static/icon/selected.png" class="selected-icon" />
+                <button :class="{'btn-order-option-selected': selectedOrderOption === 'dine-in'}" class="btn btn-order-option btn-block" @click="selectOrderOption('dine-in')">Dine-In</button>
               </div>
               <div class="col-6 position-relative">
-                <button class="btn btn-order-option btn-block" @click="selectOrderOption('takeaway')">Takeaway</button>
-                <img v-if="selectedOrderOption === 'takeaway'" src="@/static/icon/selected.png" class="selected-icon" />
+                <button :class="{'btn-order-option-selected': selectedOrderOption === 'takeaway'}" class="btn btn-order-option btn-block" @click="selectOrderOption('takeaway')">Takeaway</button>
               </div>
             </div>
           </div>
           <div class="col-md-4 col-sm-6 p-4">
             <h3 class="text-2xl fw-bold mb-2">Order Summary</h3>
             <hr>
-            <ul class="list-group mb-3">
-              <li class="list-group-item d-flex justify-content-between align-items-start px-0">
+            <ul class="list-group">
+              <li v-for="(item, index) in cart" :key="index" class="list-group-item d-flex justify-content-between align-items-center py-2">
                 <div class="d-flex flex-column">
-                  <h6 class="text-lg mb-0">Strawberry</h6>
-                  <span class="text-xs">Qty: 1</span>
+                  <h6 class="text-lg mb-0">{{ item.name }}</h6>
+                  <span class="text-xs">Qty: {{ item.quantity }}</span>
                 </div>
-                <span class="text-lg">RM 10.00</span>
+                <span class="text-lg">RM {{ item.price * item.quantity }}</span>
               </li>
-              <hr>
-              <li class="list-group-item d-flex justify-content-between align-items-center ps-5 pe-0">
-                <h5 class="text-base">Subtotal:</h5>
-                <span class="fw-600">RM 10.00</span>
+              <hr class="d-flex align-self-center" style="width: 90%;">
+              <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                Subtotal:
+                <span>RM {{ calculateSubtotal() }}</span>
               </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center ps-5 pe-0">
-                <h5 class="text-base">Tax:</h5>
-                <span class="fw-600">RM 1.00</span>
+              <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                Tax (10%):
+                <span>RM {{ calculateTax() }}</span>
               </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center ps-5 pe-0">
-                <h5 class="text-base">Total:</h5>
-                <span class="fw-600">RM 11.00</span>
+              <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                Total:
+                <span>RM {{ calculateTotal() }}</span>
               </li>
+              <div class="list-group-item">
+                <button class="btn btn-primary w-100 btn-block" @click="placeOrder">Place Order</button>
+              </div>
             </ul>
           </div>
           <hr>
@@ -58,36 +58,31 @@
             </div>
             <div class="col-md-2 col-sm-6 mb-3 pt-sm-1">
               <div class="form-check">
-                <input class="form-check-input" type="radio" id="cash" name="payment_option" value="cash">
+                <input class="form-check-input" type="radio" id="cash" name="payment_option" value="cash" v-model="form.payment_method">
                 <label class="form-check-label" for="cash">Cash</label>
               </div>
               <p class="sub-text">Pay at the counter</p>
             </div>
             <div class="col-md-4 col-sm-6 mb-3 pt-sm-1">
               <div class="form-check">
-                <input class="form-check-input" type="radio" id="direct_bank_transfer" name="payment_option" value="direct_bank_transfer">
+                <input class="form-check-input" type="radio" id="direct_bank_transfer" name="payment_option" value="direct_bank_transfer" v-model="form.payment_method">
                 <label class="form-check-label" for="direct_bank_transfer">Direct Bank Transfer</label>
               </div>
               <p class="sub-text">Make payment directly through QR scan</p>
               <button class="btn btn-secondary btn-block" @click="openModal">Scan QR</button>
             </div>
-            <div class="col-md-3 col-sm-12">
-              <button class="btn btn-primary w-100 btn-block" @click="placeOrder">Place Order</button>
-            </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- FOOTER -->
     <Footer></Footer>
-    <!-- QR Modal -->
     <el-dialog title="Scan QR Code" :visible.sync="qrModalVisible">
       <div class="d-flex justify-content-center">
         <img src="@/static/qr-checkout.png" alt="QR Code" class="img-fluid qr-checkout">
       </div>
       <el-form class="mt-2">
         <label for="receipt" class="form-label">Upload Receipt:</label>
-        <input type="file" id="receipt" class="form-control upload" accept="image/*">
+        <input type="file" id="receipt" class="form-control upload" accept="image/*" @change="handleReceiptUpload">
       </el-form>
       <span slot="footer" class="dialog-footer d-flex justify-content-center">
         <el-button class="btn btn-w" type="secondary" @click="qrModalVisible = false">Cancel</el-button>
@@ -111,46 +106,116 @@ export default {
       qrModalVisible: false,
       selectedOrderOption: '',
       form: {
-        name: '',
+        user_id: '',
+        fullname: '',
         email: '',
-        contact_number: ''
+        phone: '',
+        payment_method: '',
+        order_type: '',
+        special_instructions: localStorage.getItem('specialInstructions') || '', // Load special instructions from localStorage
       },
+      cart: [],
+      receipt: null,
     };
   },
   created() {
+    this.loadCart();
     this.getProfile();
   },
   methods: {
+    loadCart() {
+      this.cart = JSON.parse(localStorage.getItem('cart')) || [];
+    },
     async getProfile() {
       try {
         const userId = this.$cookies.get('id');
         const token = this.$cookies.get('token');
-        const response = await this.$axios(`http://localhost:8000/api/users/${userId}`, {
+        const response = await this.$axios.get(`http://localhost:8000/api/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
           },
         });
-        this.form = {
-          fullname: response.data.name,
-          email: response.data.email,
-          phone: response.data.contact_number,
-        };
+        if (response && response.data) {
+          this.form.user_id = userId;
+          this.form.fullname = response.data.name;
+          this.form.email = response.data.email;
+          this.form.phone = response.data.contact_number;
+        } else {
+          console.error('Invalid response structure:', response);
+        }
       } catch (err) {
         console.error('Error fetching profile:', err);
       }
     },
     selectOrderOption(option) {
       this.selectedOrderOption = option;
+      this.form.order_type = option;
     },
-    placeOrder() {
-      this.$router.push('/order-status');
+    calculateSubtotal() {
+      return this.cart.reduce((acc, item) => acc + (item.quantity * item.price), 0).toFixed(2);
+    },
+    calculateTax() {
+      return (this.calculateSubtotal() * 0.1).toFixed(2);
+    },
+    calculateTotal() {
+      return (parseFloat(this.calculateSubtotal()) + parseFloat(this.calculateTax())).toFixed(2);
+    },
+    async placeOrder() {
+      const token = this.$cookies.get('token');
+      const formData = new FormData();
+
+      formData.append('user_id', this.form.user_id);
+      formData.append('total_amount', this.calculateTotal());
+      formData.append('payment_method', this.form.payment_method);
+      formData.append('order_type', this.form.order_type);
+      formData.append('special_instructions', this.form.special_instructions);
+
+      this.cart.forEach((item, index) => {
+        formData.append(`items[${index}][product_id]`, item.id);
+        formData.append(`items[${index}][quantity]`, item.quantity);
+        formData.append(`items[${index}][price]`, item.price);
+      });
+
+      if (this.receipt) {
+        formData.append('receipt', this.receipt);
+      }
+
+      try {
+        const response = await this.$axios.post('http://localhost:8000/api/orders', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response && response.data && response.status === 201) {
+          console.log('Order placed successfully');
+          localStorage.removeItem('cart');
+          localStorage.removeItem('specialInstructions');
+          this.$router.push(`/order-status/${response.data.id}`); // Ensure you use the ID from the response
+        } else {
+          console.error('Invalid response structure:', response);
+        }
+      } catch (error) {
+        console.error('Error placing order:', error.response ? error.response.data : error);
+      }
+    },
+    handleReceiptUpload(event) {
+      this.receipt = event.target.files[0];
     },
     openModal() {
       this.qrModalVisible = true;
     },
     saveAndClose() {
       this.qrModalVisible = false;
+    },
+  },
+  watch: {
+    'form.special_instructions': {
+      handler(newVal) {
+        localStorage.setItem('specialInstructions', newVal);
+      },
+      deep: true,
     },
   },
 }
@@ -240,5 +305,9 @@ export default {
   right: 20px;
   width: 24px;
   height: 24px;
+}
+.btn-order-option-selected {
+  background-color: #F390C7;
+  color: #ffffff;
 }
 </style>
