@@ -40,13 +40,18 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     'cookie-universal-nuxt',
+    '@nuxtjs/dotenv',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: '/',
+    baseURL: process.env.API_BASE_URL || 'http://localhost:8000',
   },
+
+  buildModules: [
+    '@nuxtjs/dotenv',
+  ],
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
