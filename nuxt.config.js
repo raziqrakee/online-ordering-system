@@ -55,7 +55,7 @@ export default {
   },
 
   // Specify the build directory
-  buildDir: 'dist',
+  // buildDir: 'dist',
 
   // Specify the generate directory
   generate: {
