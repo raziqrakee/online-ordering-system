@@ -53,6 +53,11 @@ export default {
     middleware: ['auth']
   },
 
-  // Set the target to 'server' for SSR
-  target: 'static'
+  // Set the target to 'static' for static site generation
+  target: 'static',
+
+  // Specify the generate directory
+  generate: {
+    dir: 'dist'
+  }
 }
