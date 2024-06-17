@@ -48,7 +48,17 @@ export default {
   build: {
     transpile: [/^element-ui/],
   },
+
+  // Router middleware
   router: {
     middleware: ['auth']
+  },
+
+  // Specify the build directory
+  buildDir: 'dist',
+
+  // Specify the generate directory
+  generate: {
+    dir: 'dist'
   }
 }
