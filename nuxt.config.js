@@ -53,11 +53,6 @@ export default {
     middleware: ['auth']
   },
 
-  // Set the target to 'static' for static site generation
-  target: 'static',
-
-  // Specify the generate directory
-  generate: {
-    dir: 'dist'
-  }
+  // Set the target to 'server'
+  target: 'server',
 }
