@@ -57,6 +57,12 @@ export default {
   // Specify the build directory
   // buildDir: 'dist',
 
+  targert: "static",
+  ssr:false,
+  generate: {
+    fallback: true,
+  },
+
   // Specify the generate directory
   generate: {
     dir: 'dist'
