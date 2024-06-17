@@ -1,5 +1,5 @@
 export default {
-  // Global page headers: https://go.nuxtjs.dev/config-head
+  // Global page headers
   head: {
     title: 'online-ordering-app',
     htmlAttrs: {
@@ -16,35 +16,34 @@ export default {
     ]
   },
 
-  // Global CSS: https://go.nuxtjs.dev/config-css
+  // Global CSS
   css: [
     'element-ui/lib/theme-chalk/index.css',
-    "~/node_modules/bootstrap/dist/css/bootstrap.min.css"
+    '~/node_modules/bootstrap/dist/css/bootstrap.min.css'
   ],
 
-  // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
+  // Plugins to run before rendering page
   plugins: [
     '@/plugins/element-ui',
-    { src: "~/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js", mode: "client" }
+    { src: '~/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js', mode: 'client' }
   ],
 
-  // Auto import components: https://go.nuxtjs.dev/config-components
+  // Auto import components
   components: true,
 
-  // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
+  // Modules for dev and build (recommended)
   modules: [
-    // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     'cookie-universal-nuxt',
     '@nuxtjs/dotenv',
   ],
 
-  // Axios module configuration: https://go.nuxtjs.dev/config-axios
+  // Axios module configuration
   axios: {
     baseURL: process.env.API_BASE_URL || 'http://localhost:8000',
   },
 
-  // Build Configuration: https://go.nuxtjs.dev/config-build
+  // Build Configuration
   build: {
     transpile: [/^element-ui/],
   },
@@ -54,14 +53,11 @@ export default {
     middleware: ['auth']
   },
 
-  // Specify the build directory
-  // buildDir: 'dist',
+  // Set the target to 'static'
+  target: 'static',
 
-  targert: "static",
-  ssr:false,
-  generate: {
-    fallback: true,
-  },
+  // Specify the build directory
+  buildDir: 'dist',
 
   // Specify the generate directory
   generate: {
