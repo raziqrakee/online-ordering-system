@@ -22,26 +22,56 @@
         <!-- Main product card -->
         <div class="d-flex row">
           <div class="row w-100">
-            <div v-for="(product, index) in topProducts" :key="product.id" class="w-100 mb-4 col-md-4">
+            <!-- First product, full width -->
+            <div v-if="topProducts[0]" class="w-100 mb-4 col-12">
               <div class="card card-main">
                 <img
                   class="w-100"
-                  style="max-height: 300px; min-height: 300px; object-fit: cover;"
+                  style="max-height: 300px; min-height: 500px; object-fit: cover;"
+                  :src="topProducts[0].image_url"
+                />
+                <div class="card-body d-flex w-100 justify-content-between">
+                  <div class="d-flex flex-column mx-2 w-100">
+                    <h2 class="card-title text-uppercase fw-bolder">{{ topProducts[0].name }}</h2>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="">
+                        <h4 class="card-text fw-bold">RM {{ topProducts[0].price }}</h4>
+                      <h6 class="card-text text-capitalize">{{ topProducts[0].category }}</h6>
+                      <p class="card-text" style="font-size: 0.8rem;">Sold: {{ topProducts[0].sold }} pcs</p>
+                      </div>
+                      <div class="">
+                        <button class="btn btn-primary" @click="addToCart(topProducts[0])">
+                          Add to Cart
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Second and third products, two columns -->
+            <div v-for="(product, index) in topProducts.slice(1, 3)" :key="product.id" class="col-md-6">
+              <div class="card card-main">
+                <img
+                  class="w-100"
+                  style="max-height: 350px; min-height: 350px; object-fit: cover;"
                   :src="product.image_url"
                 />
                 <div class="card-body d-flex w-100 justify-content-between">
-                  <div class="d-flex flex-column mx-2">
+                  <div class="d-flex flex-column mx-2 w-100">
                     <h2 class="card-title text-uppercase fw-bolder">{{ product.name }}</h2>
-                    <div class="row">
-                      <h4 class="card-text fw-bold">RM {{ product.price }}</h4>
-                      <h6 class="card-text text-capitalize">{{ product.category }}</h6>
-                      <p class="card-text" style="font-size: 0.8rem;">Sold: {{ product.sold }} pcs</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="">
+                        <h4 class="card-text fw-bold">RM {{ product.price }}</h4>
+                        <h6 class="card-text text-capitalize">{{ product.category }}</h6>
+                        <p class="card-text" style="font-size: 0.8rem;">Sold: {{ product.sold }} pcs</p>
+                      </div>
+                      <div class="">
+                        <button class="btn btn-primary" @click="addToCart(product)">
+                          Add to Cart
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div class="d-flex justify-content-center mx-2">
-                    <button class="btn btn-primary" @click="addToCart(product)">
-                      Add to Cart
-                    </button>
                   </div>
                 </div>
               </div>
