@@ -28,7 +28,7 @@
             :key="item.id"
             class="col-md-3 mb-5"
           >
-            <div class="card-custom py-3 px-2 shadow-sm border-0">
+            <div class="card-custom p-3 shadow-sm border-0">
               <img :src="item.image_url" class="card-img-top-custom d-block mb-2 w-100 h-100 rounded-top" :alt="item.name" />
               <div class="card-body-custom">
                 <div class="d-flex flex-column align-items-center">
@@ -214,5 +214,9 @@ export default {
   max-height: 300px;
   min-height: 300px;
   object-fit: cover;
+}
+
+.el-input__prefix{
+  height: auto;
 }
 </style>
