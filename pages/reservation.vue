@@ -4,40 +4,40 @@
     <div id="reservation" style="min-height: 60vh;">
       <div class="bg-white text-dark px-4 py-5 mx-5">
         <div class="w-75">
-            <div class="d-flex align-items-center mb-4">
-                <h3 class="w-100 text-2xl fw-bold">Table Reservation</h3>
+          <div class="d-flex align-items-center mb-4">
+            <h3 class="w-100 text-2xl fw-bold">Table Reservation</h3>
+          </div>
+          <div class="d-flex row mt-4">
+            <div class="col-12 mt-2">
+              <label for="fullname" class="form-label text-lg">Fullname:</label>
+              <input type="text" id="fullname" v-model="newReservation.customer" placeholder="Fullname" class="form-control text-lg rounded w-100">
             </div>
-            <div class="d-flex row mt-4">
-              <div class="col-12 mt-2">
-                <label for="fullname" class="form-label text-lg">Fullname:</label>
-                <input type="text" id="fullname" v-model="newReservation.customer" placeholder="Fullname" class="form-control text-lg rounded w-100">
-              </div>
-              <div class="col-6 mt-2">
-                <label for="pax" class="form-label text-lg">Number of Pax:</label>
-                <input type="number" id="pax" v-model="newReservation.pax" placeholder="Number of Pax" class="form-control text-lg rounded w-100">
-              </div>
-              <div class="col-6 mt-2">
-                <label for="phone" class="form-label text-lg">Phone Number:</label>
-                <input type="tel" id="phone" v-model="newReservation.phone" placeholder="Phone Number" class="form-control text-lg rounded w-100">
-              </div>
-              <div class="col-12 mt-2">
-                <div class="row">
-                  <label for="reservation-time" class="form-label text-lg col-12">Choose Slot:</label>
-                  <div class="col-6">
-                      <input type="date" id="reservation-date" v-model="newReservation.date" class="form-control text-lg rounded-lg rounded" @change="fetchAvailableSlots">
-                  </div>
-                  <div class="col-6">
-                      <div class="d-flex gap-2">
-                          <select v-model="newReservation.time_slot" class="form-control text-lg rounded">
-                              <option v-for="slot in availableSlots" :key="slot" :value="slot">{{ slot }}</option>
-                          </select>
-                      </div>
+            <div class="col-6 mt-2">
+              <label for="pax" class="form-label text-lg">Number of Pax:</label>
+              <input type="number" id="pax" v-model="newReservation.pax" placeholder="Number of Pax" class="form-control text-lg rounded w-100">
+            </div>
+            <div class="col-6 mt-2">
+              <label for="phone" class="form-label text-lg">Phone Number:</label>
+              <input type="tel" id="phone" v-model="newReservation.phone" placeholder="Phone Number" class="form-control text-lg rounded w-100">
+            </div>
+            <div class="col-12 mt-2">
+              <div class="row">
+                <label for="reservation-time" class="form-label text-lg col-12">Choose Slot:</label>
+                <div class="col-6">
+                  <input type="date" id="reservation-date" v-model="newReservation.date" class="form-control text-lg rounded-lg rounded" @change="fetchAvailableSlots">
+                </div>
+                <div class="col-6">
+                  <div class="d-flex gap-2">
+                    <select v-model="newReservation.time_slot" class="form-control text-lg rounded">
+                      <option v-for="slot in availableSlots" :key="slot" :value="slot">{{ slot }}</option>
+                    </select>
                   </div>
                 </div>
+              </div>
             </div>
             <div class="d-flex gap-4 justify-start mt-5">
-                <button class="btn btn-outline-secondary w-25 rounded-pill">Cancel</button>
-                <button class="btn btn-primary w-25 rounded-pill" @click="bookReservation">Book</button>
+              <button class="btn btn-outline-secondary w-25 rounded-pill">Cancel</button>
+              <button class="btn btn-primary w-25 rounded-pill" @click="bookReservation">Book</button>
             </div>
             <div v-if="errorMessage" class="alert alert-danger mt-4">{{ errorMessage }}</div>
           </div>
@@ -45,6 +45,23 @@
       </div>
     </div>
     <Footer></Footer>
+
+    <!-- Confirmation Modal -->
+    <div v-if="showConfirmationModal" class="custom-modal">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header d-flex justify-content-center">
+            <h5 class="modal-title">Reservation Confirmed</h5>
+          </div>
+          <div class="modal-body">
+            <p>Your reservation has been successfully made. </br>Please refer to your account notification on our website to track your reservation status.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" @click="showConfirmationModal = false">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -69,7 +86,8 @@ export default {
         status: 'Pending'
       },
       availableSlots: [],
-      errorMessage: ''
+      errorMessage: '',
+      showConfirmationModal: false
     };
   },
   methods: {
@@ -85,7 +103,7 @@ export default {
       this.errorMessage = '';
       try {
         await axios.post('http://localhost:8000/api/reservations', this.newReservation);
-        alert('Reservation booked successfully');
+        this.showConfirmationModal = true;
         this.newReservation = {
           customer: '',
           date: '',
@@ -109,25 +127,67 @@ export default {
 .el-submenu__icon-arrow {
     display: none !important;
 }
-.qtt{
+.qtt {
   width: 60px !important;
 }
-.btn-primary{
+.btn-primary {
   background-color: #000000;
   border-color: #00000000;
 }
-
-.btn-primary:hover{
+.btn-primary:hover {
   background-color: #FFE9F5;
   border-color: #F390C7;
   color: #000000;
 }
-
-.list-group-item{
+.list-group-item {
   border: #00000000;
 }
-
-.product-list-img{
+.product-list-img {
   width: 60px;
+}
+.custom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-dialog {
+  max-width: 500px;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  text-align: center;
+  padding: 20px;
+}
+.modal-header {
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.modal-body {
+  margin: 20px 0;
+  font-size: 1rem;
+}
+.modal-footer {
+  display: flex;
+  justify-content: center;
+}
+.btn-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
 </style>
