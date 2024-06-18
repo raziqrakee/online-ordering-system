@@ -84,50 +84,51 @@
         </div>
       </div>
     </div>
+
     <el-dialog :visible.sync="showAddModalVisible" title="Add Order">
-      <el-form :model="newOrder">
-        <el-form-item label="User ID" v-if="!newOrder.user_id">
-          <el-input v-model="newOrder.user_id" placeholder="Enter User ID"></el-input>
-        </el-form-item>
-        <el-form-item label="Type">
-          <el-select v-model="newOrder.order_type" placeholder="Select order type">
-            <el-option label="Dine-In" value="dine-in"></el-option>
-            <el-option label="Takeaway" value="takeaway"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Order Details">
-          <div v-for="(item, index) in newOrder.items" :key="index" class="product-selection">
-            <el-select v-model="item.product" placeholder="Select product" @change="updateTotalAmount">
-              <el-option v-for="product in products" :key="product.id" :label="product.name" :value="product">
-                {{ product.name }} - RM{{ product.price }}
-              </el-option>
-            </el-select>
-            <div class="quantity-selector">
-              <el-button @click="decrementQuantity(index)">-</el-button>
-              <el-input-number v-model="item.quantity" min="1" @change="updateTotalAmount"></el-input-number>
-              <el-button @click="incrementQuantity(index)">+</el-button>
-            </div>
-            <el-button type="danger" @click="removeProduct(index)">Remove</el-button>
-          </div>
-          <el-button type="primary" @click="addProduct">Add Product</el-button>
-        </el-form-item>
-        <el-form-item label="Total Amount (RM)">
-          <el-input v-model="newOrder.total_amount" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="Special Instructions">
-          <el-input type="textarea" v-model="newOrder.special_instructions"></el-input>
-        </el-form-item>
-        <el-form-item label="Payment Method">
-          <el-select v-model="newOrder.payment_method" placeholder="Select payment method">
-            <el-option label="Cash" value="cash"></el-option>
-            <el-option label="Direct Bank Transfer" value="direct_bank_transfer"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="showAddModalVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="insertNewOrder">Save</el-button>
-      </span>
+  <el-form :model="newOrder">
+    <el-form-item label="User ID" v-if="!newOrder.user_id">
+      <el-input v-model="newOrder.user_id" placeholder="Enter User ID"></el-input>
+    </el-form-item>
+    <el-form-item label="Type">
+      <el-select v-model="newOrder.order_type" placeholder="Select order type">
+        <el-option label="Dine-In" value="dine-in"></el-option>
+        <el-option label="Takeaway" value="takeaway"></el-option>
+      </el-select>
+    </el-form-item>
+    <el-form-item label="Order Details">
+      <div v-for="(item, index) in newOrder.items" :key="index" class="product-selection">
+        <el-select v-model="item.product_id" placeholder="Select product" @change="updateSelectedProduct(index)">
+          <el-option v-for="product in products" :key="product.id" :label="product.name" :value="product.id">
+            {{ product.name }} - RM{{ product.price }}
+          </el-option>
+        </el-select>
+        <div class="quantity-selector">
+          <el-button @click="decrementQuantity(index)">-</el-button>
+          <el-input-number v-model="item.quantity" min="1" @change="updateTotalAmount"></el-input-number>
+          <el-button @click="incrementQuantity(index)">+</el-button>
+        </div>
+        <el-button type="danger" @click="removeProduct(index)">Remove</el-button>
+      </div>
+      <el-button type="primary" @click="addProduct">Add Product</el-button>
+    </el-form-item>
+    <el-form-item label="Total Amount (RM)">
+      <el-input v-model="newOrder.total_amount" :disabled="true"></el-input>
+    </el-form-item>
+    <el-form-item label="Special Instructions">
+      <el-input type="textarea" v-model="newOrder.special_instructions"></el-input>
+    </el-form-item>
+    <el-form-item label="Payment Method">
+      <el-select v-model="newOrder.payment_method" placeholder="Select payment method">
+        <el-option label="Cash" value="cash"></el-option>
+        <el-option label="Direct Bank Transfer" value="direct_bank_transfer"></el-option>
+      </el-select>
+    </el-form-item>
+  </el-form>
+  <span slot="footer" class="dialog-footer">
+    <el-button @click="showAddModalVisible = false">Cancel</el-button>
+    <el-button type="primary" @click="insertNewOrder">Save</el-button>
+  </span>
     </el-dialog>
 
     <el-dialog :visible.sync="showCustomerDetailsModalVisible" title="Order Details">
@@ -309,13 +310,24 @@ export default {
       this.selectedOrder = { ...order };
       this.showCustomerDetailsModalVisible = true;
     },
+    updateSelectedProduct(index) {
+      const selectedProductId = this.newOrder.items[index].product_id;
+      const selectedProduct = this.products.find(product => product.id === selectedProductId);
+      this.newOrder.items[index].product = selectedProduct;
+      this.updateTotalAmount();
+    },
     updateTotalAmount() {
-      const total = this.newOrder.items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+      const total = this.newOrder.items.reduce((acc, item) => {
+        if (item.product && item.quantity) {
+          return acc + (item.product.price * item.quantity);
+        }
+        return acc;
+      }, 0);
       const tax = total * 0.1;
       this.newOrder.total_amount = (total + tax).toFixed(2);
     },
     addProduct() {
-      this.newOrder.items.push({ product: null, quantity: 1 });
+      this.newOrder.items.push({ product_id: null, product: null, quantity: 1 });
     },
     removeProduct(index) {
       this.newOrder.items.splice(index, 1);
@@ -370,6 +382,8 @@ export default {
           payment_method: '',
           order_status: 'Pending',
         };
+
+        window.location.reload()
       } catch (error) {
         console.error('Error adding new order:', error);
       }
