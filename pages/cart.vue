@@ -87,10 +87,14 @@ export default {
   methods: {
     loadCart() {
       this.cart = JSON.parse(localStorage.getItem('cart')) || [];
+      this.$nextTick(() => {
+        this.updateCartCount();
+      });
     },
     saveCart() {
       localStorage.setItem('cart', JSON.stringify(this.cart));
       localStorage.setItem('specialInstructions', this.specialInstructions); // Save special instructions
+      this.updateCartCount();
     },
     proceedToCheckout() {
       if (this.cart.length > 0) {
@@ -126,6 +130,10 @@ export default {
     calculateTotal() {
       return (parseFloat(this.calculateSubtotal()) + parseFloat(this.calculateTax())).toFixed(2);
     },
+    updateCartCount() {
+      const event = new CustomEvent('cart-updated');
+      window.dispatchEvent(event);
+    }
   },
 };
 </script>
