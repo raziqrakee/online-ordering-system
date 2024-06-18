@@ -30,7 +30,8 @@
           </div>
           <div>Danish Ice Cream Cafe</div>
           <div class="mb-2">danishicecreamkeningau@gmail.com</div>
-          <div>Lot 2, Future city complex, Jalan Masjid, 89008 Keningau, Sabah, Malaysia</div>
+          <div>Lot 2, Future City Complex, Jalan Masjid,</div>
+          <div>89008 Keningau, Sabah, Malaysia</div>
         </div>
       </div>
       <div class="col-md-1 col-sm-6 d-flex mb-5 text-white">
