@@ -215,4 +215,8 @@ export default {
   min-height: 300px;
   object-fit: cover;
 }
+
+.el-input__prefix{
+  height: auto;
+}
 </style>
