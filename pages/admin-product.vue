@@ -54,7 +54,7 @@
               </div>
             </div>
             <div class="col-12 bg-white p-4 gap-4 mt-4 rounded-xl">
-              <table class="table">
+              <table class="table"  v-loading="loading">
                 <thead class="bg-gray-100 text-center rounded-xl">
                   <tr>
                     <th scope="col" class="px-6 m-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -138,6 +138,7 @@
         </div>
       </div>
     </div>
+
     <el-dialog :visible.sync="showEditModalVisible" title="Edit Product">
       <el-form :model="editProduct">
         <div class="d-flex row">
@@ -248,7 +249,7 @@
               :src="newProduct.image"
               style="width: auto; height: 200px; object-fit: cover;"
             ></el-image>
-            <el-button @click="removeImage('new')" type="danger" class="btn-w" style="width: auto; height: 45px;">Remove</el-button>
+            <el-button @click="removeNewImage('new')" type="danger" class="btn-w" style="width: auto; height: 45px;">Remove</el-button>
           </div>
           <div v-else>
             <el-upload
@@ -326,6 +327,7 @@ export default {
         { value: 'Beverages', label: 'Beverages' },
         { value: 'Desserts', label: 'Desserts' }
       ],
+      loading: true
     };
   },
   computed: {
@@ -388,16 +390,18 @@ export default {
     gotoPage(page) {
       this.currentPage = page;
     },
-    fetchProducts() {
-      axios.get('http://localhost:8000/api/products')
+    async fetchProducts() {
+      await axios.get('http://localhost:8000/api/products')
         .then(response => {
           if (response.data.status === 200) {
             this.products = response.data.products;
             this.filteredProducts = [...this.products]; // Initialize filteredProducts with all products
           }
+          this.loading = false
         })
         .catch(error => {
           console.error('Error fetching products:', error);
+          this.loading = false
         });
     },
     showEditModal(product) {
@@ -448,8 +452,8 @@ export default {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-    saveNewProduct() {
-      axios.post('http://localhost:8000/api/products', this.newProduct)
+    async saveNewProduct() {
+      await axios.post('http://localhost:8000/api/products', this.newProduct)
         .then(response => {
           if (response.data.status === 200) {
             this.fetchProducts();
@@ -531,6 +535,8 @@ export default {
         } else {
           console.error('Error adding new product:', response.data);
         }
+
+        window.location.reload();
       } catch (error) {
         console.error('Error adding new product:', error);
       }
@@ -557,6 +563,15 @@ export default {
       this.editProduct = {};
       this.editProduct = product;
       console.log(this.editProduct);
+    },
+
+    removeNewImage() {
+      const product = { ...this.newProduct };
+      product.image = null;
+      product.image_url = null;
+      this.newProduct = {};
+      this.newProduct = product;
+      console.log(this.newProduct);
     },
   }
 };
