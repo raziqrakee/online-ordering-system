@@ -69,14 +69,22 @@
         <el-form-item label="Customer Name">
           <el-input v-model="newReservation.customer"></el-input>
         </el-form-item>
-        <el-form-item label="Date">
-          <el-date-picker v-model="newReservation.date" type="date" @change="fetchAvailableSlots('new')"></el-date-picker>
-        </el-form-item>
-        <el-form-item label="Time Slot">
-          <el-select v-model="newReservation.time_slot" placeholder="Select time slot">
-            <el-option v-for="slot in availableSlots.new" :key="slot" :label="slot" :value="slot"></el-option>
-          </el-select>
-        </el-form-item>
+        
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="Date">
+              <el-date-picker v-model="newReservation.date" type="date" @change="fetchAvailableSlots('new')"></el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="Time Slot">
+              <el-select v-model="newReservation.time_slot" placeholder="Select time slot">
+                <el-option v-for="slot in availableSlots.new" :key="slot" :label="slot" :value="slot"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+    
         <el-form-item label="No. Pax">
           <el-input v-model="newReservation.pax" type="number"></el-input>
         </el-form-item>
@@ -96,6 +104,7 @@
         <el-button type="primary" @click="saveReservation">Save</el-button>
       </span>
     </el-dialog>
+    
     <el-dialog :visible.sync="showEditModalVisible" title="Edit Reservation">
       <el-form :model="editedReservation">
         <el-form-item label="Customer Name">
