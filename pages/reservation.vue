@@ -36,8 +36,8 @@
                 </div>
             </div>
             <div class="d-flex gap-4 justify-start mt-5">
-                <button class="btn btn-outline-secondary w-25">Cancel</button>
-                <button class="btn btn-primary w-25" @click="bookReservation">Book</button>
+                <button class="btn btn-outline-secondary w-25 rounded-pill">Cancel</button>
+                <button class="btn btn-primary w-25 rounded-pill" @click="bookReservation">Book</button>
             </div>
             <div v-if="errorMessage" class="alert alert-danger mt-4">{{ errorMessage }}</div>
           </div>
