@@ -54,7 +54,6 @@ export default {
 </script>
 
 <style>
-
 .el-submenu__icon-arrow {
     display: none !important;
 }
@@ -64,6 +63,5 @@ export default {
 .el-menu-item:focus, .el-menu-item:hover {
   background-color: #F390C7;
   font-weight: 700;
-  text-decoration: underline;
 }
 </style>
