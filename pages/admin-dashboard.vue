@@ -56,7 +56,7 @@
           <el-col :span="8" style="margin-bottom:20px">
             <el-card shadow="hover">
               <div class="stat-card">
-                <img src="~/static/icon/total-sales-rsvr.png" class="stat-icon" alt="Total Sales" />
+                <img src="~/static/icon/total-sales.png" class="stat-icon" alt="Total Sales" />
                 <div class="stat-info">
                   <span class="stat-value">RM {{ totalSales }}</span>
                   <span class="stat-label">Total Sales</span>
@@ -67,7 +67,7 @@
           <el-col :span="8" style="margin-bottom:20px">
             <el-card shadow="hover">
               <div class="stat-card">
-                <img src="~/static/icon/total-sales-rsvr.png" class="stat-icon" alt="Total Reservation" />
+                <img src="~/static/icon/total-rsrv.png" class="stat-icon" alt="Total Reservation" />
                 <div class="stat-info">
                   <span class="stat-value">{{ totalReservations }}</span>
                   <span class="stat-label">Total Reservations</span>
