@@ -38,14 +38,23 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(report, index) in salesReports" :key="index">
-              <td>{{ index + 1 }}</td>
+            <tr v-for="(report, index) in paginatedSalesReports" :key="index">
+              <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
               <td>{{ report.date }}</td>
               <td>{{ report.orderIds.join(', ') }}</td>
               <td>{{ formatCurrency(report.totalSale) }}</td>
             </tr>
           </tbody>
         </table>
+
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="salesReports.length"
+          :page-size="pageSize"
+          :current-page.sync="currentPage"
+          @current-change="handlePageChange"
+        ></el-pagination>
       </div>
     </div>
   </div>
@@ -62,7 +71,16 @@ export default {
   data() {
     return {
       salesReports: [],
+      currentPage: 1,
+      pageSize: 10,
     };
+  },
+  computed: {
+    paginatedSalesReports() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.salesReports.slice(start, end);
+    }
   },
   created() {
     // Fetch sales report data
@@ -94,6 +112,9 @@ export default {
       window.print();
       document.body.innerHTML = originalContents;
     },
+    handlePageChange(page) {
+      this.currentPage = page;
+    }
   },
 };
 </script>

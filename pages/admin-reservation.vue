@@ -43,7 +43,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="reservation in reservations" :key="reservation.id">
+            <tr v-for="reservation in paginatedReservations" :key="reservation.id">
               <td>{{ reservation.customer }}</td>
               <td>{{ reservation.time_slot }}</td>
               <td>{{ reservation.date }}</td>
@@ -62,6 +62,15 @@
             </tr>
           </tbody>
         </table>
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="reservations.length"
+          :page-size="pageSize"
+          :current-page.sync="currentPage"
+          @current-change="handlePageChange"
+        >
+        </el-pagination>
       </div>
     </div>
     <el-dialog :visible.sync="showAddModalVisible" title="Add Reservation">
@@ -69,22 +78,14 @@
         <el-form-item label="Customer Name">
           <el-input v-model="newReservation.customer"></el-input>
         </el-form-item>
-        
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="Date">
-              <el-date-picker v-model="newReservation.date" type="date" @change="fetchAvailableSlots('new')"></el-date-picker>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="Time Slot">
-              <el-select v-model="newReservation.time_slot" placeholder="Select time slot">
-                <el-option v-for="slot in availableSlots.new" :key="slot" :label="slot" :value="slot"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-    
+        <el-form-item label="Date">
+          <el-date-picker v-model="newReservation.date" type="date" @change="fetchAvailableSlots('new')"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="Time Slot">
+          <el-select v-model="newReservation.time_slot" placeholder="Select time slot">
+            <el-option v-for="slot in availableSlots.new" :key="slot" :label="slot" :value="slot"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="No. Pax">
           <el-input v-model="newReservation.pax" type="number"></el-input>
         </el-form-item>
@@ -104,7 +105,6 @@
         <el-button type="primary" @click="saveReservation">Save</el-button>
       </span>
     </el-dialog>
-    
     <el-dialog :visible.sync="showEditModalVisible" title="Edit Reservation">
       <el-form :model="editedReservation">
         <el-form-item label="Customer Name">
@@ -173,8 +173,17 @@ export default {
       availableSlots: {
         new: [],
         edit: []
-      }
+      },
+      currentPage: 1,
+      pageSize: 10
     };
+  },
+  computed: {
+    paginatedReservations() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.reservations.slice(start, end);
+    }
   },
   methods: {
     async fetchReservations() {
@@ -246,6 +255,9 @@ export default {
         default:
           return 'primary';
       }
+    },
+    handlePageChange(page) {
+      this.currentPage = page;
     }
   },
   mounted() {
