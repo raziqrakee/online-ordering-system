@@ -22,6 +22,15 @@
         </div>
       </div>
 
+      <div class="filter-section">
+        <el-select v-model="filterType" placeholder="Select Filter">
+          <el-option label="Weekly" value="weekly"></el-option>
+          <el-option label="Monthly" value="monthly"></el-option>
+        </el-select>
+        <el-date-picker v-model="filterDate" type="date" placeholder="Pick a date"></el-date-picker>
+        <el-button type="primary" @click="applyFilter">Apply Filter</el-button>
+      </div>
+
       <div class="admin-sales-table">
         <div class="table-header">
           <h1 class="title">Sales Report</h1>
@@ -50,7 +59,7 @@
         <el-pagination
           background
           layout="prev, pager, next"
-          :total="salesReports.length"
+          :total="filteredSalesReports.length"
           :page-size="pageSize"
           :current-page.sync="currentPage"
           @current-change="handlePageChange"
@@ -71,15 +80,18 @@ export default {
   data() {
     return {
       salesReports: [],
+      filteredSalesReports: [],
       currentPage: 1,
       pageSize: 10,
+      filterType: '',
+      filterDate: '',
     };
   },
   computed: {
     paginatedSalesReports() {
       const start = (this.currentPage - 1) * this.pageSize;
       const end = start + this.pageSize;
-      return this.salesReports.slice(start, end);
+      return this.filteredSalesReports.slice(start, end);
     }
   },
   created() {
@@ -92,6 +104,7 @@ export default {
         .then(response => {
           if (response.data.status === 200) {
             this.salesReports = response.data.salesReports;
+            this.filteredSalesReports = this.salesReports;
           } else {
             console.error('Failed to fetch sales report data:', response.data.message);
           }
@@ -114,6 +127,29 @@ export default {
     },
     handlePageChange(page) {
       this.currentPage = page;
+    },
+    applyFilter() {
+      if (this.filterType && this.filterDate) {
+        const filterDate = new Date(this.filterDate);
+        if (this.filterType === 'weekly') {
+          const startOfWeek = new Date(filterDate.setDate(filterDate.getDate() - filterDate.getDay()));
+          const endOfWeek = new Date(filterDate.setDate(startOfWeek.getDate() + 6));
+          this.filteredSalesReports = this.salesReports.filter(report => {
+            const reportDate = new Date(report.date);
+            return reportDate >= startOfWeek && reportDate <= endOfWeek;
+          });
+        } else if (this.filterType === 'monthly') {
+          const selectedMonth = filterDate.getMonth();
+          const selectedYear = filterDate.getFullYear();
+          this.filteredSalesReports = this.salesReports.filter(report => {
+            const reportDate = new Date(report.date);
+            return reportDate.getMonth() === selectedMonth && reportDate.getFullYear() === selectedYear;
+          });
+        }
+      } else {
+        this.filteredSalesReports = this.salesReports;
+      }
+      this.currentPage = 1; // Reset to the first page
     }
   },
 };
@@ -137,6 +173,13 @@ export default {
   padding: 20px;
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.filter-section {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 .title {
   font-size: 24px;
@@ -165,7 +208,9 @@ export default {
 }
 @media print {
   .header,
-  .el-button {
+  .el-button,
+  .filter-section,
+  .el-pagination {
     display: none;
   }
 }
