@@ -119,7 +119,7 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900">{{ product.category }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td>
                       <div class="d-flex flex-row gap-2 p-6 justify-between whitespace-nowrap text-sm text-gray-500">
                         <img src="/assets/edit-product.svg" alt="Edit" class="btn-list-img cursor-pointer" @click="showEditModal(product)">
                         <img src="/assets/delete-product.svg" alt="Delete" class="btn-list-img w-6 cursor-pointer" @click="showDeleteModal(product.id)">
