@@ -43,7 +43,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="reservation in reservations" :key="reservation.id">
+            <tr v-for="reservation in paginatedReservations" :key="reservation.id">
               <td>{{ reservation.customer }}</td>
               <td>{{ reservation.time_slot }}</td>
               <td>{{ reservation.date }}</td>
@@ -62,6 +62,15 @@
             </tr>
           </tbody>
         </table>
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="reservations.length"
+          :page-size="pageSize"
+          :current-page.sync="currentPage"
+          @current-change="handlePageChange"
+        >
+        </el-pagination>
       </div>
     </div>
     <el-dialog :visible.sync="showAddModalVisible" title="Add Reservation">
@@ -164,8 +173,17 @@ export default {
       availableSlots: {
         new: [],
         edit: []
-      }
+      },
+      currentPage: 1,
+      pageSize: 10
     };
+  },
+  computed: {
+    paginatedReservations() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.reservations.slice(start, end);
+    }
   },
   methods: {
     async fetchReservations() {
@@ -237,6 +255,9 @@ export default {
         default:
           return 'primary';
       }
+    },
+    handlePageChange(page) {
+      this.currentPage = page;
     }
   },
   mounted() {
