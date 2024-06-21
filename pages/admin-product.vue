@@ -29,22 +29,6 @@
             <div class="d-flex flex-row justify-content-between align-items-center">
               <h1 class="title">Products</h1>
               <div class="d-flex align-items-center gap-1">
-                <el-dropdown trigger="click">
-                  <button class="btn btn-outline-secondary btn-w d-flex align-items-center shadow">
-                    <span>Filter</span>
-                    <img src="/assets/filter-product.svg" alt="Delete" class="btn-img cursor-pointer">
-                  </button>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item @click="filterBy('name', 'asc')">Title (A-Z)</el-dropdown-item>
-                    <el-dropdown-item @click="filterBy('name', 'desc')">Title (Z-A)</el-dropdown-item>
-                    <el-dropdown-item @click="filterBy('id', 'asc')">ID (Low-High)</el-dropdown-item>
-                    <el-dropdown-item @click="filterBy('id', 'desc')">ID (High-Low)</el-dropdown-item>
-                    <el-dropdown-item @click="filterBy('price', 'asc')">Price (Low-High)</el-dropdown-item>
-                    <el-dropdown-item @click="filterBy('price', 'desc')">Price (High-Low)</el-dropdown-item>
-                    <el-dropdown-item @click="filterBy('category', 'asc')">Category (A-Z)</el-dropdown-item>
-                    <el-dropdown-item @click="filterBy('category', 'desc')">Category (Z-A)</el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
                 <button @click="showAddModalVisible = true" class="btn btn-secondary btn-w d-flex align-items-center shadow">
                   <span>Add Product</span>
                   <svg xmlns="http://www.w3.org/2000/svg" class="btn-img" viewBox="0 0 20 20" fill="currentColor">

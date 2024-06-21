@@ -1,7 +1,6 @@
 <template>
   <div>
     <Navbar></Navbar>
-    <!-- navigation menue end -->
     <div class="m-4 p-4">
       <h3>Edit Profile</h3>
       <el-form style="width:50%">
@@ -51,8 +50,6 @@
         </div>
       </el-form>
     </div>
-
-    <!-- FOOTER -->
     <Footer></Footer>
   </div>
 </template>
@@ -60,11 +57,12 @@
 <script>
 import Navbar from '../components/Navbar.vue';
 import Footer from '../components/Footer.vue';
+import { EventBus } from '~/plugins/event-bus';
 
 export default {
   components: {
-    Navbar, // Register the Navbar component
-    Footer, // Register the Footer component
+    Navbar,
+    Footer,
   },
   data() {
     return {
@@ -74,6 +72,7 @@ export default {
         contact_number: '',
         image: '',
       },
+      image: null,
     };
   },
   created() {
@@ -91,7 +90,7 @@ export default {
           },
         });
         this.form = response.data;
-        if (response.data.image_url.split('http://localhost:8000/')[1] !== '') this.image = response.data.image_url;
+        this.image = response.data.image_url;
       } catch (err) {
         // Handle error
       }
@@ -137,6 +136,7 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.$message.success('Profile saved successfully.');
+          EventBus.$emit('profile-updated', response.data.image_url);
         })
         .catch((error) => {
           console.error(error);
@@ -145,14 +145,20 @@ export default {
     },
     logout() {
       this.$cookies.remove('token');
-      // this.$router.push("/login")
       window.location.href = 'login';
     },
     async removeImage() {
       try {
         const userId = this.$cookies.get('id');
         const token = this.$cookies.get('token');
-        const response = await this.$axios.delete(`http://localhost:8000/api/user/${userId}/remove-image`);
+        const response = await this.$axios.delete(`http://localhost:8000/api/user/${userId}/remove-image`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        this.image = null;
+        EventBus.$emit('profile-updated', null);
         window.location.reload();
       } catch (err) {
         this.$message.error(err);

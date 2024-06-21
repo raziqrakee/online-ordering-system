@@ -16,8 +16,7 @@
       <el-menu-item index="reservation" style="color: #fff;">
         <nuxt-link to="/reservation" style="text-decoration: none; color: #fff;">Reservation</nuxt-link>
       </el-menu-item>
-      <el-menu-item index="contact" class="d-flex align-items-center" style="color: #fff;" @click="handleSelect('contact')">Contact</nuxt-link>
-      </el-menu-item>
+      <el-menu-item index="contact" class="d-flex align-items-center" style="color: #fff;" @click="handleSelect('contact')">Contact</el-menu-item>
     </div>
     <div class="d-flex">
       <nuxt-link to="/cart" class="cart-nav d-flex align-items-center position-relative">
@@ -26,7 +25,8 @@
       </nuxt-link>
       <el-submenu index="2">
         <template slot="title">
-          <i style="color: #fff;" class="el-icon-user-solid"></i>
+          <img v-if="profilePicture" :src="profilePicture" class="profile-picture" />
+          <i v-else style="color: #fff;" class="el-icon-user-solid"></i>
         </template>
         <el-menu-item index="2-1">
           <nuxt-link to="/edit-profile" style="text-decoration: none; color: #000;">Edit Profile</nuxt-link>
@@ -38,18 +38,26 @@
 </template>
 
 <script>
+import { EventBus } from '~/plugins/event-bus';
+
 export default {
   data() {
     return {
-      cartCount: 0 // Initially set to 0
+      cartCount: 0,
+      profilePicture: null,
     };
   },
   mounted() {
     this.updateCartCount();
     window.addEventListener('cart-updated', this.updateCartCount);
+    this.fetchUserProfile();
+    EventBus.$on('cart-updated', this.updateCartCount);
+    EventBus.$on('profile-updated', this.updateProfilePicture);
   },
   beforeDestroy() {
     window.removeEventListener('cart-updated', this.updateCartCount);
+    EventBus.$off('cart-updated', this.updateCartCount);
+    EventBus.$off('profile-updated', this.updateProfilePicture);
   },
   methods: {
     handleSelect(index) {
@@ -66,9 +74,27 @@ export default {
     updateCartCount() {
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
       this.cartCount = cart.reduce((total, item) => total + item.quantity, 0);
-    }
-  }
-}
+    },
+    async fetchUserProfile() {
+      try {
+        const userId = this.$cookies.get('id');
+        const token = this.$cookies.get('token');
+        const response = await this.$axios.get(`http://localhost:8000/api/users/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        this.profilePicture = response.data.image_url || null;
+      } catch (err) {
+        console.error('Error fetching user profile:', err);
+      }
+    },
+    updateProfilePicture(newProfilePicture) {
+      this.profilePicture = newProfilePicture;
+    },
+  },
+};
 </script>
 
 <style>
@@ -86,8 +112,8 @@ export default {
   background-color: transparent;
 }
 .cart-nav {
-  text-decoration: none; 
-  color: #fff; 
+  text-decoration: none;
+  color: #fff;
   margin-right: 10px;
   font-size: 18px;
   position: relative;
@@ -101,5 +127,11 @@ export default {
   border-radius: 50%;
   padding: 2px 5px;
   font-size: 7px;
+}
+.profile-picture {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 </style>
