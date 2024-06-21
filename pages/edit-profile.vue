@@ -1,7 +1,6 @@
 <template>
   <div>
     <Navbar></Navbar>
-    <!-- navigation menue end -->
     <div class="m-4 p-4">
       <h3>Edit Profile</h3>
       <el-form style="width:50%">
@@ -51,8 +50,6 @@
         </div>
       </el-form>
     </div>
-
-    <!-- FOOTER -->
     <Footer></Footer>
   </div>
 </template>
@@ -60,11 +57,12 @@
 <script>
 import Navbar from '../components/Navbar.vue';
 import Footer from '../components/Footer.vue';
+import { EventBus } from '~/plugins/event-bus';
 
 export default {
   components: {
-    Navbar, // Register the Navbar component
-    Footer, // Register the Footer component
+    Navbar,
+    Footer,
   },
   data() {
     return {
@@ -85,16 +83,16 @@ export default {
       try {
         const userId = this.$cookies.get('id');
         const token = this.$cookies.get('token');
-        const response = await this.$axios.get(`http://localhost:8000/api/users/${userId}`, {
+        const response = await this.$axios(`http://localhost:8000/api/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
         this.form = response.data;
-        if (response.data.image_url.split('http://localhost:8000/')[1] !== '') this.image = response.data.image_url;
+        this.image = response.data.image_url;
       } catch (err) {
-        console.error('Error fetching user profile:', err);
+        // Handle error
       }
     },
     handleRemove(file, fileList) {
@@ -104,7 +102,7 @@ export default {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-    async saveProfile() {
+    saveProfile() {
       // Perform validation before saving
       if (!this.form.name || !this.form.email || !this.form.contact_number) {
         this.$message.error('Please fill in all fields.');
@@ -128,39 +126,43 @@ export default {
 
       const userId = this.$cookies.get('id');
       const token = this.$cookies.get('token');
-      try {
-        const response = await this.$axios.post(`http://localhost:8000/api/user/${userId}`, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
+      // Send the form data to your API endpoint
+      this.$axios.post(`http://localhost:8000/api/user/${userId}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+        .then((response) => {
+          console.log(response.data);
+          this.$message.success('Profile saved successfully.');
+          EventBus.$emit('profile-updated', response.data.image_url);
+        })
+        .catch((error) => {
+          console.error(error);
+          this.$message.error('Failed to save profile.');
         });
-        this.$message.success('Profile saved successfully.');
-        this.image = response.data.image_url;
-      } catch (error) {
-        console.error('Error saving profile:', error);
-        this.$message.error('Failed to save profile.');
-      }
+    },
+    logout() {
+      this.$cookies.remove('token');
+      window.location.href = 'login';
     },
     async removeImage() {
       try {
         const userId = this.$cookies.get('id');
         const token = this.$cookies.get('token');
-        await this.$axios.delete(`http://localhost:8000/api/user/${userId}/remove-image`, {
+        const response = await this.$axios.delete(`http://localhost:8000/api/user/${userId}/remove-image`, {
           headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
         });
         this.image = null;
-        this.$message.success('Profile picture removed successfully.');
+        EventBus.$emit('profile-updated', null);
+        window.location.reload();
       } catch (err) {
-        console.error('Error removing profile picture:', err);
-        this.$message.error('Failed to remove profile picture.');
+        this.$message.error(err);
       }
-    },
-    logout() {
-      this.$cookies.remove('token');
-      window.location.href = 'login';
     },
   },
 };

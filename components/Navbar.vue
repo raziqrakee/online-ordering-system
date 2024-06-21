@@ -52,10 +52,12 @@ export default {
     window.addEventListener('cart-updated', this.updateCartCount);
     this.fetchUserProfile();
     EventBus.$on('cart-updated', this.updateCartCount);
+    EventBus.$on('profile-updated', this.updateProfilePicture);
   },
   beforeDestroy() {
     window.removeEventListener('cart-updated', this.updateCartCount);
     EventBus.$off('cart-updated', this.updateCartCount);
+    EventBus.$off('profile-updated', this.updateProfilePicture);
   },
   methods: {
     handleSelect(index) {
@@ -87,6 +89,9 @@ export default {
       } catch (err) {
         console.error('Error fetching user profile:', err);
       }
+    },
+    updateProfilePicture(newProfilePicture) {
+      this.profilePicture = newProfilePicture;
     },
   },
 };
