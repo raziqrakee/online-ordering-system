@@ -46,6 +46,8 @@
 </template>
 
 <script>
+import { EventBus } from '~/plugins/event-bus';
+
 export default {
   async asyncData({ params, $axios, $cookies }) {
     const orderId = params.id;
@@ -65,6 +67,19 @@ export default {
     } catch (error) {
       console.error('Error fetching order status:', error);
       return { status: '' };
+    }
+  },
+  mounted() {
+    EventBus.$on('order-updated', this.updateOrderStatus);
+  },
+  beforeDestroy() {
+    EventBus.$off('order-updated', this.updateOrderStatus);
+  },
+  methods: {
+    updateOrderStatus(order) {
+      if (order.id === this.$route.params.id) {
+        this.status = order.status;
+      }
     }
   },
   computed: {
@@ -145,9 +160,6 @@ export default {
   justify-content: center;
   align-items: center;
   transition: background-color 0.3s ease-in-out;
-}
-.timeline-item.completed .timeline-icon {
-
 }
 .timeline-item h5 {
   margin: 0;
