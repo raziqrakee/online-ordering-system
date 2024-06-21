@@ -36,8 +36,8 @@
                     <div class="d-flex justify-content-between align-items-center">
                       <div class="">
                         <h4 class="card-text fw-bold">RM {{ topProducts[0].price }}</h4>
-                      <h6 class="card-text text-capitalize">{{ topProducts[0].category }}</h6>
-                      <p class="card-text" style="font-size: 0.8rem;">Sold: {{ topProducts[0].sold }} pcs</p>
+                        <h6 class="card-text text-capitalize">{{ topProducts[0].category }}</h6>
+                        <p class="card-text" style="font-size: 0.8rem;">Sold: {{ topProducts[0].sold }} pcs</p>
                       </div>
                       <div class="">
                         <button class="btn btn-primary" @click="addToCart(topProducts[0])">
@@ -141,12 +141,12 @@
 <script>
 import Navbar from '../components/Navbar.vue';
 import Footer from '../components/Footer.vue';
-import { Notification } from 'element-ui'; // Import the Notification component
+import { EventBus } from '~/plugins/event-bus';
 
 export default {
   components: {
-    Navbar, // Register the Navbar component
-    Footer, // Register the Footer component
+    Navbar,
+    Footer,
   },
   data() {
     return {
@@ -224,11 +224,12 @@ export default {
         cart.push(item);
       }
       localStorage.setItem('cart', JSON.stringify(cart));
-      Notification({
+      this.$notify({
         title: 'Success',
         message: 'Item added to cart',
         type: 'success'
       });
+      EventBus.$emit('cart-updated');
     },
     loadMore() {
       this.$router.push('/product');

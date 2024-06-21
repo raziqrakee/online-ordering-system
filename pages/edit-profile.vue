@@ -74,6 +74,7 @@ export default {
         contact_number: '',
         image: '',
       },
+      image: null,
     };
   },
   created() {
@@ -84,7 +85,7 @@ export default {
       try {
         const userId = this.$cookies.get('id');
         const token = this.$cookies.get('token');
-        const response = await this.$axios(`http://localhost:8000/api/users/${userId}`, {
+        const response = await this.$axios.get(`http://localhost:8000/api/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -93,7 +94,7 @@ export default {
         this.form = response.data;
         if (response.data.image_url.split('http://localhost:8000/')[1] !== '') this.image = response.data.image_url;
       } catch (err) {
-        // Handle error
+        console.error('Error fetching user profile:', err);
       }
     },
     handleRemove(file, fileList) {
@@ -103,7 +104,7 @@ export default {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-    saveProfile() {
+    async saveProfile() {
       // Perform validation before saving
       if (!this.form.name || !this.form.email || !this.form.contact_number) {
         this.$message.error('Please fill in all fields.');
@@ -127,36 +128,39 @@ export default {
 
       const userId = this.$cookies.get('id');
       const token = this.$cookies.get('token');
-      // Send the form data to your API endpoint
-      this.$axios.post(`http://localhost:8000/api/user/${userId}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-        .then((response) => {
-          console.log(response.data);
-          this.$message.success('Profile saved successfully.');
-        })
-        .catch((error) => {
-          console.error(error);
-          this.$message.error('Failed to save profile.');
+      try {
+        const response = await this.$axios.post(`http://localhost:8000/api/user/${userId}`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
         });
-    },
-    logout() {
-      this.$cookies.remove('token');
-      // this.$router.push("/login")
-      window.location.href = 'login';
+        this.$message.success('Profile saved successfully.');
+        this.image = response.data.image_url;
+      } catch (error) {
+        console.error('Error saving profile:', error);
+        this.$message.error('Failed to save profile.');
+      }
     },
     async removeImage() {
       try {
         const userId = this.$cookies.get('id');
         const token = this.$cookies.get('token');
-        const response = await this.$axios.delete(`http://localhost:8000/api/user/${userId}/remove-image`);
-        window.location.reload();
+        await this.$axios.delete(`http://localhost:8000/api/user/${userId}/remove-image`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        this.image = null;
+        this.$message.success('Profile picture removed successfully.');
       } catch (err) {
-        this.$message.error(err);
+        console.error('Error removing profile picture:', err);
+        this.$message.error('Failed to remove profile picture.');
       }
+    },
+    logout() {
+      this.$cookies.remove('token');
+      window.location.href = 'login';
     },
   },
 };

@@ -57,6 +57,7 @@
 <script>
 import Navbar from '../components/Navbar.vue';
 import Footer from '../components/Footer.vue';
+import { EventBus } from '~/plugins/event-bus';
 
 export default {
   components: {
@@ -121,6 +122,7 @@ export default {
         message: 'Item added to cart',
         type: 'success'
       });
+      EventBus.$emit('cart-updated');
     },
     loadMore() {
       this.currentPage++;
@@ -139,6 +141,7 @@ export default {
   },
 }
 </script>
+
 
 <style>
 .menu-custom {
