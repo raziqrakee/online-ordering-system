@@ -1,8 +1,8 @@
 <template>
   <div class="admin-product">
     <Sidebar></Sidebar>
-    <div class="content" style="background-color:#f6f6f6; height:100vh; padding: 0px;">
-      <div class="header" style="background-color: #fff; height:10vh; padding: 20px">
+    <div class="content">
+      <div class="header">
         <div class="search">
           <el-input
             placeholder="Search"
@@ -23,11 +23,11 @@
           </el-dropdown>
         </div>
       </div>
-      <div class="admin-product bg-light" style="padding:20px; height:90vh">
+      <div class="admin-product-table" style="padding:20px; height:90vh">
         <div class="row w-100 h-100">
           <div class="col-12 h-100">
-            <div class="d-flex flex-row justify-content-between align-items-center my-4">
-              <h1 class="text-3xl font-bold">Products</h1>
+            <div class="d-flex flex-row justify-content-between align-items-center">
+              <h1 class="title">Products</h1>
               <div class="d-flex align-items-center gap-1">
                 <el-dropdown trigger="click">
                   <button class="btn btn-outline-secondary btn-w d-flex align-items-center shadow">
@@ -119,7 +119,7 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900">{{ product.category }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td>
                       <div class="d-flex flex-row gap-2 p-6 justify-between whitespace-nowrap text-sm text-gray-500">
                         <img src="/assets/edit-product.svg" alt="Edit" class="btn-list-img cursor-pointer" @click="showEditModal(product)">
                         <img src="/assets/delete-product.svg" alt="Delete" class="btn-list-img w-6 cursor-pointer" @click="showDeleteModal(product.id)">
@@ -578,18 +578,33 @@ export default {
 </script>
 
 <style>
+.title {
+  font-size: 24px;
+  font-weight: bold;
+}
+.admin-product-table {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 .admin-product {
   display: flex;
   height: 100vh;
 }
 .content {
   flex: 1;
-  padding: 20px;
+  background-color: #f6f6f6;
+  padding: 0 20px;
 }
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .search {
   width: 300px;

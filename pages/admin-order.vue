@@ -68,11 +68,11 @@
                 </el-button>
               </td>
               <td>
-                <div class="d-flex gap-1 justify-content-center">
-                  <button class="btn btn-eye" @click="viewCustomerDetails(order)">👁️</button>
-                  <button class="btn btn-accept" @click="acceptOrder(order)">✔</button>
-                  <button class="btn btn-reject" @click="rejectOrder(order)">✖</button>
-                </div>
+                <div class="d-flex flex-row gap-2 p-6 justify-between whitespace-nowrap text-sm text-gray-500">
+                  <img src="/icon/view.png" alt="View Details" class="btn-list-img cursor-pointer" @click="viewCustomerDetails(order)">
+                  <img src="/icon/tick.png" alt="Accept Order" class="btn-list-img w-6 cursor-pointer" @click="acceptOrder(order)">
+                  <img src="/icon/cancel.png" alt="Reject Order" class="btn-list-img w-6 cursor-pointer" @click="rejectOrder(order)">
+                </div>            
               </td>
             </tr>
           </tbody>
@@ -452,6 +452,11 @@ export default {
 </script>
 
 <style>
+.btn-list-img {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
 .receipt-image {
   width: 300px;
 }
