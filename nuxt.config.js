@@ -24,6 +24,7 @@ export default {
 
   // Plugins to run before rendering page
   plugins: [
+    '~/plugins/event-bus.js',
     '@/plugins/element-ui',
     { src: '~/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js', mode: 'client' }
   ],
