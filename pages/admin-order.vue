@@ -72,7 +72,7 @@
                   <img src="/icon/view.png" alt="View Details" class="btn-list-img cursor-pointer" @click="viewCustomerDetails(order)">
                   <img src="/icon/tick.png" alt="Accept Order" class="btn-list-img w-6 cursor-pointer" @click="acceptOrder(order)">
                   <img src="/icon/cancel.png" alt="Reject Order" class="btn-list-img w-6 cursor-pointer" @click="rejectOrder(order)">
-                </div>            
+                </div>
               </td>
             </tr>
           </tbody>
@@ -165,6 +165,7 @@
 <script>
 import axios from 'axios';
 import Sidebar from '../components/Sidebar.vue';
+import { EventBus } from '~/plugins/event-bus';
 
 export default {
   components: {
@@ -383,7 +384,7 @@ export default {
           order_status: 'Pending',
         };
 
-        window.location.reload()
+        EventBus.$emit('order-updated', { id: response.data.id, status: response.data.customer_order_status });
       } catch (error) {
         console.error('Error adding new order:', error);
       }
@@ -423,6 +424,8 @@ export default {
 
         order.order_status = response.data.order_status;
         order.customer_order_status = response.data.customer_order_status;
+
+        EventBus.$emit('order-updated', { id: order.id, status: order.customer_order_status });
       } catch (error) {
         console.error('Error updating order status:', error);
       }
@@ -440,6 +443,8 @@ export default {
 
         order.order_status = response.data.order_status;
         order.customer_order_status = response.data.customer_order_status;
+
+        EventBus.$emit('order-updated', { id: order.id, status: order.customer_order_status });
       } catch (error) {
         console.error('Error updating order status:', error);
       }
