@@ -1,31 +1,33 @@
 <template>
-  <div class="sidebar" style="padding-left: 0px; height: 100vh; padding-right: 0px;">
-    <div class="logo">
-      <img src="~/static/logo.png" alt="Logo" class="img-fluid" width="98px">
+  <div class="sidebar d-flex flex-column justify-content-between">
+    <div class="">
+      <div class="logo">
+        <img src="~/static/logo.png" alt="Logo" class="img-fluid" width="98px">
+      </div>
+      <el-menu :default-active="activeLink" class="sidebar-menu" @select="handleSelect">
+        <el-menu-item index="dashboard" :class="sidebarItemClass('dashboard')">
+          <i class="el-icon-menu"></i>
+          <span>Dashboard</span>
+        </el-menu-item>
+        <el-menu-item index="product" :class="sidebarItemClass('product')">
+          <i class="el-icon-goods"></i>
+          <span>Product</span>
+        </el-menu-item>
+        <el-menu-item index="order" :class="sidebarItemClass('order')">
+          <i class="el-icon-shopping-cart-2"></i>
+          <span>Order</span>
+        </el-menu-item>
+        <el-menu-item index="reservation" :class="sidebarItemClass('reservation')">
+          <i class="el-icon-date"></i>
+          <span>Reservation</span>
+        </el-menu-item>
+        <el-menu-item index="sales" :class="sidebarItemClass('sales')">
+          <i class="el-icon-document"></i>
+          <span>Sale Report</span>
+        </el-menu-item>
+      </el-menu>
     </div>
-    <el-menu :default-active="activeLink" class="sidebar-menu" @select="handleSelect">
-      <el-menu-item index="dashboard" :class="sidebarItemClass('dashboard')">
-        <i class="el-icon-menu"></i>
-        <span>Dashboard</span>
-      </el-menu-item>
-      <el-menu-item index="product" :class="sidebarItemClass('product')">
-        <i class="el-icon-goods"></i>
-        <span>Product</span>
-      </el-menu-item>
-      <el-menu-item index="order" :class="sidebarItemClass('order')">
-        <i class="el-icon-shopping-cart-2"></i>
-        <span>Order</span>
-      </el-menu-item>
-      <el-menu-item index="reservation" :class="sidebarItemClass('reservation')">
-        <i class="el-icon-date"></i>
-        <span>Reservation</span>
-      </el-menu-item>
-      <el-menu-item index="sales" :class="sidebarItemClass('sales')">
-        <i class="el-icon-document"></i>
-        <span>Sale Report</span>
-      </el-menu-item>
-    </el-menu>
-    <div class="logout">
+    <div class="logout d-flex justify-content-center mb-2">
       <el-button type="danger" icon="el-icon-switch-button" round @click="logout()">Logout</el-button>
     </div>
   </div>
@@ -64,7 +66,7 @@ export default {
 .sidebar {
   background-color: #FFE9F5;
   color: #fff;
-  padding: 20px;
+  padding-block: 20px;
   min-width: 200px;
 }
 .logo {
@@ -97,11 +99,5 @@ export default {
 .custom-sidebar-item:active .el-icon-date,
 .custom-sidebar-item:active .el-icon-document {
   color: #66b1ff;
-}
-.logout {
-  position: absolute;
-  bottom: 20px;
-  left: 40px;
-  right: 20px;
 }
 </style>
