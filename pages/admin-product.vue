@@ -23,7 +23,7 @@
           </el-dropdown>
         </div>
       </div>
-      <div class="admin-product-table" style="padding:20px; height:90vh">
+      <div class="admin-product-table pb-0" style="padding:20px">
         <div class="row w-100 h-100">
           <div class="col-12 h-100">
             <div class="d-flex flex-row justify-content-between align-items-center">
@@ -574,7 +574,7 @@ export default {
 }
 .admin-product {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
 }
 .content {
   flex: 1;

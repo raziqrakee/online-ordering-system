@@ -467,7 +467,7 @@ export default {
 }
 .admin-order {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
 }
 .content {
   flex: 1;

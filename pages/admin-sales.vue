@@ -158,7 +158,7 @@ export default {
 <style scoped>
 .admin-sales {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
 }
 .content {
   flex: 1;
