@@ -39,6 +39,9 @@
               </div>
             </div>
           </div>
+          <div class="text-center mt-5">
+            <button @click="goToIndex" class="btn btn-link">Go to Home</button>
+          </div>
         </div>
       </div>
     </div>
@@ -80,6 +83,9 @@ export default {
       if (order.id === this.$route.params.id) {
         this.status = order.status;
       }
+    },
+    goToIndex() {
+      this.$router.push('/');
     }
   },
   computed: {
@@ -177,5 +183,13 @@ export default {
   to {
     transform: scale(1.3);
   }
+}
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
 }
 </style>
