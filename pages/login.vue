@@ -4,7 +4,7 @@
     <div class="card p-4" style="width: 50%; background-color: #D1E6FB; border:none">
       <div class="card-body">
         <div class="text-center mb-4">
-          <img src="~static/logo.png" alt="Logo" class="img-fluid" style="max-width: 150px;">
+          <img src="logo.ico" alt="Logo" class="img-fluid" style="max-width: 150px;">
         </div>
         <h5 class="card-title text-center mb-4">Login to your Account</h5>
         <el-form>
@@ -24,12 +24,12 @@
           <span>Don't have an account?</span>
           <span class="text-secondary" @click="redirect('register')">Sign up!</span>
         </div>
-        <div class="text-center mt-3">
+        <!-- <div class="text-center mt-3">
           <span style="color: #909399;">or Sign in with Email</span>
-        </div>
-        <div class="text-center mt-3">
+        </div> -->
+        <!-- <div class="text-center mt-3">
           <el-button type="primary" class="w-100">Continue with Google</el-button>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
