@@ -31,6 +31,9 @@
         <el-menu-item index="2-1">
           <nuxt-link to="/edit-profile" style="text-decoration: none; color: #000;">Edit Profile</nuxt-link>
         </el-menu-item>
+        <el-menu-item index="2-2">
+          <nuxt-link to="/order-status" style="text-decoration: none; color: #000;">Order Status</nuxt-link>
+        </el-menu-item>
         <el-menu-item index="2-3" @click="logout()">Logout</el-menu-item>
       </el-submenu>
     </div>
