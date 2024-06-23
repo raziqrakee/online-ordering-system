@@ -269,15 +269,13 @@ export default {
 <style>
 .admin-reservation {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
 }
-
 .content {
   flex: 1;
   background-color: #f6f6f6;
   padding: 0 20px;
 }
-
 .header {
   display: flex;
   justify-content: space-between;
@@ -287,40 +285,33 @@ export default {
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .search {
   width: 300px;
 }
-
 .user {
   cursor: pointer;
 }
-
 .admin-reservation-table {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
-
 .title {
   font-size: 24px;
   font-weight: bold;
 }
-
 .actions {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-
 .btn {
   display: flex;
   align-items: center;
@@ -330,50 +321,40 @@ export default {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
 .btn span {
   margin-right: 8px;
 }
-
 .btn-icon {
   width: 20px;
   height: 20px;
 }
-
 .btn-filter {
   background-color: #fff;
   color: #000;
 }
-
 .btn-filter:hover {
   background-color: #f0f0f0;
 }
-
 .dropdown-menu {
   display: none;
 }
-
 .btn-add {
   background-color: #FFE9F5;
   color: #000000;
 }
-
 .btn-add:hover {
   background-color: #6c757d;
   color: #ffffff
 }
-
 .table {
   width: 100%;
   border-collapse: collapse;
 }
-
 .table th, .table td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
-
 .btn-accept {
   color: white;
   padding: 1px 5px;
@@ -381,11 +362,9 @@ export default {
   border: none;
   cursor: pointer;
 }
-
 .btn-accept:hover {
   background-color: #67C23A;
 }
-
 .btn-reject {
   color: white;
   padding: 1px 5px;
@@ -393,11 +372,9 @@ export default {
   border: none;
   cursor: pointer;
 }
-
 .btn-reject:hover {
   background-color: #F56C6C;
 }
-
 .btn-edit {
   color: #000000;
   padding: 1px 7px;
@@ -405,29 +382,24 @@ export default {
   border: none;
   cursor: pointer;
 }
-
 .btn-edit:hover {
   background-color: #409EFF;
 }
-
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
 }
-
 .status-filter {
   margin-bottom: 20px;
   display: flex;
   justify-content: flex-start;
   gap: 10px;
 }
-
 .status-filter .el-radio-group {
   display: flex;
   gap: 10px;
 }
-
 .table .el-button {
   padding: 4px 10px;
   border-radius: 60px;
