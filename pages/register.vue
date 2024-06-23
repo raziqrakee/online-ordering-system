@@ -4,7 +4,7 @@
     <div class="card p-4" style="width: 50%; background-color: #D1E6FB; border:none">
       <div class="card-body">
         <div class="text-center mb-4">
-          <img src="~/static/logo.png" alt="Logo" class="img-fluid" style="max-width: 150px;">
+          <img src="logo.ico" alt="Logo" class="img-fluid" style="max-width: 150px;">
         </div>
         <h5 class="card-title text-center">Sign Up</h5>
         <div class="card-title text-center mb-4" style="color: #909399;">Create your account now</div>

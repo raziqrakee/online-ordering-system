@@ -33,7 +33,7 @@ export default {
   components: true,
 
   // Modules for dev and build (recommended)
-  modules: [
+  buildModules: [
     '@nuxtjs/axios',
     'cookie-universal-nuxt',
     '@nuxtjs/dotenv',
@@ -47,6 +47,22 @@ export default {
   // Build Configuration
   build: {
     transpile: [/^element-ui/],
+    extend(config, { isDev, isClient }) {
+      if (isClient) {
+        config.devtool = isDev ? 'source-map' : false;
+      }
+
+      const HtmlWebpackPlugin = config.plugins.find(
+        (plugin) => plugin.constructor.name === 'HtmlWebpackPlugin'
+      );
+
+      if (HtmlWebpackPlugin) {
+        HtmlWebpackPlugin.options.minify = isDev ? false : {
+          collapseWhitespace: true,
+          removeComments: true,
+        };
+      }
+    },
   },
 
   // Router middleware
