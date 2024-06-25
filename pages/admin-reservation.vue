@@ -4,7 +4,11 @@
     <div class="content">
       <div class="header">
         <div class="search">
-          <el-input placeholder="Search" prefix-icon="el-icon-search"></el-input>
+          <el-input
+            placeholder="Search by name or phone"
+            prefix-icon="el-icon-search"
+            v-model="searchQuery"
+          ></el-input>
         </div>
         <div class="user">
           <el-dropdown trigger="click">
@@ -46,7 +50,7 @@
             <tr v-for="reservation in paginatedReservations" :key="reservation.id">
               <td>{{ reservation.customer }}</td>
               <td>{{ reservation.time_slot }}</td>
-              <td>{{ reservation.date }}</td>
+              <td>{{ formatDate(reservation.date) }}</td>
               <td>{{ reservation.pax }}</td>
               <td>{{ reservation.phone }}</td>
               <td>
@@ -65,7 +69,7 @@
         <el-pagination
           background
           layout="prev, pager, next"
-          :total="reservations.length"
+          :total="filteredReservations.length"
           :page-size="pageSize"
           :current-page.sync="currentPage"
           @current-change="handlePageChange"
@@ -79,7 +83,7 @@
           <el-input v-model="newReservation.customer"></el-input>
         </el-form-item>
         <el-form-item label="Date">
-          <el-date-picker v-model="newReservation.date" type="date" @change="fetchAvailableSlots('new')"></el-date-picker>
+          <el-date-picker v-model="newReservation.date" type="date" :picker-options="datePickerOptions" @change="fetchAvailableSlots('new')"></el-date-picker>
         </el-form-item>
         <el-form-item label="Time Slot">
           <el-select v-model="newReservation.time_slot" placeholder="Select time slot">
@@ -111,7 +115,7 @@
           <el-input v-model="editedReservation.customer"></el-input>
         </el-form-item>
         <el-form-item label="Date">
-          <el-date-picker v-model="editedReservation.date" type="date" @change="fetchAvailableSlots('edit')"></el-date-picker>
+          <el-date-picker v-model="editedReservation.date" type="date" :picker-options="datePickerOptions" @change="fetchAvailableSlots('edit')"></el-date-picker>
         </el-form-item>
         <el-form-item label="Time Slot">
           <el-select v-model="editedReservation.time_slot" placeholder="Select time slot">
@@ -143,6 +147,7 @@
 <script>
 import axios from 'axios';
 import Sidebar from '../components/Sidebar.vue';
+import moment from 'moment';
 
 export default {
   components: {
@@ -152,6 +157,7 @@ export default {
     return {
       showAddModalVisible: false,
       showEditModalVisible: false,
+      searchQuery: '', // Added for search functionality
       newReservation: {
         customer: '',
         date: '',
@@ -175,30 +181,51 @@ export default {
         edit: []
       },
       currentPage: 1,
-      pageSize: 10
+      pageSize: 10,
+      datePickerOptions: {
+        disabledDate(date) {
+          // Allow today's date and future dates
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          return date < today;
+        }
+      }
     };
   },
   computed: {
+    filteredReservations() {
+      // Filter reservations by customer name or phone number based on search query
+      const query = this.searchQuery.toLowerCase();
+      return this.reservations.filter(
+        reservation =>
+          reservation.customer.toLowerCase().includes(query) ||
+          reservation.phone.toLowerCase().includes(query)
+      );
+    },
     paginatedReservations() {
       const start = (this.currentPage - 1) * this.pageSize;
       const end = start + this.pageSize;
-      return this.reservations.slice(start, end);
+      return this.filteredReservations.slice(start, end);
     }
   },
   methods: {
+    formatDate(date) {
+      return moment(date).format('YYYY-MM-DD');
+    },
     async fetchReservations() {
       const response = await axios.get('http://localhost:8000/api/reservations');
-      this.reservations = response.data;
+      this.reservations = response.data.map(reservation => ({
+        ...reservation,
+        date: this.formatDate(reservation.date) // Ensure date is correctly formatted
+      }));
     },
     async fetchAvailableSlots(type) {
       const date = type === 'new' ? this.newReservation.date : this.editedReservation.date;
       if (!date) return;
-      const formattedDate = new Date(date).toISOString().split('T')[0]; // Format the date as YYYY-MM-DD
-      console.log('Fetching available slots for date:', formattedDate); // Debugging log
+      const formattedDate = moment(date).format('YYYY-MM-DD');
       try {
         const response = await axios.get(`http://localhost:8000/api/available-slots/${formattedDate}`);
         this.availableSlots[type] = response.data;
-        console.log('Available slots:', this.availableSlots[type]); // Debugging log
       } catch (error) {
         console.error('Failed to fetch available slots:', error);
       }
@@ -211,8 +238,7 @@ export default {
     },
     async saveReservation() {
       try {
-        const reservationData = { ...this.newReservation, date: new Date(this.newReservation.date).toISOString().split('T')[0] }; // Format the date as YYYY-MM-DD
-        console.log('Saving new reservation:', reservationData); // Debugging log
+        const reservationData = { ...this.newReservation, date: moment(this.newReservation.date).format('YYYY-MM-DD') };
         await axios.post('http://localhost:8000/api/reservations', reservationData);
         this.fetchReservations();
         this.showAddModalVisible = false;
@@ -222,8 +248,7 @@ export default {
     },
     async updateReservation() {
       try {
-        const reservationData = { ...this.editedReservation, date: new Date(this.editedReservation.date).toISOString().split('T')[0] }; // Format the date as YYYY-MM-DD
-        console.log('Updating reservation:', reservationData); // Debugging log
+        const reservationData = { ...this.editedReservation, date: moment(this.editedReservation.date).format('YYYY-MM-DD') };
         await axios.put(`http://localhost:8000/api/reservations/${reservationData.id}`, reservationData);
         this.fetchReservations();
         this.showEditModalVisible = false;
