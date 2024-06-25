@@ -71,5 +71,5 @@ export default {
   },
 
   // Set the target to 'server'
-  target: 'server',
+  // target: 'server',
 }
