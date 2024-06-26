@@ -24,7 +24,7 @@
               <div class="row">
                 <label for="reservation-time" class="form-label text-lg col-12">Choose Slot:</label>
                 <div class="col-6">
-                  <input type="date" id="reservation-date" v-model="newReservation.date" class="form-control text-lg rounded-lg rounded" @change="fetchAvailableSlots">
+                  <input type="date" id="reservation-date" v-model="newReservation.date" :min="today" class="form-control text-lg rounded-lg rounded" @change="fetchAvailableSlots">
                 </div>
                 <div class="col-6">
                   <div class="d-flex gap-2">
@@ -69,6 +69,7 @@
 import Navbar from '../components/Navbar.vue';
 import Footer from '../components/Footer.vue';
 import axios from 'axios';
+import moment from 'moment';
 
 export default {
   components: {
@@ -89,6 +90,11 @@ export default {
       errorMessage: '',
       showConfirmationModal: false
     };
+  },
+  computed: {
+    today() {
+      return moment().format('YYYY-MM-DD');
+    }
   },
   methods: {
     async fetchAvailableSlots() {
