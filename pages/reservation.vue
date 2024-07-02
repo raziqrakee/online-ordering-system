@@ -12,6 +12,10 @@
               <label for="fullname" class="form-label text-lg">Fullname:</label>
               <input type="text" id="fullname" v-model="newReservation.customer" placeholder="Fullname" class="form-control text-lg rounded w-100">
             </div>
+            <div class="col-12 mt-2">
+              <label for="email" class="form-label text-lg">Email:</label>
+              <input type="email" id="email" v-model="newReservation.email" placeholder="Email" class="form-control text-lg rounded w-100">
+            </div>
             <div class="col-6 mt-2">
               <label for="pax" class="form-label text-lg">Number of Pax:</label>
               <input type="number" id="pax" v-model="newReservation.pax" placeholder="Number of Pax" class="form-control text-lg rounded w-100">
@@ -54,7 +58,7 @@
             <h5 class="modal-title">Reservation Confirmed</h5>
           </div>
           <div class="modal-body">
-            <p>Your reservation has been successfully made. </br>Please refer to your account notification on our website to track your reservation status.</p>
+            <p>Your reservation has been successfully made. </br>Please refer to your email to track your reservation status.</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" @click="showConfirmationModal = false">Close</button>
@@ -84,6 +88,7 @@ export default {
         time_slot: '',
         pax: '',
         phone: '',
+        email: '',
         status: 'Pending'
       },
       availableSlots: [],
@@ -116,6 +121,7 @@ export default {
           time_slot: '',
           pax: '',
           phone: '',
+          email: '',
           status: 'Pending'
         };
       } catch (error) {
@@ -125,6 +131,11 @@ export default {
   }
 };
 </script>
+
+<style>
+/* styles as provided */
+</style>
+
 
 <style>
 .menu {

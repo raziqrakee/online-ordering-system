@@ -149,7 +149,7 @@ export default {
       } else {
         this.filteredSalesReports = this.salesReports;
       }
-      this.currentPage = 1; // Reset to the first page
+      this.currentPage = 1; 
     }
   },
 };

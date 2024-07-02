@@ -82,6 +82,9 @@
         <el-form-item label="Customer Name">
           <el-input v-model="newReservation.customer"></el-input>
         </el-form-item>
+        <el-form-item label="Email">
+          <el-input v-model="newReservation.email"></el-input>
+        </el-form-item>
         <el-form-item label="Date">
           <el-date-picker v-model="newReservation.date" type="date" :picker-options="datePickerOptions" @change="fetchAvailableSlots('new')"></el-date-picker>
         </el-form-item>
@@ -113,6 +116,9 @@
       <el-form :model="editedReservation">
         <el-form-item label="Customer Name">
           <el-input v-model="editedReservation.customer"></el-input>
+        </el-form-item>
+        <el-form-item label="Email">
+          <el-input v-model="editedReservation.email"></el-input>
         </el-form-item>
         <el-form-item label="Date">
           <el-date-picker v-model="editedReservation.date" type="date" :picker-options="datePickerOptions" @change="fetchAvailableSlots('edit')"></el-date-picker>
@@ -164,6 +170,7 @@ export default {
         time_slot: '',
         pax: '',
         phone: '',
+        email: '',
         status: 'Pending'
       },
       editedReservation: {
@@ -173,6 +180,7 @@ export default {
         time_slot: '',
         pax: '',
         phone: '',
+        email: '',
         status: ''
       },
       reservations: [],
