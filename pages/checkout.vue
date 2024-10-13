@@ -9,8 +9,11 @@
             <hr>
             <div class="mb-3">
               <input type="text" v-model="form.fullname" id="name" placeholder="Fullname" class="form-control mb-2">
+              <div v-if="errors.fullname" class="text-danger">{{ errors.fullname }}</div>
               <input type="text" v-model="form.email" id="email" placeholder="Email" class="form-control mb-2">
+              <div v-if="errors.email" class="text-danger">{{ errors.email }}</div>
               <input type="tel" v-model="form.phone" id="contact_number" placeholder="Phone Number" class="form-control mb-2">
+              <div v-if="errors.phone" class="text-danger">{{ errors.phone }}</div>
             </div>
             <h4 class="text-2xl fw-normal mb-2">Order Options</h4>
             <div id="order-options" class="row d-flex mb-3">
@@ -21,6 +24,7 @@
                 <button :class="{'btn-order-option-selected': selectedOrderOption === 'takeaway'}" class="btn btn-order-option btn-block" @click="selectOrderOption('takeaway')">Takeaway</button>
               </div>
             </div>
+            <div v-if="errors.order_type" class="text-danger">{{ errors.order_type }}</div>
           </div>
           <div class="col-md-4 col-sm-6 p-4">
             <h3 class="text-2xl fw-bold mb-2">Order Summary</h3>
@@ -49,6 +53,9 @@
               <div class="list-group-item">
                 <button class="btn btn-primary w-100 btn-block" @click="placeOrder">Place Order</button>
               </div>
+            <div class="list-group-item">
+              <button class="btn btn-secondary w-100 btn-block" @click="cancelOrder">Cancel</button>
+            </div>
             </ul>
           </div>
           <hr>
@@ -69,8 +76,10 @@
                 <label class="form-check-label" for="direct_bank_transfer">Direct Bank Transfer</label>
               </div>
               <p class="sub-text">Make payment directly through QR scan</p>
-              <button class="btn btn-secondary btn-block" @click="openModal">Scan QR</button>
+              <button v-if="form.payment_method === 'direct_bank_transfer'" class="btn btn-secondary btn-block" @click="openModal">Scan QR</button>
+              <div v-if="errors.receipt" class="text-danger">{{ errors.receipt }}</div>
             </div>
+            <div v-if="errors.payment_method" class="text-danger">{{ errors.payment_method }}</div>
           </div>
         </div>
       </div>
@@ -114,6 +123,7 @@ export default {
         order_type: '',
         special_instructions: localStorage.getItem('specialInstructions') || '', // Load special instructions from localStorage
       },
+      errors: {},
       cart: [],
       receipt: null,
     };
@@ -125,6 +135,9 @@ export default {
   methods: {
     loadCart() {
       this.cart = JSON.parse(localStorage.getItem('cart')) || [];
+    },
+    cancelOrder() {
+      this.$router.push('/');
     },
     async getProfile() {
       try {
@@ -160,7 +173,33 @@ export default {
     calculateTotal() {
       return (parseFloat(this.calculateSubtotal()) + parseFloat(this.calculateTax())).toFixed(2);
     },
+    validateForm() {
+      this.errors = {};
+      if (!this.form.fullname) {
+        this.errors.fullname = 'Fullname is required';
+      }
+      if (!this.form.email) {
+        this.errors.email = 'Email is required';
+      }
+      if (!this.form.phone) {
+        this.errors.phone = 'Phone number is required';
+      }
+      if (!this.form.order_type) {
+        this.errors.order_type = 'Order type is required';
+      }
+      if (!this.form.payment_method) {
+        this.errors.payment_method = 'Payment method is required';
+      }
+      if (this.form.payment_method === 'direct_bank_transfer' && !this.receipt) {
+        this.errors.receipt = 'Receipt is required for direct bank transfer';
+      }
+      return Object.keys(this.errors).length === 0;
+    },
     async placeOrder() {
+      if (!this.validateForm()) {
+        return;
+      }
+
       const token = this.$cookies.get('token');
       const formData = new FormData();
 
@@ -190,9 +229,17 @@ export default {
 
         if (response && response.data && response.status === 201) {
           console.log('Order placed successfully');
-          localStorage.removeItem('cart');
-          localStorage.removeItem('specialInstructions');
-          this.$router.push(`/order-status/${response.data.id}`); // Ensure you use the ID from the response
+          this.$notify({
+            title: 'Success',
+            message: 'Order placed successfully',
+            type: 'success',
+          });
+          setTimeout(() => {
+            localStorage.removeItem('cart');
+            localStorage.removeItem('specialInstructions');
+            localStorage.setItem('lastOrderId', response.data.id); 
+            this.$router.push(`/order-status/${response.data.id}`);
+          }, 2000); // 2 seconds delay
         } else {
           console.error('Invalid response structure:', response);
         }
@@ -220,6 +267,7 @@ export default {
   },
 }
 </script>
+
 
 <style>
 .menu {

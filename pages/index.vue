@@ -112,12 +112,12 @@
             <div class="card-body">
               <h3 class="text-2xl fw-bold">Are you interested in catering services?</h3>
               <p class="card-text mb-4">Fill this form and we will contact you next 48 hours.</p>
-              <el-form ref="form" :model="form" label-position="top">
+              <el-form ref="form" :model="form" label-position="top" :rules="rules">
                 <div class="d-flex">
-                  <el-form-item style="width: 50%; margin-right: 10px;" name="name" label="Your Name" prop="name" :rules="[{ required: true, message: 'Please enter your name' }]">
+                  <el-form-item style="width: 50%; margin-right: 10px;" name="name" label="Your Name" prop="name">
                     <el-input v-model="form.name"></el-input>
                   </el-form-item>
-                  <el-form-item style="width: 50%; margin-left: 10px;" name="email" label="Your e-mail" prop="email" :rules="[{ required: true, message: 'Please enter your email', type: 'email' }]">
+                  <el-form-item style="width: 50%; margin-left: 10px;" name="email" label="Your e-mail" prop="email">
                     <el-input v-model="form.email"></el-input>
                   </el-form-item>
                 </div>
@@ -142,6 +142,7 @@
 import Navbar from '../components/Navbar.vue';
 import Footer from '../components/Footer.vue';
 import { EventBus } from '~/plugins/event-bus';
+import axios from 'axios';
 
 export default {
   components: {
@@ -154,6 +155,18 @@ export default {
         name: '',
         email: '',
         message: ''
+      },
+      rules: {
+        name: [
+          { required: true, message: 'Please enter your name', trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: 'Please enter your email', trigger: 'blur' },
+          { type: 'email', message: 'Please enter a valid email address', trigger: 'blur' }
+        ],
+        message: [
+          { required: true, message: 'Please enter your message', trigger: 'blur' }
+        ]
       },
       activeIndex: 'all',
       selectedFilter: '',

@@ -52,11 +52,16 @@
 import { EventBus } from '~/plugins/event-bus';
 
 export default {
+  data() {
+    return {
+      status: '',
+    };
+  },
   async asyncData({ params, $axios, $cookies }) {
     const orderId = params.id;
     if (!orderId) {
       console.error('Order ID is not provided');
-      return;
+      return { status: '' };
     }
 
     try {
@@ -70,6 +75,16 @@ export default {
     } catch (error) {
       console.error('Error fetching order status:', error);
       return { status: '' };
+    }
+  },
+  beforeMount() {
+    if (!this.$route.params.id) {
+      const orderId = localStorage.getItem('lastOrderId');
+      if (orderId) {
+        this.$router.push(`/order-status/${orderId}`);
+      } else {
+        console.error('Order ID is not available');
+      }
     }
   },
   mounted() {

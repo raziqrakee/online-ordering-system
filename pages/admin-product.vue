@@ -38,11 +38,10 @@
               </div>
             </div>
             <div class="col-12 bg-white p-4 gap-4 mt-4 rounded-xl">
-              <table class="table"  v-loading="loading">
+              <table class="table" v-loading="loading">
                 <thead class="bg-gray-100 text-center rounded-xl">
                   <tr>
-                    <th scope="col" class="px-6 m-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    </th>
+                    <th scope="col" class="px-6 m-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                     <th scope="col" class="px-6 m-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Title
                     </th>
@@ -73,8 +72,8 @@
                   <tr class="border-b-gray-50" v-for="product in paginatedProducts" :key="product.id">
                     <td>
                       <div class="flex-shrink-0 h-10 w-10">
-                          <img :src="product.image_url" alt="Product Icon" class="product-list-img">
-                        </div>
+                        <img :src="product.image_url" alt="Product Icon" class="product-list-img">
+                      </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="flex items-center">
@@ -124,9 +123,9 @@
     </div>
 
     <el-dialog :visible.sync="showEditModalVisible" title="Edit Product">
-      <el-form :model="editProduct">
+      <el-form :model="editProduct" :rules="rules" ref="editProductForm">
         <div class="d-flex row">
-          <el-form-item label="Product Name" class="col-md-7 col-sm-6">
+          <el-form-item label="Product Name" prop="name" class="col-md-7 col-sm-6">
             <el-input v-model="editProduct.name"></el-input>
           </el-form-item>
           <el-form-item label="ID" class="col-md-5 col-sm-6">
@@ -137,13 +136,13 @@
           <el-input v-model="editProduct.description"></el-input>
         </el-form-item>
         <div class="d-flex row">
-          <el-form-item label="Price (RM)" class="col-md-5 col-sm-6">
-            <el-input v-model="editProduct.price"></el-input>
+          <el-form-item label="Price (RM)" prop="price" class="col-md-5 col-sm-6">
+            <el-input v-model.number="editProduct.price" type="number" step="0.01"></el-input>
           </el-form-item>
-          <el-form-item label="Stock Quantity" class="col-md-3 col-sm-6">
-            <el-input v-model="editProduct.quantity"></el-input>
+          <el-form-item label="Stock Quantity" prop="quantity" class="col-md-3 col-sm-6">
+            <el-input v-model.number="editProduct.quantity" type="number"></el-input>
           </el-form-item>
-          <el-form-item label="Category" class="col-md-4 col-sm-6">
+          <el-form-item label="Category" prop="category" class="col-md-4 col-sm-6">
             <el-select v-model="editProduct.category" filterable placeholder="Select">
               <el-option
                 v-for="item in categories"
@@ -184,7 +183,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer d-flex justify-content-center">
         <el-button class="btn btn-w btn-secondary" @click="showEditModalVisible = false">Cancel</el-button>
-        <el-button class="btn btn-w btn-primary" type="primary" @click="updateEditProduct">Update</el-button>
+        <el-button class="btn btn-w btn-primary" type="primary" @click="validateAndUpdateProduct">Update</el-button>
       </span>
     </el-dialog>
 
@@ -197,9 +196,9 @@
     </el-dialog>
 
     <el-dialog :visible.sync="showAddModalVisible" class="fw-bolder" title="Add Product">
-      <el-form :model="newProduct" ref="newProductForm">
+      <el-form :model="newProduct" ref="newProductForm" :rules="rules">
         <div class="d-flex row">
-          <el-form-item label="Product Name" class="col-md-7 col-sm-6">
+          <el-form-item label="Product Name" prop="name" class="col-md-7 col-sm-6">
             <el-input v-model="newProduct.name"></el-input>
           </el-form-item>
           <el-form-item label="ID" class="col-md-5 col-sm-6">
@@ -210,13 +209,13 @@
           <el-input v-model="newProduct.description"></el-input>
         </el-form-item>
         <div class="d-flex row">
-          <el-form-item label="Price (RM)" class="col-md-5 col-sm-6">
-            <el-input v-model="newProduct.price"></el-input>
+          <el-form-item label="Price (RM)" prop="price" class="col-md-5 col-sm-6">
+            <el-input v-model.number="newProduct.price" type="number" step="0.01"></el-input>
           </el-form-item>
-          <el-form-item label="Stock Quantity" class="col-md-3 col-sm-6">
-            <el-input v-model="newProduct.quantity"></el-input>
+          <el-form-item label="Stock Quantity" prop="quantity" class="col-md-3 col-sm-6">
+            <el-input v-model.number="newProduct.quantity" type="number"></el-input>
           </el-form-item>
-          <el-form-item label="Category" class="col-md-4 col-sm-6">
+          <el-form-item label="Category" prop="category" class="col-md-4 col-sm-6">
             <el-select v-model="newProduct.category" filterable placeholder="Select">
               <el-option
                 v-for="item in categories"
@@ -233,7 +232,7 @@
               :src="newProduct.image"
               style="width: auto; height: 200px; object-fit: cover;"
             ></el-image>
-            <el-button @click="removeNewImage('new')" type="danger" class="btn-w" style="width: auto; height: 45px;">Remove</el-button>
+            <el-button @click="removeNewImage()" type="danger" class="btn-w" style="width: auto; height: 45px;">Remove</el-button>
           </div>
           <div v-else>
             <el-upload
@@ -257,7 +256,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer d-flex gap-4 justify-content-center">
         <el-button class="btn btn-w btn-secondary" @click="discardNewProduct()">Discard</el-button>
-        <el-button class="btn btn-w btn-primary" type="primary" @click="insertNewProduct()">Save</el-button>
+        <el-button class="btn btn-w btn-primary" type="primary" @click="validateAndInsertProduct">Save</el-button>
       </span>
     </el-dialog>
   </div>
@@ -285,7 +284,7 @@ export default {
       filterByField: '',
       filteredProducts: [],
       sortedProducts: [],
-      searchQuery: '', // Added for search functionality
+      searchQuery: '',
       editProduct: {
         name: '',
         id: '',
@@ -311,7 +310,23 @@ export default {
         { value: 'Beverages', label: 'Beverages' },
         { value: 'Desserts', label: 'Desserts' }
       ],
-      loading: true
+      loading: true,
+      rules: {
+        name: [
+          { required: true, message: 'Please input the product name', trigger: 'blur' }
+        ],
+        price: [
+          { required: true, message: 'Please input the product price', trigger: 'blur' },
+          { type: 'number', transform(value) { return parseFloat(value); }, message: 'Price must be a number', trigger: 'blur' }
+        ],
+        quantity: [
+          { required: true, message: 'Please input the stock quantity', trigger: 'blur' },
+          { type: 'number', transform(value) { return parseInt(value); }, message: 'Quantity must be a number', trigger: 'blur' }
+        ],
+        category: [
+          { required: true, message: 'Please select the product category', trigger: 'change' }
+        ]
+      }
     };
   },
   computed: {
@@ -381,11 +396,11 @@ export default {
             this.products = response.data.products;
             this.filteredProducts = [...this.products]; // Initialize filteredProducts with all products
           }
-          this.loading = false
+          this.loading = false;
         })
         .catch(error => {
           console.error('Error fetching products:', error);
-          this.loading = false
+          this.loading = false;
         });
     },
     showEditModal(product) {
@@ -397,57 +412,14 @@ export default {
       this.fileList = fileList;
       this.editProduct.image = URL.createObjectURL(file.raw);
     },
-    updateProduct() {
-      axios.put(`http://localhost:8000/api/products/${this.editProduct.id}/edit`, this.editProduct)
-        .then(response => {
-          if (response.data.status === 200) {
-            this.fetchProducts();
-            this.showEditModalVisible = false;
-          }
-        })
-        .catch(error => {
-          console.error('Error updating product:', error);
-        });
-    },
-    showDeleteModal(productId) {
-      this.deleteProductId = productId;
-      this.showDeleteModalVisible = true;
-    },
-    deleteProduct() {
-      axios.delete(`http://localhost:8000/api/products/${this.deleteProductId}/delete`)
-        .then(response => {
-          if (response.data.status === 200) {
-            this.fetchProducts();
-            this.showDeleteModalVisible = false;
-          }
-        })
-        .catch(error => {
-          console.error('Error deleting product:', error);
-        });
-    },
-    handleNewUploadImage(file, fileList) {
-      this.fileList = fileList;
-      this.newProduct.image = URL.createObjectURL(file.raw);
-    },
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-    },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
-    },
-    async saveNewProduct() {
-      await axios.post('http://localhost:8000/api/products', this.newProduct)
-        .then(response => {
-          if (response.data.status === 200) {
-            this.fetchProducts();
-            this.clearNewProductForm();
-            this.showAddModalVisible = false;
-          }
-        })
-        .catch(error => {
-          console.error('Error adding new product:', error);
-        });
+    validateAndUpdateProduct() {
+      this.$refs.editProductForm.validate(valid => {
+        if (valid) {
+          this.updateEditProduct();
+        } else {
+          Message.error('Please fill in the required fields');
+        }
+      });
     },
     async updateEditProduct() {
       try {
@@ -462,37 +434,63 @@ export default {
           formData.append('image', file, file.name);
         }
 
-        let response;
-
-        if (this.editProduct.id) {
-          response = await axios.post(`http://localhost:8000/api/product/${this.editProduct.id}`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
-        }
+        const response = await axios.post(`http://localhost:8000/api/product/${this.editProduct.id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
 
         if (response.data.status === 200) {
           this.fetchProducts();
-          this.clearNewProductForm();
-          this.showAddModalVisible = false;
-          this.editProduct.id = null;
-
-          Message.success('Product Updated Successfully');
-
-          setTimeout(() => {
-            this.showEditModalVisible = false;
-          }, 1000);
+          this.showEditModalVisible = false;
+          Message.success('Product updated successfully');
         } else {
-          console.error('Error with product operation:', response.data);
-          Message.error('Error updating product. Please try again.');
+          Message.error('Failed to update product');
         }
       } catch (error) {
-        console.error('Error with product operation:', error);
+        console.error('Error updating product:', error);
         Message.error('Error updating product. Please try again.');
       }
     },
-
+    showDeleteModal(productId) {
+      this.deleteProductId = productId;
+      this.showDeleteModalVisible = true;
+    },
+    async deleteProduct() {
+      try {
+        const response = await axios.delete(`http://localhost:8000/api/products/${this.deleteProductId}/delete`);
+        if (response.data.status === 200) {
+          this.fetchProducts();
+          this.showDeleteModalVisible = false;
+          Message.success('Product deleted successfully');
+        } else {
+          Message.error('Failed to delete product');
+        }
+      } catch (error) {
+        console.error('Error deleting product:', error);
+        Message.error('Error deleting product. Please try again.');
+      }
+    },
+    handleNewUploadImage(file, fileList) {
+      this.fileList = fileList;
+      this.newProduct.image = URL.createObjectURL(file.raw);
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    validateAndInsertProduct() {
+      this.$refs.newProductForm.validate(valid => {
+        if (valid) {
+          this.insertNewProduct();
+        } else {
+          Message.error('Please fill in the required fields');
+        }
+      });
+    },
     async insertNewProduct() {
       try {
         const formData = new FormData();
@@ -516,13 +514,13 @@ export default {
           this.fetchProducts();
           this.clearNewProductForm();
           this.showAddModalVisible = false;
+          Message.success('Product added successfully');
         } else {
-          console.error('Error adding new product:', response.data);
+          Message.error('Failed to add product');
         }
-
-        window.location.reload();
       } catch (error) {
         console.error('Error adding new product:', error);
+        Message.error('Error adding product. Please try again.');
       }
     },
     discardNewProduct() {
@@ -539,23 +537,19 @@ export default {
         category: '',
         image: null,
       };
+      this.fileList = [];
     },
     removeEditImage() {
       const product = { ...this.editProduct };
       product.image = null;
       product.image_url = null;
-      this.editProduct = {};
       this.editProduct = product;
-      console.log(this.editProduct);
     },
-
     removeNewImage() {
       const product = { ...this.newProduct };
       product.image = null;
       product.image_url = null;
-      this.newProduct = {};
       this.newProduct = product;
-      console.log(this.newProduct);
     },
   }
 };
