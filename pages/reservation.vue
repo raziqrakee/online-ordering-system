@@ -9,6 +9,21 @@
           </div>
           <div class="d-flex row mt-4">
             <div class="col-12 mt-2">
+              <div class="row">
+                <label for="reservation-time" class="form-label text-lg col-12">Choose Slot:</label>
+                <div class="col-6">
+                  <input type="date" id="reservation-date" v-model="newReservation.date" :min="today" class="form-control text-lg rounded-lg rounded" @change="fetchAvailableSlots">
+                </div>
+                <div class="col-6">
+                  <div class="d-flex gap-2">
+                    <select v-model="newReservation.time_slot" class="form-control text-lg rounded">
+                      <option v-for="slot in availableSlots" :key="slot" :value="slot">{{ slot }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 mt-2">
               <label for="fullname" class="form-label text-lg">Fullname:</label>
               <input type="text" id="fullname" v-model="newReservation.customer" placeholder="Fullname" class="form-control text-lg rounded w-100">
             </div>
@@ -24,24 +39,9 @@
               <label for="phone" class="form-label text-lg">Phone Number:</label>
               <input type="tel" id="phone" v-model="newReservation.phone" placeholder="Phone Number" class="form-control text-lg rounded w-100">
             </div>
-            <div class="col-12 mt-2">
-              <div class="row">
-                <label for="reservation-time" class="form-label text-lg col-12">Choose Slot:</label>
-                <div class="col-6">
-                  <input type="date" id="reservation-date" v-model="newReservation.date" :min="today" class="form-control text-lg rounded-lg rounded" @change="fetchAvailableSlots">
-                </div>
-                <div class="col-6">
-                  <div class="d-flex gap-2">
-                    <select v-model="newReservation.time_slot" class="form-control text-lg rounded">
-                      <option v-for="slot in availableSlots" :key="slot" :value="slot">{{ slot }}</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
             <div class="d-flex gap-4 justify-start mt-5">
-              <button class="btn btn-outline-secondary w-25 rounded-pill">Cancel</button>
-              <button class="btn btn-primary w-25 rounded-pill" @click="bookReservation">Book</button>
+              <button class="btn btn-outline-secondary w-25 rounded-pill" @click="cancelReservation">Cancel</button>
+              <button class="btn btn-primary w-25 rounded-pill" @click="validateAndBookReservation">Book</button>
             </div>
             <div v-if="errorMessage" class="alert alert-danger mt-4">{{ errorMessage }}</div>
           </div>
@@ -110,8 +110,39 @@ export default {
         this.errorMessage = error.response?.data?.error || 'Failed to fetch available slots';
       }
     },
-    async bookReservation() {
+    validateAndBookReservation() {
       this.errorMessage = '';
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const phonePattern = /^[0-9]{9,11}$/;
+
+      if (!this.newReservation.customer) {
+        this.errorMessage = 'Customer name is required';
+        return;
+      }
+      if (!emailPattern.test(this.newReservation.email)) {
+        this.errorMessage = 'Valid email is required';
+        return;
+      }
+      if (!this.newReservation.date) {
+        this.errorMessage = 'Date is required';
+        return;
+      }
+      if (!this.newReservation.time_slot) {
+        this.errorMessage = 'Time slot is required';
+        return;
+      }
+      if (this.newReservation.pax < 1 || this.newReservation.pax > 6) {
+        this.errorMessage = 'Number of pax must be between 1 and 6';
+        return;
+      }
+      if (!phonePattern.test(this.newReservation.phone)) {
+        this.errorMessage = 'Phone number must be 9-11 digits';
+        return;
+      }
+
+      this.bookReservation();
+    },
+    async bookReservation() {
       try {
         await axios.post('http://localhost:8000/api/reservations', this.newReservation);
         this.showConfirmationModal = true;
@@ -127,6 +158,9 @@ export default {
       } catch (error) {
         this.errorMessage = error.response?.data?.error || 'Failed to save reservation';
       }
+    },
+    cancelReservation() {
+      this.$router.push('/');
     }
   }
 };
@@ -134,10 +168,6 @@ export default {
 
 <style>
 /* styles as provided */
-</style>
-
-
-<style>
 .menu {
   border-bottom: 1px solid #e6e6e6;
 }

@@ -86,11 +86,11 @@
     </div>
 
     <el-dialog :visible.sync="showAddModalVisible" title="Add Order">
-      <el-form :model="newOrder">
-        <el-form-item label="User ID" v-if="!newOrder.user_id">
+      <el-form :model="newOrder" :rules="rules" ref="newOrderForm">
+        <el-form-item label="User ID" v-if="!newOrder.user_id" prop="user_id">
           <el-input v-model="newOrder.user_id" placeholder="Enter User ID"></el-input>
         </el-form-item>
-        <el-form-item label="Type">
+        <el-form-item label="Type" prop="order_type">
           <el-select v-model="newOrder.order_type" placeholder="Select order type">
             <el-option label="Dine-In" value="dine-in"></el-option>
             <el-option label="Takeaway" value="takeaway"></el-option>
@@ -98,11 +98,13 @@
         </el-form-item>
         <el-form-item label="Order Details">
           <div v-for="(item, index) in newOrder.items" :key="index" class="product-selection w-100">
-            <el-select v-model="item.product_id" placeholder="Select product" @change="updateSelectedProduct(index)">
-              <el-option v-for="product in products" :key="product.id" :label="product.name" :value="product.id">
-                {{ product.name }} - RM{{ product.price }}
-              </el-option>
-            </el-select>
+            <el-form-item prop="items" :rules="[{ type: 'array', required: true, message: 'Please add at least one item', trigger: 'blur' }]">
+              <el-select v-model="item.product_id" placeholder="Select product" @change="updateSelectedProduct(index)">
+                <el-option v-for="product in products" :key="product.id" :label="product.name" :value="product.id">
+                  {{ product.name }} - RM{{ product.price }}
+                </el-option>
+              </el-select>
+            </el-form-item>
             <div class="quantity-selector">
               <el-button @click="decrementQuantity(index)">-</el-button>
               <el-input class="text-center" v-model="item.quantity" min="1" @change="updateTotalAmount"></el-input>
@@ -112,13 +114,13 @@
           </div>
           <el-button type="primary" @click="addProduct">Add Product</el-button>
         </el-form-item>
-        <el-form-item label="Total Amount (RM)">
+        <el-form-item label="Total Amount (RM)" prop="total_amount">
           <el-input v-model="newOrder.total_amount" :disabled="true"></el-input>
         </el-form-item>
         <el-form-item label="Special Instructions">
           <el-input type="textarea" v-model="newOrder.special_instructions"></el-input>
         </el-form-item>
-        <el-form-item label="Payment Method">
+        <el-form-item label="Payment Method" prop="payment_method">
           <el-select v-model="newOrder.payment_method" placeholder="Select payment method">
             <el-option label="Cash" value="cash"></el-option>
             <el-option label="Direct Bank Transfer" value="direct_bank_transfer"></el-option>
@@ -127,7 +129,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="showAddModalVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="insertNewOrder">Save</el-button>
+        <el-button type="primary" @click="validateAndInsertNewOrder">Save</el-button>
       </span>
     </el-dialog>
 
@@ -166,6 +168,7 @@
 import axios from 'axios';
 import Sidebar from '../components/Sidebar.vue';
 import { EventBus } from '~/plugins/event-bus';
+import { Message } from 'element-ui';
 
 export default {
   components: {
@@ -207,6 +210,23 @@ export default {
       },
       selectedStatus: 'All',
       orders: [],
+      rules: {
+        user_id: [
+          { required: true, message: 'Please input the user ID', trigger: 'blur' }
+        ],
+        order_type: [
+          { required: true, message: 'Please select the order type', trigger: 'change' }
+        ],
+        items: [
+          { type: 'array', required: true, message: 'Please add at least one item', trigger: 'change' }
+        ],
+        total_amount: [
+          { required: true, message: 'Please input the total amount', trigger: 'blur' }
+        ],
+        payment_method: [
+          { required: true, message: 'Please select the payment method', trigger: 'change' }
+        ]
+      }
     };
   },
   computed: {
@@ -356,6 +376,15 @@ export default {
       };
       this.showAddModalVisible = true;
     },
+    validateAndInsertNewOrder() {
+      this.$refs.newOrderForm.validate(valid => {
+        if (valid) {
+          this.insertNewOrder();
+        } else {
+          Message.error('Please fill in the required fields');
+        }
+      });
+    },
     async insertNewOrder() {
       try {
         const token = this.$cookies.get('token');
@@ -383,10 +412,11 @@ export default {
           payment_method: '',
           order_status: 'Pending',
         };
-
+        Message.success('Order added successfully');
         EventBus.$emit('order-updated', { id: response.data.id, status: response.data.customer_order_status });
       } catch (error) {
         console.error('Error adding new order:', error);
+        Message.error('Error adding order. Please try again.');
       }
     },
     async acceptOrder(order) {
@@ -426,8 +456,10 @@ export default {
         order.customer_order_status = response.data.customer_order_status;
 
         EventBus.$emit('order-updated', { id: order.id, status: order.customer_order_status });
+        Message.success('Order status updated successfully');
       } catch (error) {
         console.error('Error updating order status:', error);
+        Message.error('Error updating order status. Please try again.');
       }
     },
     async updateOrderStatus(order) {
@@ -445,8 +477,10 @@ export default {
         order.customer_order_status = response.data.customer_order_status;
 
         EventBus.$emit('order-updated', { id: order.id, status: order.customer_order_status });
+        Message.success('Order status updated successfully');
       } catch (error) {
         console.error('Error updating order status:', error);
+        Message.error('Error updating order status. Please try again.');
       }
     },
     searchOrders() {

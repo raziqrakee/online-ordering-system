@@ -23,7 +23,11 @@
         </div>
 
         <div class="row">
+          <div v-if="filteredItems.length === 0" class="text-center w-100">
+            <p class="text-xl fw-bold">No results were found</p>
+          </div>
           <div
+            v-else
             v-for="item in filteredItems"
             :key="item.id"
             class="col-md-3 mb-5"
@@ -45,7 +49,7 @@
           </div>
         </div>
 
-        <div class="text-center mt-4">
+        <div v-if="filteredItems.length > 0" class="text-center mt-4">
           <button class="btn btn-secondary-custom" @click="loadMore">Load more...</button>
         </div>
       </div>
@@ -141,7 +145,6 @@ export default {
   },
 }
 </script>
-
 
 <style>
 .menu-custom {

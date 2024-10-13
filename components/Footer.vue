@@ -37,16 +37,19 @@
       <div class="col-md-1 col-sm-6 d-flex mb-5 text-white">
         <div class="d-flex row flex-wrap justify-content-center">
           <div class="d-flex justify-content-center">
-            <img src="~/static/icon/fb.png" alt="Facebook" class="social-list-img">
+            <a href="https://m.facebook.com/Danishicecreamkeningau/" target="_blank">
+              <img src="~/static/icon/fb.png" alt="Facebook" class="social-list-img">
+            </a>
           </div>
           <div class="d-flex justify-content-center">
-            <img src="~/static/icon/ig.png" alt="Instagram" class="social-list-img">
+            <a href="https://www.instagram.com/danishicecream_/" target="_blank">
+              <img src="~/static/icon/ig.png" alt="Instagram" class="social-list-img">
+            </a>
           </div>
           <div class="d-flex justify-content-center">
-            <img src="~/static/icon/tiktok.png" alt="Tiktok" class="social-list-img">
-          </div>
-          <div class="d-flex justify-content-center">
-            <img src="~/static/icon/whatsapp.png" alt="Whatsapp" class="social-list-img">
+            <a href="http://wasap.my/+601118960067" target="_blank">
+              <img src="~/static/icon/whatsapp.png" alt="Whatsapp" class="social-list-img">
+            </a>
           </div>
         </div>
       </div>

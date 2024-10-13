@@ -6,7 +6,7 @@
       </el-menu-item>
     </div>
     <div class="d-flex">
-      <el-menu-item index="home" style="color: #fff;">
+      <el-menu-item index="home" style="color: #fff;" @click="goHome">
         <nuxt-link to="/" style="text-decoration: none; color: #fff;">Home</nuxt-link>
       </el-menu-item>
       <el-menu-item index="news" class="d-flex align-items-center" style="color: #fff;" @click="handleSelect('news')">News</el-menu-item>
@@ -70,8 +70,27 @@ export default {
         this.$router.push({ path: '/', hash: '#contact-section' });
       }
     },
+    async goHome() {
+      try {
+        const response = await this.$axios.get('/api/orders/latest', {
+          headers: {
+            Authorization: `Bearer ${this.$cookies.get('token')}`,
+          },
+        });
+        if (response.status === 200 && response.data.order_id) {
+          this.$router.push(`/order-status/${response.data.order_id}`);
+        } else {
+          this.$router.push('/');
+        }
+      } catch (error) {
+        console.error('Error fetching latest order:', error);
+        this.$router.push('/');
+      }
+    },
     logout() {
       this.$cookies.remove("token");
+      this.$cookies.remove("id");
+      localStorage.removeItem('cart');
       window.location.href = "/login";
     },
     updateCartCount() {
